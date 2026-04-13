@@ -117,20 +117,9 @@ Headless component library providing accessible, unstyled React primitives for b
 
 | Utility | URL |
 | --- | --- |
-| Client Only | https://ark-ui.com/react/docs/utilities/client-only |
-| Download Trigger | https://ark-ui.com/react/docs/utilities/download-trigger |
-| Environment | https://ark-ui.com/react/docs/utilities/environment |
-| Focus Trap | https://ark-ui.com/react/docs/utilities/focus-trap |
-| Format Byte | https://ark-ui.com/react/docs/utilities/format-byte |
-| Format Number | https://ark-ui.com/react/docs/utilities/format-number |
-| Format Relative Time | https://ark-ui.com/react/docs/utilities/format-relative-time |
-| Frame | https://ark-ui.com/react/docs/utilities/frame |
-| Highlight | https://ark-ui.com/react/docs/utilities/highlight |
-| JSON Tree View | https://ark-ui.com/react/docs/utilities/json-tree-view |
-| Locale | https://ark-ui.com/react/docs/utilities/locale |
-| Presence | https://ark-ui.com/react/docs/utilities/presence |
+
+<!-- Content truncated to meet Windsurf 6KB limit -->
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/hashintel)
-> This is a context snippet only. You'll also want the standalone SKILL.md file — [download at TomeVault](https://tomevault.io/claim/hashintel)
-<!-- tomevault:4.0:windsurf_rules:2026-04-09 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/hashintel) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:windsurf_rules:2026-04-13 -->
