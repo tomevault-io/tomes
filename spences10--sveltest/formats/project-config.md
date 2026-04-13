@@ -205,72 +205,9 @@ page.getByRole('link', { name: 'Submit' }); // <a role="button">Submit</a>
 // ✅ CORRECT: Use the actual role
 page.getByRole('button', { name: 'Submit' });
 
-// ❌ WRONG: Input role doesn't exist
-page.getByRole('input', { name: 'Email' });
 
-// ✅ CORRECT: Use textbox for input elements
-page.getByRole('textbox', { name: 'Email' });
-```
-
-## Quick Reference
-
-### ✅ DO:
-
-- Use locators (`page.getBy*()`) - never containers
-- Always await locator assertions: `await expect.element()`
-- Use `.first()`, `.nth()`, `.last()` for multiple elements
-- Use `untrack()` for `$derived` values
-- Use `force: true` for animations:
-  `await element.click({ force: true })`
-- Test form validation lifecycle: initial (valid) → validate → fix
-- Use smoke tests for complex reactive components
-- Test CSS classes that control appearance (`text-success`, `h-4 w-4`)
-- Test semantic HTML structure and user experience
-- Use real FormData/Request objects in server tests
-
-### ❌ DON'T:
-
-- Never click SvelteKit form submits - test state directly
-- Don't ignore strict mode violations - use `.first()` instead
-- Don't expect forms to be invalid initially
-- Don't assume element roles - verify with browser dev tools
-- Don't test implementation details (SVG paths, internal markup)
-- Don't write brittle tests that break when libraries update
-- Don't mock browser APIs - real APIs work in vitest-browser-svelte
-- Avoid children props in vitest-browser-svelte
-
-## Essential Patterns
-
-### Semantic Queries (Preferred)
-
-```typescript
-page.getByRole('button', { name: 'Submit' });
-page.getByRole('textbox', { name: 'Email' });
-page.getByLabel('Email address');
-page.getByText('Welcome');
-```
-
-### Multiple Element Handling
-
-```typescript
-// Handle desktop + mobile nav components
-page.getByRole('link', { name: 'Home' }).first();
-page.getByRole('link', { name: 'Home' }).nth(1);
-page.getByRole('link', { name: 'Home' }).last();
-```
-
-### Avoid Test Hangs
-
-```typescript
-// ❌ Can cause infinite hangs
-await submit_button.click();
-
-// ✅ Test form state directly
-render(MyForm, { props: { errors: { email: 'Required' } } });
-await expect.element(page.getByText('Required')).toBeInTheDocument();
-```
+<!-- Content truncated to meet Windsurf 6KB limit -->
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/spences10)
-> This is a context snippet only. You'll also want the standalone SKILL.md file — [download at TomeVault](https://tomevault.io/claim/spences10)
-<!-- tomevault:4.0:windsurf_rules:2026-04-08 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/spences10) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:windsurf_rules:2026-04-13 -->
