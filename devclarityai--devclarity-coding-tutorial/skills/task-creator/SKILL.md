@@ -36,5 +36,5 @@ When a new task or feature is specified, create a markdown file named `{task-nam
 The task file should be detailed enough for a developer to understand what needs to be done and how to implement it correctly following the project's conventions and best practices. Include sufficient context from existing code patterns when relevant.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/devclarityai/devclarity-coding-tutorial)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/devclarityai) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
