@@ -700,5 +700,5 @@ transparency:
 **This comprehensive skill transforms AI IDE usage from basic assistance to strategic development mastery, enabling developers to leverage cutting-edge tools while maintaining control and cost-effectiveness.** 🚀💻
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/sandraschi/advanced-memory-mcp)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/sandraschi) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
