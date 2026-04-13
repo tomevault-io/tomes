@@ -422,5 +422,5 @@ gdb --args build-debug/apps/gnostr/gnostr
 - [`docs/TESTING.md`](../../docs/TESTING.md) — Test suite documentation
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/chebizarro/nostrc)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/chebizarro) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
