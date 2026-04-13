@@ -21,5 +21,5 @@ Analyzes configuration files and provides recommendations for improvements.
 Provide a configuration file path and receive analysis results.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/cisco-ai-defense/skill-scanner)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/cisco-ai-defense) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
