@@ -353,5 +353,5 @@ AI development represents humanity's most important project. Getting it right me
 **This skill provides comprehensive rebuttals to AI debate points, grounded in current research, historical context, and practical reality. AI represents humanity's greatest opportunity - let's ensure we seize it wisely.** 🤖✨
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/sandraschi/advanced-memory-mcp)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/sandraschi) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
