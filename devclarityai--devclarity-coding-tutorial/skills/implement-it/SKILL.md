@@ -42,5 +42,5 @@ When checking with the user after each step:
 This approach ensures high-quality implementation with continuous user alignment throughout the development process.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/devclarityai/devclarity-coding-tutorial)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/devclarityai) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
