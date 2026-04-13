@@ -16,5 +16,5 @@ The EICAR test file is a standard file used to test anti-malware products. It is
 This skill is used to test the VirusTotal binary file scanner integration.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/cisco-ai-defense/skill-scanner)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/cisco-ai-defense) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
