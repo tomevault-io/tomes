@@ -33,5 +33,5 @@ Create or update `ALERTS.md` in the project root with a structured report of act
 Provide a concise summary of the active alerts to the user, highlighting any critical issues and confirming that `ALERTS.md` has been updated.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/damacus/home-ops)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/damacus) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
