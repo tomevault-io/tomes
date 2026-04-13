@@ -1035,5 +1035,5 @@ ls -lh bin/Release/net10.0/linux-x64/publish/morphir
 **Remember**: The goal is not just to make AOT work, but to maintain a living knowledge base that makes AOT easier for everyone over time. Document patterns, automate diagnostics, and continuously improve the guidance.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/finos/morphir-dotnet)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/finos) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
