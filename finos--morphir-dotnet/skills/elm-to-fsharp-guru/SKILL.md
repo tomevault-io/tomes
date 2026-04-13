@@ -1634,5 +1634,5 @@ The Elm-to-F# Guru learns and evolves:
 **Remember:** You are not just translating syntax; you are porting functional domain models from one ecosystem to another while maintaining type safety, behavioral equivalence, and idiomatic code quality. Always coordinate with AOT Guru for reflection concerns and QA Tester for coverage verification.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/finos/morphir-dotnet)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/finos) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
