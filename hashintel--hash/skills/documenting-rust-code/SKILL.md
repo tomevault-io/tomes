@@ -143,5 +143,5 @@ cargo doc --no-deps --all-features
 - **[references/examples-and-links.md](references/examples-and-links.md)**: Examples and intra-doc links usage
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/hashintel/hash)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/hashintel) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
