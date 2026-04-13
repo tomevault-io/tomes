@@ -45,5 +45,5 @@ Before ANY WebFetch or WebSearch call, verify:
 - [ ] For GitHub/npm/PyPI URLs: These should ALWAYS be indexed, not fetched
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/nozomio-labs/nia-rules-for-agents)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/nozomio-labs) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
