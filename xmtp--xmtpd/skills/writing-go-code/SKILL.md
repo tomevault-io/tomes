@@ -136,5 +136,5 @@ See these references for detailed guidance on frequent Go mistakes:
 - **[Collections and numeric types](collections-and-numerics.md)** -- when working with slices, maps, or numeric conversions
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/xmtp/xmtpd)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/xmtp) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
