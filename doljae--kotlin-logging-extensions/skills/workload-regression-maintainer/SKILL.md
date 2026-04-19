@@ -22,5 +22,5 @@ Use this skill when tasks involve usage examples or integration-style behavior c
 - Maintain readable test naming and assertions.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/doljae/kotlin-logging-extensions)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/doljae) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
