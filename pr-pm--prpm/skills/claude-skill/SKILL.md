@@ -24,5 +24,5 @@ Invoke this skill when you need to test Claude skill installation.
 3. Confirm frontmatter is parsed correctly
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/pr-pm/prpm)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/pr-pm) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
