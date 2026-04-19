@@ -917,5 +917,5 @@ Before finalizing a subagent:
 **Remember:** Great subagents are specialized experts, not generalists. Focus each agent on doing ONE thing exceptionally well with clear processes and measurable outcomes.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/pr-pm/prpm)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/pr-pm) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
