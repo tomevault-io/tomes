@@ -126,5 +126,5 @@ When working with Taproot/Bech32m code:
 - [BIP86](https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki) - Taproot key derivation (m/86'/...)
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/hiromaily/go-crypto-wallet)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/hiromaily) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
