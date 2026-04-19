@@ -34,5 +34,5 @@ Rules that help AI solve problems more effectively and consistently.
 - [VueUse GitHub](https://github.com/vueuse/vueuse)
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/jianxcao/qbittorrent-web)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/jianxcao) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
