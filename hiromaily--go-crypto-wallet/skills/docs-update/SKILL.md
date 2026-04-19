@@ -179,5 +179,5 @@ Example: `docs(standards): update coding conventions for error handling`
 - [Task Classification](../../../docs/guidelines/task-classification.md) - Label SSOT
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/hiromaily/go-crypto-wallet)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/hiromaily) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
