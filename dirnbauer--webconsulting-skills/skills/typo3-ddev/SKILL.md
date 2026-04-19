@@ -482,5 +482,5 @@ Original repository: https://github.com/netresearch/typo3-ddev-skill
 Adapted by webconsulting.at for this skill collection
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/dirnbauer/webconsulting-skills)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/dirnbauer) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
