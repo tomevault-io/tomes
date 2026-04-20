@@ -187,5 +187,5 @@ metadata:
 **使用时机**：当需要撰写PR评论或提供反馈时，参考此文档以确保反馈专业、建设性且有帮助。
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/smallnest/langgraphgo)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/smallnest) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
