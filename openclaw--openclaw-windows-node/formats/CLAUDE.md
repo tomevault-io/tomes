@@ -1,0 +1,43 @@
+# openclaw-windows-node
+
+> All agents working in this repository must run validation after each code change before marking work complete.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/openclaw-windows-node/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# AGENTS.md
+
+## Required Validation After Every Change
+
+All agents working in this repository must run validation after each code change before marking work complete.
+
+Required steps:
+
+1. Run full repo build:
+   - `./build.ps1`
+2. Run shared tests:
+   - `dotnet test ./tests/OpenClaw.Shared.Tests/OpenClaw.Shared.Tests.csproj --no-restore`
+3. Run tray tests:
+   - `dotnet test ./tests/OpenClaw.Tray.Tests/OpenClaw.Tray.Tests.csproj --no-restore`
+
+If a command fails:
+
+1. Fix the issue.
+2. Re-run the failed command.
+3. Re-run all required validation commands before completion.
+
+Notes:
+
+- If a build/test is blocked by an environmental lock (for example running executable locking output assemblies), stop/close the locking process and rerun.
+- Do not claim completion without reporting validation results.
+
+---
+> Source: [openclaw/openclaw-windows-node](https://github.com/openclaw/openclaw-windows-node) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-04-20 -->
