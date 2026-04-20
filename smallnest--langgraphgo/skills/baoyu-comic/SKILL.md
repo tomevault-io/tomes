@@ -412,5 +412,5 @@ Custom styles and configurations via EXTEND.md.
 If found, load before Step 1. Extension content overrides defaults.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/smallnest/langgraphgo)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/smallnest) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
