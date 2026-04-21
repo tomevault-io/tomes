@@ -396,5 +396,5 @@ These logs feed the existing `/self-reflect` pipeline. Over time, the knowledge 
 Future routing decisions improve automatically as the knowledge base grows from session log analysis.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/dsifry/metaswarm)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/dsifry) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
