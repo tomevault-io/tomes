@@ -349,5 +349,5 @@ If the work is too specific to generalize, say so explicitly and do not force a 
 - Not checking existing docs before creating duplicates
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/knowns-dev/knowns)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/knowns-dev) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
