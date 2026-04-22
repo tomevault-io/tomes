@@ -1,0 +1,55 @@
+# co-researcher
+
+> This project provides PhD-level research capabilities for your Gemini CLI sessions.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/co-researcher/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# Co-Researcher Agents for Gemini
+
+This project provides PhD-level research capabilities for your Gemini CLI sessions.
+
+## Available Agents
+
+### Available Skills
+See `skills/` for the full list of capabilities, including:
+- `research-methodology`
+- `literature-review`
+- `critical-analysis`
+- `hypothesis-testing`
+- `lateral-thinking`
+- `qualitative-research`
+- `quantitative-analysis`
+- `peer-review`
+- `ethics-review`
+- `grant-writing`
+
+
+## How to use in Gemini CLI
+
+Gemini automatically discovers these agents when you run it from this directory. You can invoke them by name:
+
+```bash
+gemini "Use the literature-review skill to find recent papers on room temperature superconductors"
+gemini "Ask the critical-analysis skill to review my methodology in proposal.md"
+```
+
+The CLI reads the context from `agents/` and this `GEMINI.md` file automatically.
+It also has access to the specialized skills in the `skills/` directory.
+
+### Available Skills
+See `skills/` for the full list of capabilities, including:
+- `research-methodology`
+- `literature-review`
+- `critical-analysis`
+
+---
+> Source: [poemswe/co-researcher](https://github.com/poemswe/co-researcher) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-04-22 -->
