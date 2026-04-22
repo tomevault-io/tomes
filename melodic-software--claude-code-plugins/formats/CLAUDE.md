@@ -1,0 +1,115 @@
+# claude-code-plugins
+
+> Use when working with Claude Code plugins, skills, agents, hooks, commands, or MCP servers. Plugins extend Claude Code with reusable components that may be installed in user/global locations outside the project.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/claude-code-plugins/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+
+# Claude Code Plugin System
+
+Claude Code extensions (skills, agents, hooks, MCP servers) are organized into **plugins** which can be installed globally or per-user, separate from the project repository.
+
+## Plugin Installation Locations
+
+Plugins are installed via marketplaces and stored in user-level directories:
+
+| Platform | Typical Location |
+|----------|-----------------|
+| macOS/Linux | `~/.claude/plugins/marketplaces/{marketplace-name}/{plugin-name}/` |
+| Windows | `%USERPROFILE%\.claude\plugins\marketplaces\{marketplace-name}\{plugin-name}\` |
+
+**Note**: The exact path depends on Claude Code configuration. Use `${CLAUDE_PLUGIN_ROOT}` environment variable in plugin scripts for reliable path resolution.
+
+## Plugin Directory Structure
+
+```text
+plugin-name/
+├── .claude-plugin/
+│   └── plugin.json          # Required: plugin manifest
+├── agents/                   # Subagents (*.md files)
+│   └── my-agent.md
+├── skills/                   # Agent Skills
+│   └── my-skill/
+│       └── SKILL.md
+├── hooks/                    # Event handlers
+│   └── hooks.json
+├── .mcp.json                 # MCP server definitions
+└── scripts/                  # Supporting scripts
+```
+
+## Key Files
+
+### plugin.json (Required)
+
+Located at `.claude-plugin/plugin.json`:
+
+```json
+{
+  "name": "plugin-name",
+  "version": "1.0.0",
+  "description": "What this plugin does",
+  "author": { "name": "Author Name" }
+}
+```
+
+### SKILL.md (For Skills)
+
+Each skill lives in `skills/{skill-name}/SKILL.md` with optional supporting files in the same directory.
+
+### hooks.json (For Hooks)
+
+Event handlers configured in `hooks/hooks.json` or inline in plugin.json.
+
+### .mcp.json (For MCP Servers)
+
+MCP server definitions at plugin root.
+
+## Component Types
+
+| Component | Location | Format | Purpose |
+|-----------|----------|--------|---------|
+| Agents | `agents/` | Markdown with frontmatter | Specialized subagents |
+| Skills | `skills/*/SKILL.md` | Markdown with frontmatter | Model-invoked capabilities |
+| Hooks | `hooks/hooks.json` | JSON | Event handlers |
+| MCP Servers | `.mcp.json` | JSON | External tool integration |
+
+## When Working with Plugin Components
+
+1. **Check if it's from a plugin**: Components may be in the project OR in a user-installed plugin
+2. **Find the plugin location**: Look in `~/.claude/plugins/marketplaces/` for installed plugins
+3. **Respect the structure**: Keep components in their designated directories
+4. **Use ${CLAUDE_PLUGIN_ROOT}**: For paths in hooks and MCP configs
+
+## Marketplace Structure
+
+Marketplaces are collections of plugins with a manifest at `.claude-plugin/marketplace.json`:
+
+```json
+{
+  "name": "marketplace-name",
+  "owner": { "name": "Owner" },
+  "plugins": [
+    {
+      "name": "plugin-name",
+      "source": "./plugin-name",
+      "description": "Plugin description"
+    }
+  ]
+}
+```
+
+## Related Rules
+
+- See `claude-skills.mdc` for detailed skill workflow guidance
+
+---
+> Source: [melodic-software/claude-code-plugins](https://github.com/melodic-software/claude-code-plugins) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-04-22 -->
