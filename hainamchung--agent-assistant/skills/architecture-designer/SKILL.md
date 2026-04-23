@@ -79,5 +79,5 @@ Distributed systems, microservices, event-driven architecture, CQRS, DDD, CAP th
 - **Secure Code Guardian** - Security architecture
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/hainamchung/agent-assistant)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/hainamchung) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
