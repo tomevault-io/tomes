@@ -229,5 +229,5 @@ Before delivering UI code, verify these items:
 - [ ] `prefers-reduced-motion` respected
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/kevinnguyen271090/claudekit-engineering)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/kevinnguyen271090) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
