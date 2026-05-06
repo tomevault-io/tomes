@@ -167,5 +167,5 @@ For custom scripts calling FAL API directly:
 **See `REFERENCE.md` for complete endpoint reference.**
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/donghaozhang/video-agent-skill)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/donghaozhang) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
