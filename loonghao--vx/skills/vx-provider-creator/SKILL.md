@@ -1689,5 +1689,5 @@ runtime_def(name="node")  # parser only reads first positional arg
 For complete code templates, see `references/templates.md`.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/loonghao/vx)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/loonghao) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
