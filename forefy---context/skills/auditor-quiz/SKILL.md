@@ -110,5 +110,5 @@ Consult `references/question-types.md` for detailed examples and patterns.
 - Don't make the correct question obvious by it being always the longer answer, or always the same choice field
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/forefy/.context)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/forefy) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
