@@ -271,9 +271,243 @@
       "path": "templates/.claude/skills/writing-clearly-and-concisely",
       "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/writing-clearly-and-concisely",
       "description": ""
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/post-release-followup/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/post-release-followup/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/agora/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/agora/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/codex-exec/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/codex-exec/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/hada-scout/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/hada-scout/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/memory-management/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/memory-management/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/omcustom-auto-improve/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/omcustom-auto-improve/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/pipeline/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/pipeline/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/post-release-followup/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/post-release-followup/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/profile/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/profile/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/reasoning-sandwich/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/reasoning-sandwich/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/scout/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/scout/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/skills-sh-search/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/skills-sh-search/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/update-external/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/update-external/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/claude-native/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/claude-native/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/claude-native/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/claude-native/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/agent-eval-framework/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/agent-eval-framework/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/crg-integration/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/crg-integration/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/dev-review/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/dev-review/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/instinct-extractor/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/instinct-extractor/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/peer-messaging/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/peer-messaging/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/semble-integration/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/semble-integration/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/agent-eval-framework/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/agent-eval-framework/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/crg-integration/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/crg-integration/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/dev-review/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/dev-review/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/instinct-extractor/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/instinct-extractor/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/peer-messaging/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/peer-messaging/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/semble-integration/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/semble-integration/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/goal/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/goal/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/goal/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/goal/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/de-lead-routing/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/de-lead-routing/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/dev-lead-routing/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/dev-lead-routing/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/intent-detection/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/intent-detection/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/research/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/research/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": ".claude/skills/roundtable-debate/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/roundtable-debate/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/de-lead-routing/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/de-lead-routing/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/dev-lead-routing/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/dev-lead-routing/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/intent-detection/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/intent-detection/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/research/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/research/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
+    },
+    {
+      "name": "SKILL.md",
+      "path": "templates/.claude/skills/roundtable-debate/SKILL.md",
+      "github_url": "https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/roundtable-debate/SKILL.md",
+      "description": "oh-my-zsh style customization framework for Claude Code"
     }
   ],
   "source_url": "https://github.com/baekenough/oh-my-customcode",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-05-02T15:31:39Z"
+  "distributed_at": "2026-05-30T04:32:16Z"
 }
