@@ -17,10 +17,6 @@ Original source: `AGENTS.md` in [bchewy/fireclaw](https://github.com/bchewy/fire
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [fireclaw-vm-demo](https://github.com/bchewy/fireclaw/tree/main/.agents/skills/fireclaw-vm-demo)
-
 Quality verified by TomeVault's automated analysis pipeline. Source: [github.com/bchewy/fireclaw](https://github.com/bchewy/fireclaw)
 
 ---
