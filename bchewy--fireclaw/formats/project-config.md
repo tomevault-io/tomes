@@ -9,7 +9,7 @@ Repository guide for coding agents and contributors working in `fireclaw`.
 
 ## 1) Documentation Status (Current)
 
-As of 2026-02-08, documentation is in a good state for operators, with a few contributor-focused gaps.
+As of 2026-06-10, documentation is in a good state for operators, with a few contributor-focused gaps.
 
 Present and useful:
 - `README.md`: architecture, prerequisites, install, setup options, lifecycle usage, networking, env overrides.
@@ -26,8 +26,8 @@ Gaps to keep in mind:
 Core files and responsibilities:
 - `bin/fireclaw`: CLI entrypoint and command routing.
 - `bin/vm-setup`: one-shot provisioning path (`fireclaw setup`).
-- `bin/vm-provision`: reprovision-only flow (`fireclaw provision`).
-- `bin/vm-ctl`: lifecycle commands (`list/status/start/stop/restart/logs/shell/token/destroy`).
+- `bin/vm-provision`: saved-config updates + reprovision flow (`fireclaw provision`).
+- `bin/vm-ctl`: lifecycle commands (`doctor/list/status/start/stop/restart/logs/shell/token/destroy`).
 - `bin/vm-common.sh`: shared helpers, path conventions, validation, network/IP/port helpers.
 - `scripts/provision-guest.sh`: in-VM provisioning and guest service creation.
 - `docs/LEARNINGS.md`: field notes and follow-ups.
@@ -76,4 +76,4 @@ Before finishing:
 
 ---
 > Source: [bchewy/fireclaw](https://github.com/bchewy/fireclaw) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:windsurf_rules:2026-04-25 -->
+<!-- tomevault:4.0:windsurf_rules:2026-06-10 -->
