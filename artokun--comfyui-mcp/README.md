@@ -17,17 +17,7 @@ Original source: `CLAUDE.md` in [artokun/comfyui-mcp](https://github.com/artokun
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (7)
-
-- [comfyui-core](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/comfyui-core)
-- [director](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/director)
-- [flux-txt2img](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/flux-txt2img)
-- [prompt-engineering](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/prompt-engineering)
-- [qwen-image-edit](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/qwen-image-edit)
-- [troubleshooting](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/troubleshooting)
-- [wan-flf-video](https://github.com/artokun/comfyui-mcp/tree/main/plugin/skills/wan-flf-video)
-
-From [artokun/comfyui-mcp](https://github.com/artokun/comfyui-mcp) — a repo with 48+ stars on GitHub.
+From [artokun/comfyui-mcp](https://github.com/artokun/comfyui-mcp) — a repo with 145+ stars on GitHub.
 
 ---
 
