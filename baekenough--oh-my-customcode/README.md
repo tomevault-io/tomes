@@ -17,7 +17,7 @@ Original source: `CLAUDE.md` in [baekenough/oh-my-customcode](https://github.com
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (78)
+## Bundled Skills (93)
 
 - [airflow-best-practices](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/airflow-best-practices)
 - [audit-agents](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/audit-agents)
@@ -30,6 +30,7 @@ Original source: `CLAUDE.md` in [baekenough/oh-my-customcode](https://github.com
 - [dev-lead-routing](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/dev-lead-routing)
 - [dev-refactor](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/dev-refactor)
 - [dev-review](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/dev-review)
+- [docker-best-practices](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/docker-best-practices)
 - [fastapi-best-practices](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/fastapi-best-practices)
 - [fix-refs](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/fix-refs)
 - [go-backend-best-practices](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/go-backend-best-practices)
@@ -58,6 +59,8 @@ Original source: `CLAUDE.md` in [baekenough/oh-my-customcode](https://github.com
 - [vercel-deploy](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/vercel-deploy)
 - [web-design-guidelines](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/web-design-guidelines)
 - [writing-clearly-and-concisely](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/writing-clearly-and-concisely)
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/omcustom-feedback/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/omcustom-feedback/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/post-release-followup/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/agora/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/codex-exec/SKILL.md) — oh-my-zsh style customization framework for Claude Code
@@ -92,11 +95,23 @@ Original source: `CLAUDE.md` in [baekenough/oh-my-customcode](https://github.com
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/intent-detection/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/research/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/roundtable-debate/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/structured-dev-cycle/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/de-lead-routing/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/dev-lead-routing/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/intent-detection/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/research/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 - [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/roundtable-debate/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/structured-dev-cycle/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/homework/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/homework/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/skill-extractor/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/skill-extractor/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/scout/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/pipeline/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/fsd/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/fsd/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/.claude/skills/aws-best-practices/SKILL.md) — oh-my-zsh style customization framework for Claude Code
+- [SKILL.md](https://github.com/baekenough/oh-my-customcode/tree/main/templates/.claude/skills/aws-best-practices/SKILL.md) — oh-my-zsh style customization framework for Claude Code
 
 Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/baekenough/oh-my-customcode](https://github.com/baekenough/oh-my-customcode)
 
