@@ -1,128 +1,287 @@
 ---
-name: roundtable-debate
-description: Multi-agent structured debate with anti-groupthink mechanisms — Devil's Advocate, minority opinion protection, 2-round hard cap. Use when divergent perspectives matter more than consensus (architecture decisions, design tradeoffs, contested specifications). Use when this capability is needed.
+name: aws-best-practices
+description: AWS patterns from Well-Architected Framework Use when this capability is needed.
 metadata:
   author: baekenough
 ---
 
-# roundtable-debate
+## Purpose
 
-발산 보존(divergence preservation)을 목표로 하는 다중 에이전트 구조화 토론 스킬.
+Apply AWS patterns for building scalable, secure, and cost-effective cloud infrastructure.
 
-## When to Use
+> **Offline core vs. live documentation**: This skill provides static Well-Architected patterns that work without credentials or network access — the always-available baseline. For real-time AWS documentation, current API syntax, and up-to-date best practices (resolving knowledge-cutoff gaps), use the AWS MCP Server's `search_documentation` / `read_documentation` tools when installed. The two sources are complementary: static patterns for structural guidance; live docs for current specifics. Installation is user-manual (R001 auto-install prohibited) — see `infra-aws-expert` agent for setup instructions.
 
-| 상황 | 적합 여부 |
-|------|-----------|
-| 다각적 평가 필요 (리스크 발굴) | 적합 |
-| 의도적 발산 + 소수의견 보존 | 적합 |
-| 단일 결정 + 단일 답변 | 부적합 (단일 에이전트 사용) |
-| 만장일치 합의 필요 (스펙 확정) | 부적합 (adversarial-review 참고) |
+## Well-Architected Framework Pillars
 
-## Anti-Groupthink Mechanisms
-
-다중 LLM 토론의 3대 고질병을 구조적으로 방지:
-
-| 고질병 | 메커니즘 |
-|--------|---------|
-| 앵커링 효과 | Independent-first parallel analysis (라운드 0 — 다른 에이전트 의견 노출 전 독립 분석) |
-| 집단사고 (Groupthink) | Devil's Advocate 강제 주입 (전담 페르소나 1명) |
-| Degeneration of Thought | 2라운드 하드캡 (라운드 수 증가 시 다양성 감소 연구 기반) |
-| 소수의견 묵살 | 기각 시 명시적 정당화 요구 프로토콜 |
-
-## Workflow
-
-### Phase 0: Independent Parallel Analysis
-
-각 페르소나 에이전트가 다른 에이전트 의견을 보지 않고 **독립적으로** 분석. 앵커링 효과 차단.
-
-```
-TeamCreate("roundtable-{topic}")
-  → Agent(architect): 독립 분석
-  → Agent(critic-devil): 독립 분석 (Devil's Advocate)
-  → Agent(implementer): 독립 분석
-  → Agent(user-advocate): 독립 분석
-  (R009 hard cap 5 준수)
-```
-
-각 에이전트는 자신의 분석을 artifact로 저장 (R006 Artifact Channel Protocol).
-
-각 에이전트에게 위임 시 다음 directive를 prompt에 포함:
-
-```
-**Sensitive-path artifact protocol (mandatory for this task)**
-
-If your task involves writing artifacts under `.claude/outputs/`:
-1. Build script in /tmp: cat > /tmp/roundtable-<persona>-<timestamp>.sh << 'EOF' ... EOF
-2. Script: mkdir -p .claude/outputs/sessions/<date>/ && cat > .claude/outputs/sessions/<date>/<artifact>.md << 'ARTIFACT' ... ARTIFACT
-3. Execute: bash /tmp/roundtable-<persona>-<timestamp>.sh
-4. Cleanup: rm /tmp/roundtable-<persona>-<timestamp>.sh
-DO NOT use Write/Edit directly on `.claude/outputs/` — CC sensitive-path guard triggers regardless of bypassPermissions/allow rules.
-```
-
-### Phase 1: Round 1 — Discussion
-
-모든 독립 분석 공개 후 라운드 1 토론. SendMessage로 peer 의견 교환.
-
-규칙:
-1. 다른 의견을 기각할 때 명시적 정당화 (3개 근거) 필수
-2. Devil's Advocate는 합의에 동의하지 않음 — 항상 반대 입장 견지
-3. 소수의견(1명만 주장)은 별도 트랙으로 보존
-
-### Phase 2: Round 2 — Convergence Attempt (last round)
-
-라운드 2가 마지막. 합의 도달 여부 무관하게 **종료**.
-
-산출물:
-1. 공통 합의 사항 (있을 경우)
-2. 보존된 소수의견 + 정당화
-3. Devil's Advocate 최종 반대 의견
-
-### Phase 3: Synthesis
-
-오케스트레이터가 3종 결과를 종합 보고. 합의가 없는 영역은 명시적으로 "합의 없음 — 사용자 결정 필요"로 표기.
-
-## Persona Templates
-
-기본 4 페르소나 (도메인에 따라 mgr-creator로 추가 가능):
-
-| 페르소나 | 역할 |
-|---------|------|
-| architect | 구조적 일관성, R006 separation of concerns |
-| critic-devil | Devil's Advocate — 모든 제안 반대 입장 |
-| implementer | 구현 실현 가능성, 비용 |
-| user-advocate | 사용자 경험, DX |
-
-## Comparison with Existing Skills
-
-| 스킬 | 목표 | 종료 조건 |
-|------|------|----------|
-| `roundtable-debate` | 발산 보존 | 2라운드 도달 |
-| `adversarial-review` | 공격자 1인 시각 | 단일 라운드 |
-| `evaluator-optimizer` | 평가-개선 루프 | 평가 통과 |
-
-## Configuration
+### 1. Operational Excellence
 
 ```yaml
-# Skill arguments
-personas: 4              # 기본 4명, 3-5명 권장
-max_rounds: 2            # HARD CAP — 변경 금지 (research-based)
-devil_advocate: required # Devil's Advocate 슬롯 강제
-minority_protection: strict  # 기각 시 정당화 필수
+principles:
+  - Perform operations as code
+  - Make frequent, small, reversible changes
+  - Refine operations procedures frequently
+  - Anticipate failure
+  - Learn from all operational failures
+
+practices:
+  - Use CloudFormation/CDK for IaC
+  - Implement CI/CD pipelines
+  - Use CloudWatch for monitoring
+  - Set up alarms and dashboards
+  - Document runbooks
 ```
 
-## Integration
+### 2. Security
 
-| Rule | How |
-|------|-----|
-| R009 | Phase 0 병렬 분석 (4-5 페르소나, hard cap 5 준수) |
-| R010 | 오케스트레이터가 페르소나 dispatch, 페르소나 간 직접 파일 수정 금지 |
-| R018 | Agent Teams 활성 시 자동 사용 (3+ 에이전트) |
-| R006 | Phase 0/1/2 간 결과 핸드오프는 artifact channel 사용 |
+```yaml
+principles:
+  - Implement strong identity foundation
+  - Enable traceability
+  - Apply security at all layers
+  - Automate security best practices
+  - Protect data in transit and at rest
+  - Keep people away from data
+  - Prepare for security events
 
-## Attribution
+iam:
+  - Use least privilege principle
+  - Never use root account for daily tasks
+  - Enable MFA for all users
+  - Use IAM roles for services
+  - Rotate credentials regularly
 
-Pattern source: [cc-roundtable](https://github.com/gaebalai/cc-roundtable) by gaebalai.
+patterns: |
+  # IAM Policy - Least Privilege
+  {
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::my-bucket/*",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": "10.0.0.0/8"
+        }
+      }
+    }]
+  }
+```
+
+### 3. Reliability
+
+```yaml
+principles:
+  - Automatically recover from failure
+  - Test recovery procedures
+  - Scale horizontally
+  - Stop guessing capacity
+  - Manage change through automation
+
+practices:
+  - Multi-AZ deployments
+  - Auto Scaling groups
+  - Health checks and self-healing
+  - Backup and disaster recovery
+  - Loose coupling with queues
+
+patterns:
+  high_availability: |
+    # Multi-AZ RDS
+    - Primary in us-east-1a
+    - Standby in us-east-1b
+    - Read replicas in us-east-1c
+
+  auto_scaling: |
+    # Target tracking scaling
+    - Metric: CPUUtilization
+    - Target: 70%
+    - Min: 2, Max: 10
+```
+
+### 4. Performance Efficiency
+
+```yaml
+principles:
+  - Democratize advanced technologies
+  - Go global in minutes
+  - Use serverless architectures
+  - Experiment more often
+  - Consider mechanical sympathy
+
+compute:
+  - Right-size instances
+  - Use Spot for fault-tolerant workloads
+  - Consider Graviton (ARM) processors
+  - Containerize with ECS/EKS
+
+storage:
+  - Use appropriate storage class
+  - S3 Intelligent-Tiering for variable access
+  - EBS volume types based on IOPS needs
+
+database:
+  - Aurora for MySQL/PostgreSQL
+  - DynamoDB for key-value/document
+  - ElastiCache for caching
+```
+
+### 5. Cost Optimization
+
+```yaml
+principles:
+  - Implement cloud financial management
+  - Adopt consumption model
+  - Measure overall efficiency
+  - Stop spending on undifferentiated heavy lifting
+  - Analyze and attribute expenditure
+
+practices:
+  - Use Reserved Instances/Savings Plans
+  - Right-size resources
+  - Delete unused resources
+  - Use Spot Instances
+  - Implement auto scaling
+
+tools:
+  - AWS Cost Explorer
+  - AWS Budgets
+  - AWS Trusted Advisor
+  - Cost Allocation Tags
+```
+
+### 6. Sustainability
+
+```yaml
+principles:
+  - Understand your impact
+  - Establish sustainability goals
+  - Maximize utilization
+  - Anticipate and adopt more efficient offerings
+  - Use managed services
+  - Reduce downstream impact
+
+practices:
+  - Use efficient instance types (Graviton)
+  - Optimize storage lifecycle
+  - Use serverless where possible
+  - Select regions with lower carbon intensity
+```
+
+## Common Patterns
+
+### VPC Design
+
+```yaml
+pattern: |
+  VPC (10.0.0.0/16)
+  ├── Public Subnets
+  │   ├── us-east-1a: 10.0.1.0/24
+  │   ├── us-east-1b: 10.0.2.0/24
+  │   └── us-east-1c: 10.0.3.0/24
+  ├── Private Subnets (App)
+  │   ├── us-east-1a: 10.0.11.0/24
+  │   ├── us-east-1b: 10.0.12.0/24
+  │   └── us-east-1c: 10.0.13.0/24
+  └── Private Subnets (Data)
+      ├── us-east-1a: 10.0.21.0/24
+      ├── us-east-1b: 10.0.22.0/24
+      └── us-east-1c: 10.0.23.0/24
+
+components:
+  - Internet Gateway (public access)
+  - NAT Gateway (private outbound)
+  - VPC Endpoints (AWS services)
+  - Network ACLs (subnet level)
+  - Security Groups (instance level)
+```
+
+### Three-Tier Architecture
+
+```yaml
+pattern: |
+  [Internet]
+      │
+  [CloudFront]
+      │
+  [ALB] ← Public Subnet
+      │
+  [ECS/EC2] ← Private Subnet (App)
+      │
+  [RDS Multi-AZ] ← Private Subnet (Data)
+
+components:
+  web_tier:
+    - CloudFront for CDN
+    - WAF for protection
+    - ALB for load balancing
+
+  app_tier:
+    - ECS Fargate or EC2
+    - Auto Scaling
+    - ElastiCache
+
+  data_tier:
+    - RDS Multi-AZ
+    - Read Replicas
+    - Automated backups
+```
+
+### Serverless Pattern
+
+```yaml
+pattern: |
+  [API Gateway]
+      │
+  [Lambda] → [DynamoDB]
+      │
+  [SQS] → [Lambda] → [S3]
+
+components:
+  - API Gateway for REST/HTTP APIs
+  - Lambda for compute
+  - DynamoDB for NoSQL
+  - SQS for decoupling
+  - S3 for storage
+  - Step Functions for orchestration
+```
+
+### CI/CD Pipeline
+
+```yaml
+pattern: |
+  [CodeCommit/GitHub]
+      │
+  [CodePipeline]
+      │
+  ├── [CodeBuild] - Build & Test
+  │
+  ├── [ECR] - Container Registry
+  │
+  └── [CodeDeploy/ECS] - Deploy
+
+practices:
+  - Blue/Green deployments
+  - Canary releases
+  - Automated rollback
+  - Infrastructure as Code
+```
+
+## Application
+
+When designing AWS architecture:
+
+1. **Always** follow least privilege for IAM
+2. **Always** use Multi-AZ for production
+3. **Always** encrypt data at rest and in transit
+4. **Prefer** managed services over self-managed
+5. **Implement** monitoring and alerting
+6. **Use** IaC for all infrastructure
+7. **Design** for failure
+8. **Optimize** costs continuously
 
 ---
 > Source: [baekenough/oh-my-customcode](https://github.com/baekenough/oh-my-customcode) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:skill_md:2026-05-30 -->
+<!-- tomevault:4.0:skill_md:2026-06-13 -->
