@@ -17,10 +17,6 @@ Original source: `CLAUDE.md` in [azalio/map-framework](https://github.com/azalio
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [map-planning](https://github.com/azalio/map-framework/tree/main/src/mapify_cli/templates/skills/map-planning)
-
 Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/azalio/map-framework](https://github.com/azalio/map-framework)
 
 ---
