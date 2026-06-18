@@ -42,5 +42,5 @@ src/
 - DB mock: `jest.mock` 또는 테스트 전용 DB 인스턴스
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/ggombee) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-16 -->
+> Source: [ggombee/code-forge](https://github.com/ggombee/code-forge) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-06-14 -->
