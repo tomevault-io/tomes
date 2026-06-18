@@ -2,8 +2,6 @@
 
 > Sourced from [ggombee/code-forge](https://github.com/ggombee/code-forge) and converted for every major platform by [TomeVault](https://tomevault.io)
 
-AI instruction skills by ggombee
-
 ## All Platforms Config
 
 The `TOME.json` file in this directory is the project config converted for All Platforms.
@@ -17,11 +15,13 @@ Original source: `CLAUDE.md` in [ggombee/code-forge](https://github.com/ggombee/
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
+## Bundled Skills (3)
 
 - [node-express](https://github.com/ggombee/code-forge/tree/main/modules/frameworks/node-express)
+- [python-django](https://github.com/ggombee/code-forge/tree/main/modules/frameworks/python-django)
+- [python-fastapi](https://github.com/ggombee/code-forge/tree/main/modules/frameworks/python-fastapi)
 
-From a repo with 0+ stars on GitHub. [See the full profile](https://tomevault.io/claim/ggombee)
+From [ggombee/code-forge](https://github.com/ggombee/code-forge) — a repo with 12+ stars on GitHub.
 
 ---
 
