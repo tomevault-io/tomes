@@ -168,5 +168,5 @@ npm run build     # Full pipeline
 ```
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/evolving-machines-lab) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-11 -->
+> Source: [evolving-machines-lab/evolve](https://github.com/evolving-machines-lab/evolve) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-05-16 -->
