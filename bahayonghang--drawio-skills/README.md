@@ -17,11 +17,7 @@ Original source: `AGENTS.md` in [bahayonghang/drawio-skills](https://github.com/
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [drawio](https://github.com/bahayonghang/drawio-skills/tree/main/skills/drawio)
-
-From [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills) — a repo with 132+ stars on GitHub.
+From [bahayonghang/drawio-skills](https://github.com/bahayonghang/drawio-skills) — a repo with 219+ stars on GitHub.
 
 ---
 
