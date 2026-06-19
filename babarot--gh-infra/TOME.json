@@ -37,15 +37,8 @@
       "platform": "Windsurf"
     }
   ],
-  "skills": [
-    {
-      "name": "ci-cd",
-      "path": ".agents/skills/ci-cd",
-      "github_url": "https://github.com/babarot/gh-infra/tree/main/.agents/skills/ci-cd",
-      "description": ""
-    }
-  ],
+  "skills": [],
   "source_url": "https://github.com/babarot/gh-infra",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-04-21T04:30:33Z"
+  "distributed_at": "2026-06-19T06:31:38Z"
 }
