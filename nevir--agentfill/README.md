@@ -17,15 +17,7 @@ Original source: `AGENTS.md` in [nevir/agentfill](https://github.com/nevir/agent
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (5)
-
-- [global-magic-skill](https://github.com/nevir/agentfill/tree/main/tests/agents/global-skills/global/.agents/skills/global-magic-skill)
-- [magic-skill](https://github.com/nevir/agentfill/tree/main/tests/agents/skills-support/sandbox/.agents/skills/magic-skill)
-- [markdown-style](https://github.com/nevir/agentfill/tree/main/.agents/skills/markdown-style)
-- [shell-style](https://github.com/nevir/agentfill/tree/main/.agents/skills/shell-style)
-- [skill](https://github.com/nevir/agentfill/tree/main/.agents/skills/skill)
-
-From [nevir/agentfill](https://github.com/nevir/agentfill) — a repo with 18+ stars on GitHub.
+From [nevir/agentfill](https://github.com/nevir/agentfill) — a repo with 19+ stars on GitHub.
 
 ---
 
