@@ -17,10 +17,6 @@ Original source: `CLAUDE.md` in [babarot/gh-infra](https://github.com/babarot/gh
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [ci-cd](https://github.com/babarot/gh-infra/tree/main/.agents/skills/ci-cd)
-
 Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/babarot/gh-infra](https://github.com/babarot/gh-infra)
 
 ---
