@@ -37,39 +37,8 @@
       "platform": "Windsurf"
     }
   ],
-  "skills": [
-    {
-      "name": "global-magic-skill",
-      "path": "tests/agents/global-skills/global/.agents/skills/global-magic-skill",
-      "github_url": "https://github.com/nevir/agentfill/tree/main/tests/agents/global-skills/global/.agents/skills/global-magic-skill",
-      "description": ""
-    },
-    {
-      "name": "magic-skill",
-      "path": "tests/agents/skills-support/sandbox/.agents/skills/magic-skill",
-      "github_url": "https://github.com/nevir/agentfill/tree/main/tests/agents/skills-support/sandbox/.agents/skills/magic-skill",
-      "description": ""
-    },
-    {
-      "name": "markdown-style",
-      "path": ".agents/skills/markdown-style",
-      "github_url": "https://github.com/nevir/agentfill/tree/main/.agents/skills/markdown-style",
-      "description": ""
-    },
-    {
-      "name": "shell-style",
-      "path": ".agents/skills/shell-style",
-      "github_url": "https://github.com/nevir/agentfill/tree/main/.agents/skills/shell-style",
-      "description": ""
-    },
-    {
-      "name": "skill",
-      "path": ".agents/skills/skill",
-      "github_url": "https://github.com/nevir/agentfill/tree/main/.agents/skills/skill",
-      "description": ""
-    }
-  ],
+  "skills": [],
   "source_url": "https://github.com/nevir/agentfill",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-05-02T18:47:47Z"
+  "distributed_at": "2026-06-19T14:30:58Z"
 }
