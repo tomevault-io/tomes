@@ -75,5 +75,5 @@ To test/visualize the artifact, use available tools (including other Skills or b
 - **shadcn/ui components**: https://ui.shadcn.com/docs/components
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/evolving-machines-lab) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-11 -->
+> Source: [evolving-machines-lab/evolve](https://github.com/evolving-machines-lab/evolve) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-05-16 -->
