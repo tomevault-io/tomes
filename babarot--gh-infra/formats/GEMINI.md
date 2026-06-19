@@ -44,4 +44,4 @@ Key constraints:
 
 ---
 > Source: [babarot/gh-infra](https://github.com/babarot/gh-infra) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:gemini_md:2026-04-21 -->
+<!-- tomevault:4.0:gemini_md:2026-06-19 -->
