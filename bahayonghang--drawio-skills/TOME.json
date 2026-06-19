@@ -37,15 +37,8 @@
       "platform": "Windsurf"
     }
   ],
-  "skills": [
-    {
-      "name": "drawio",
-      "path": "skills/drawio",
-      "github_url": "https://github.com/bahayonghang/drawio-skills/tree/main/skills/drawio",
-      "description": ""
-    }
-  ],
+  "skills": [],
   "source_url": "https://github.com/bahayonghang/drawio-skills",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-04-21T17:43:08Z"
+  "distributed_at": "2026-06-19T06:32:17Z"
 }
