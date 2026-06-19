@@ -17,10 +17,9 @@ Original source: `CLAUDE.md` in [evolving-machines-lab/evolve](https://github.co
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (8)
+## Bundled Skills (7)
 
 - [agent-browser](https://github.com/evolving-machines-lab/evolve/tree/main/skills/agent-browser)
-- [evolve](https://github.com/evolving-machines-lab/evolve/tree/main/skills/evolve)
 - [frontend-design](https://github.com/evolving-machines-lab/evolve/tree/main/skills/frontend-design)
 - [remotion](https://github.com/evolving-machines-lab/evolve/tree/main/skills/remotion)
 - [shadcn-webapp-design](https://github.com/evolving-machines-lab/evolve/tree/main/skills/shadcn-webapp-design)
