@@ -26,7 +26,7 @@ Skills are managed using vercel-labs/agent-skills (skills.sh/docs).
 - Prefer deterministic commands and repeatable workflows.
 - Prefer concise, evidence-backed SKILL.md guidance.
 - Put operational details in `references/` when they are verbose.
-- Public skills under `skills/` must include `license: AGPL-3.0-only` and `metadata.source: https://github.com/vincentkoc/dotskills`.
+- Public skills under `skills/` must include `license: MIT` and `metadata.source: https://github.com/vincentkoc/dotskills`.
 - Validators must enforce public-skill license and source metadata.
 
 ## OpenAI Metadata Defaults
@@ -99,4 +99,4 @@ When adding or removing a private skill:
 
 ---
 > Source: [vincentkoc/dotskills](https://github.com/vincentkoc/dotskills) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:gemini_md:2026-05-03 -->
+<!-- tomevault:4.0:gemini_md:2026-06-20 -->
