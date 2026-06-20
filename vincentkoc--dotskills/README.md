@@ -17,16 +17,6 @@ Original source: `AGENTS.md` in [vincentkoc/dotskills](https://github.com/vincen
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (7)
-
-- [technical-documentation](https://github.com/vincentkoc/dotskills/tree/main/skills/technical-documentation)
-- [technical-deslop](https://github.com/vincentkoc/dotskills/tree/main/skills/technical-deslop)
-- [technical-integrations](https://github.com/vincentkoc/dotskills/tree/main/skills/technical-integrations)
-- [technical-skill-finder](https://github.com/vincentkoc/dotskills/tree/main/skills/technical-skill-finder)
-- [example-skill](https://github.com/vincentkoc/dotskills/tree/main/skills/example-skill)
-- [opik-integrations-auditor](https://github.com/vincentkoc/dotskills/tree/main/skills/opik-integrations-auditor)
-- [opik-optimizer](https://github.com/vincentkoc/dotskills/tree/main/skills/opik-optimizer)
-
 Quality verified by TomeVault's automated analysis pipeline. Source: [github.com/vincentkoc/dotskills](https://github.com/vincentkoc/dotskills)
 
 ---
