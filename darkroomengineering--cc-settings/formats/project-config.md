@@ -15,6 +15,10 @@ description: > Coding standards and guardrails for AI-assisted development.
 This codebase will outlive any single contributor. Every shortcut becomes someone else's burden.
 Fight entropy. Leave the codebase better than you found it.
 
+Make the codebase legible to agents. The work to make a codebase legible to an agent — written-down
+conventions, skills, rules, intent docs — is simply the debt you owe to your human engineers; every
+entry pays it down for both audiences at once.
+
 ---
 
 ## Getting Started
@@ -30,7 +34,7 @@ Don't over-engineer your workflow. Start simple, add complexity only when you fe
 
 ## Response Calibration
 
-Claude Opus 4.7 calibrates response length to task complexity rather than defaulting to fixed verbosity. Match your output to what was asked:
+Claude Opus 4.8 calibrates response length to task complexity rather than defaulting to fixed verbosity. Match your output to what was asked:
 
 - **Simple questions** (1-2 sentences): direct answer, no preamble, no trailing summary
 - **Lookups ("where is X", "what does Y do")**: one short paragraph + file:line reference
@@ -44,13 +48,27 @@ Claude Opus 4.7 calibrates response length to task complexity rather than defaul
 - Use "I'll now..." / "Let me..." preambles; just do the thing and announce completion
 - Pad responses with caveats or qualifications that don't change the outcome
 
-**Positive guidance beats negative**: state how to respond (concise, direct) rather than what to avoid. 4.7 interprets prompts literally — a rule like "don't be verbose" is weaker than "respond in 1-2 sentences for simple questions."
+**Positive guidance beats negative**: state how to respond (concise, direct) rather than what to avoid. 4.8 interprets prompts literally — a rule like "don't be verbose" is weaker than "respond in 1-2 sentences for simple questions."
 
 ---
 
 ## Guardrails
 
 These rules exist because we've seen them violated repeatedly. Non-negotiable.
+
+### Laziness Ladder (Before Writing Code)
+The best code is the code you don't write. Before generating anything, stop at the **first rung that holds**:
+
+1. **Does this need to exist?** — if no, skip it (YAGNI). Question the request before solving it.
+2. **Does the standard library / runtime already do this?** — use it.
+3. **Does a native platform feature cover it?** — use it.
+4. **Does an already-installed dependency solve it?** — use it; don't add a new one.
+5. **Can it be one line?** — make it one line.
+6. **Only then** — write the minimum that works.
+
+Default to deletion over addition, boring over clever, fewest files possible. No abstractions, dependencies, or boilerplate nobody asked for. When two stdlib approaches tie on size, pick the edge-case-correct one.
+
+**Lazy, not negligent.** The ladder never applies to trust-boundary/input validation, error handling that prevents data loss, security, accessibility, or anything explicitly requested — those are always built in full. It also bends for real-world physical constraints (hardware drift, sensor inaccuracy) when the task involves them.
 
 ### Read Before Edit
 **Never change code you haven't read.** Research the codebase before editing — open the file, trace the callers, understand the context. Edit-first behavior produces shallow fixes and regressions. If you're about to modify something you haven't read in this session, stop and read it first.
@@ -70,50 +88,14 @@ When fixing a bug, stay **confined to files directly related to the bug**:
 - Don't touch files outside the immediate blast radius
 - A bug fix PR should be reviewable in under 2 minutes
 
-### Verify After Every Fix
-Run the build after any fix and verify it passes **before moving on**. Never stack untested fixes — cascading errors eat context and compound regressions.
+### Completeness Is Cheap
+AI-assisted coding pushes the marginal cost of finishing toward zero. When the complete version of the thing you're **already building** costs minutes more than the shortcut, do the complete thing — every edge case, error path, and test. "Ship the 90%, defer the rest" is legacy thinking from when human typing was the bottleneck.
 
-### Pre-Commit Verification
-Before ANY commit:
-1. Run type checking (`tsc --noEmit` for TypeScript) — fix all errors
-2. Run the build command — fix all errors
-3. Run existing tests — fix all failures
+This is bounded by scope, not a license to expand it. Complete the **unit you're deliberately touching**; it does not override `Bug Fix Scope` (a fix stays minimal) or `Surface Conflicts`. Finishing a bounded module is a "lake" — boil it. Rewriting an adjacent system is an "ocean" — flag it as out of scope, don't start it.
 
-**Never commit code that doesn't build.**
-
-### Never Fake Measurements
-NEVER fabricate output from Lighthouse, bundle size tools, performance profilers, test runners, or build systems. If you can't run a tool, say so.
-
-### Visual/Spatial Honesty
-For sub-pixel rendering, WebGL, physics, complex animations, or canvas — acknowledge limitations upfront. Provide best-effort with clear TODOs, and suggest the user validate visually.
-
-For CSS/visual bugs: if a fix doesn't work after 2 attempts, propose **3 fundamentally different approaches** and let the user pick.
-
-### Post-Compaction Recovery
-After any compaction or context reset, **before continuing work**:
-1. Re-read the task plan (todo, plan file, or issue)
-2. Re-read the files you're actively modifying
-3. Run `git diff --stat` to see what's changed
-4. Only then continue implementation
-
-Never assume you remember file contents or task state after compaction. Context loss is silent — re-read, don't guess.
-
-### Neutral Exploration
-When investigating code (auditing, reviewing, exploring), use **neutral prompts** that don't bias toward a specific outcome:
-- Say "analyze the logic and report all findings" — not "find the bug"
-- Say "review the auth flow and describe what happens" — not "what's wrong with auth"
-- Say "trace the data flow and report" — not "where's the data leak"
-
-Biased prompts cause agents to manufacture issues that don't exist.
-
-### TODO Comments Are Instructions
-When you encounter a `TODO`, `FIXME`, or `HACK` comment, **implement it** — don't delete it. Removing a TODO without doing the work is marking your own homework complete by erasing the assignment.
-
-### Plan Before Multi-File Changes
-Before any change touching **5+ files**, outline the plan first:
 
 <!-- Content truncated to meet Windsurf 6KB limit -->
 
 ---
 > Source: [darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:windsurf_rules:2026-05-02 -->
+<!-- tomevault:4.0:windsurf_rules:2026-06-20 -->
