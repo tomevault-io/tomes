@@ -17,27 +17,9 @@ Original source: `CLAUDE.md` in [darkroomengineering/cc-settings](https://github
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (19)
+## Bundled Skills (1)
 
-- [ask](https://github.com/darkroomengineering/cc-settings/tree/main/skills/ask)
-- [build](https://github.com/darkroomengineering/cc-settings/tree/main/skills/build)
-- [component](https://github.com/darkroomengineering/cc-settings/tree/main/skills/component)
-- [debug](https://github.com/darkroomengineering/cc-settings/tree/main/skills/debug)
-- [docs](https://github.com/darkroomengineering/cc-settings/tree/main/skills/docs)
-- [explore](https://github.com/darkroomengineering/cc-settings/tree/main/skills/explore)
-- [fix](https://github.com/darkroomengineering/cc-settings/tree/main/skills/fix)
-- [hook](https://github.com/darkroomengineering/cc-settings/tree/main/skills/hook)
-- [init](https://github.com/darkroomengineering/cc-settings/tree/main/skills/init)
-- [learn](https://github.com/darkroomengineering/cc-settings/tree/main/skills/learn)
-- [lenis](https://github.com/darkroomengineering/cc-settings/tree/main/skills/lenis)
-- [orchestrate](https://github.com/darkroomengineering/cc-settings/tree/main/skills/orchestrate)
-- [premortem](https://github.com/darkroomengineering/cc-settings/tree/main/skills/premortem)
-- [qa](https://github.com/darkroomengineering/cc-settings/tree/main/skills/qa)
-- [refactor](https://github.com/darkroomengineering/cc-settings/tree/main/skills/refactor)
-- [review](https://github.com/darkroomengineering/cc-settings/tree/main/skills/review)
-- [teams](https://github.com/darkroomengineering/cc-settings/tree/main/skills/teams)
-- [test](https://github.com/darkroomengineering/cc-settings/tree/main/skills/test)
-- [tldr](https://github.com/darkroomengineering/cc-settings/tree/main/skills/tldr)
+- [nuclear-review](https://github.com/darkroomengineering/cc-settings/tree/main/skills/nuclear-review)
 
 Quality verified by TomeVault's automated analysis pipeline. Source: [github.com/darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings)
 
