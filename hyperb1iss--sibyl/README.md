@@ -17,12 +17,6 @@ Original source: `CLAUDE.md` in [hyperb1iss/sibyl](https://github.com/hyperb1iss
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (3)
-
-- [agent-orchestrate](https://github.com/hyperb1iss/sibyl/tree/main/apps/cli/src/sibyl_cli/data/skills/agent-orchestrate)
-- [sandbox-init](https://github.com/hyperb1iss/sibyl/tree/main/skills/sandbox-init)
-- [sibyl](https://github.com/hyperb1iss/sibyl/tree/main/apps/cli/src/sibyl_cli/data/skills/sibyl)
-
 Quality verified by TomeVault's automated analysis pipeline. Source: [github.com/hyperb1iss/sibyl](https://github.com/hyperb1iss/sibyl)
 
 ---
