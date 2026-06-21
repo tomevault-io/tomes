@@ -17,12 +17,7 @@ Original source: `AGENTS.md` in [trpc-group/trpc-agent-go](https://github.com/tr
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (2)
-
-- [demo-skill](https://github.com/trpc-group/trpc-agent-go/tree/main/examples/skillloadmode/skills/demo-skill)
-- [python_math](https://github.com/trpc-group/trpc-agent-go/tree/main/examples/skillrun/skills/python_math)
-
-From [trpc-group/trpc-agent-go](https://github.com/trpc-group/trpc-agent-go) — a repo with 1134+ stars on GitHub.
+From [trpc-group/trpc-agent-go](https://github.com/trpc-group/trpc-agent-go) — a repo with 1382+ stars on GitHub.
 
 ---
 
