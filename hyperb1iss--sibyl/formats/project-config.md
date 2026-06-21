@@ -1,14 +1,14 @@
 ---
 trigger: always_on
-description: **Sibyl** is a graph-backed memory system - an MCP server and web app providing persistent memory,
+description: **Sibyl** is a SurrealDB-native memory system - an MCP server and web app providing persistent
 ---
 
 # Sibyl Development Guide
 
 ## Project Overview
 
-**Sibyl** is a graph-backed memory system - an MCP server and web app providing persistent memory,
-search, and task coordination through a Graphiti-powered knowledge graph.
+**Sibyl** is a SurrealDB-native memory system - an MCP server and web app providing persistent
+memory, search, and task coordination through a unified graph, content, and auth runtime.
 
 **See package READMEs for detailed documentation:**
 
@@ -96,7 +96,7 @@ cross-package dependencies. Never use raw `pnpm`/`uv` commands for lint, test, b
 
 ```bash
 # Lifecycle
-moon run dev              # Start everything (FalkorDB, API, worker, web)
+moon run dev              # Start SurrealDB, API with in-process jobs, and web. Default.
 moon run stop             # Stop all services
 
 # Quality (from any directory)
@@ -151,11 +151,12 @@ sibyl logs tail --json
 
 ### Ports
 
-| Service   | Port |
-| --------- | ---- |
-| API + MCP | 3334 |
-| Frontend  | 3337 |
-| FalkorDB  | 6380 |
+| Service             | Port |
+| ------------------- | ---- |
+| API + MCP           | 3334 |
+| Frontend            | 3337 |
+| SurrealDB (default) | 8000 |
+| Redis/Valkey        | 6381 |
 
 ---
 
@@ -169,15 +170,12 @@ sibyl logs tail --json
 manager = EntityManager(client, group_id=str(org.id))
 ```
 
-Each organization gets its own isolated FalkorDB graph. Forgetting org scope queries the wrong graph
-or breaks isolation.
+Each organization gets its own isolated Surreal namespace (`org_<uuid_hex>`). Forgetting org scope
+queries the wrong namespace or breaks isolation.
 
-### FalkorDB Write Concurrency
-
-FalkorDB's `BlockingConnectionPool` (50 connections, 60s timeout) handles write concurrency
 
 <!-- Content truncated to meet Windsurf 6KB limit -->
 
 ---
 > Source: [hyperb1iss/sibyl](https://github.com/hyperb1iss/sibyl) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:windsurf_rules:2026-05-03 -->
+<!-- tomevault:4.0:windsurf_rules:2026-06-21 -->
