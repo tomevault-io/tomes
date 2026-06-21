@@ -33,4 +33,4 @@ The root `go.mod` requires Go 1.21. The environment has Go 1.22+ pre-installed, 
 
 ---
 > Source: [trpc-group/trpc-agent-go](https://github.com/trpc-group/trpc-agent-go) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-05-04 -->
+<!-- tomevault:4.0:agents_md:2026-06-21 -->
