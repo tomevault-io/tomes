@@ -1,13 +1,13 @@
 ## sibyl
 
-> **Sibyl** is a graph-backed memory system - an MCP server and web app providing persistent memory,
+> **Sibyl** is a SurrealDB-native memory system - an MCP server and web app providing persistent
 
 # Sibyl Development Guide
 
 ## Project Overview
 
-**Sibyl** is a graph-backed memory system - an MCP server and web app providing persistent memory,
-search, and task coordination through a Graphiti-powered knowledge graph.
+**Sibyl** is a SurrealDB-native memory system - an MCP server and web app providing persistent
+memory, search, and task coordination through a unified graph, content, and auth runtime.
 
 **See package READMEs for detailed documentation:**
 
@@ -95,7 +95,7 @@ cross-package dependencies. Never use raw `pnpm`/`uv` commands for lint, test, b
 
 ```bash
 # Lifecycle
-moon run dev              # Start everything (FalkorDB, API, worker, web)
+moon run dev              # Start SurrealDB, API with in-process jobs, and web. Default.
 moon run stop             # Stop all services
 
 # Quality (from any directory)
@@ -150,11 +150,12 @@ sibyl logs tail --json
 
 ### Ports
 
-| Service   | Port |
-| --------- | ---- |
-| API + MCP | 3334 |
-| Frontend  | 3337 |
-| FalkorDB  | 6380 |
+| Service             | Port |
+| ------------------- | ---- |
+| API + MCP           | 3334 |
+| Frontend            | 3337 |
+| SurrealDB (default) | 8000 |
+| Redis/Valkey        | 6381 |
 
 ---
 
@@ -168,22 +169,23 @@ sibyl logs tail --json
 manager = EntityManager(client, group_id=str(org.id))
 ```
 
-Each organization gets its own isolated FalkorDB graph. Forgetting org scope queries the wrong graph
-or breaks isolation.
+Each organization gets its own isolated Surreal namespace (`org_<uuid_hex>`). Forgetting org scope
+queries the wrong namespace or breaks isolation.
 
-### FalkorDB Write Concurrency
+### Surreal Write Concurrency
 
-FalkorDB's `BlockingConnectionPool` (50 connections, 60s timeout) handles write concurrency
-natively. No application-level locking is needed.
+The SurrealDB driver serializes websocket queries through a per-client `asyncio.Lock`. Do not hold
+the lock across awaits you don't control, and don't share a single driver instance across orgs — use
+`driver.clone(group_id)` to get an isolated client.
 
-### Node Labels
+### Legacy Graph Archives
 
-Graphiti creates two node types:
+Older Graphiti archives contain two node shapes:
 
 - `Episodic` - Created by `add_episode()`
 - `Entity` - Extracted entities
 
-**Queries must handle both:**
+Migration and compatibility queries must handle both:
 
 ```cypher
 WHERE (n:Episodic OR n:Entity) AND n.entity_type = $type
@@ -205,16 +207,14 @@ from sibyl.cli.common import ELECTRIC_PURPLE
 
 ## Common Gotchas
 
-### FalkorDB
+### SurrealDB (default)
 
-- **Port 6380** (not 6379) to avoid Redis conflicts
-- **Graph corruption** can crash - nuke with `GRAPH.DELETE <org-uuid>`
-- **SEMAPHORE_LIMIT** must be set before importing graphiti
-
-### Graphiti
-
-- `add_episode()` creates `Episodic` nodes, not `Entity` nodes
-- Always query both labels
+- **Port 8000** for ws/http; RPC path is `/rpc`
+- **Embedded mode** uses RocksDB at `.moon/cache/surreal-dev` by default; single-writer
+- **Namespace-per-org** (`org_<uuid_hex>`): missing group_id routes queries to the wrong namespace
+- **Memory mode** (`memory://`) is test-only; forbidden in production via config validator
+- **Legacy graph compatibility code** is not part of the default memory loop. Graphiti-shaped
+  records are handled by Sibyl-owned projection and archive code without installing Graphiti.
 
 ### Next.js 16
 
@@ -262,4 +262,4 @@ See [`apps/web/README.md`](apps/web/README.md) for full design system documentat
 
 ---
 > Source: [hyperb1iss/sibyl](https://github.com/hyperb1iss/sibyl) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:gemini_md:2026-05-03 -->
+<!-- tomevault:4.0:gemini_md:2026-06-21 -->
