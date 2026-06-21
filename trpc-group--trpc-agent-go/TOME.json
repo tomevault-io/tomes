@@ -37,21 +37,8 @@
       "platform": "Windsurf"
     }
   ],
-  "skills": [
-    {
-      "name": "demo-skill",
-      "path": "examples/skillloadmode/skills/demo-skill",
-      "github_url": "https://github.com/trpc-group/trpc-agent-go/tree/main/examples/skillloadmode/skills/demo-skill",
-      "description": ""
-    },
-    {
-      "name": "python_math",
-      "path": "examples/skillrun/skills/python_math",
-      "github_url": "https://github.com/trpc-group/trpc-agent-go/tree/main/examples/skillrun/skills/python_math",
-      "description": ""
-    }
-  ],
+  "skills": [],
   "source_url": "https://github.com/trpc-group/trpc-agent-go",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-05-04T23:37:10Z"
+  "distributed_at": "2026-06-21T05:31:28Z"
 }
