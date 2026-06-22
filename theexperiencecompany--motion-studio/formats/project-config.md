@@ -128,4 +128,4 @@ The Studio's Inspector hides the Style section for locked compositions, and
 
 ---
 > Source: [theexperiencecompany/motion-studio](https://github.com/theexperiencecompany/motion-studio) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:windsurf_rules:2026-05-09 -->
+<!-- tomevault:4.0:windsurf_rules:2026-06-22 -->
