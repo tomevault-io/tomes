@@ -17,11 +17,7 @@ Original source: `CLAUDE.md` in [yoichiojima-2/consultant](https://github.com/yo
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [consulting](https://github.com/yoichiojima-2/consultant/tree/main/skills/consulting)
-
-From [yoichiojima-2/consultant](https://github.com/yoichiojima-2/consultant) — a repo with 8+ stars on GitHub.
+From [yoichiojima-2/consultant](https://github.com/yoichiojima-2/consultant) — a repo with 24+ stars on GitHub.
 
 ---
 
