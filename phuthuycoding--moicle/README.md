@@ -17,19 +17,7 @@ Original source: `CLAUDE.md` in [phuthuycoding/moicle](https://github.com/phuthu
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (9)
-
-- [api-integration](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/api-integration)
-- [deprecation](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/deprecation)
-- [documentation](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/documentation)
-- [go-module](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/go-module)
-- [new-feature](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/new-feature)
-- [onboarding](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/onboarding)
-- [pr-review](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/pr-review)
-- [refactor](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/refactor)
-- [tdd](https://github.com/phuthuycoding/moicle/tree/main/assets/skills/tdd)
-
-From [phuthuycoding/moicle](https://github.com/phuthuycoding/moicle) — a repo with 8+ stars on GitHub.
+From [phuthuycoding/moicle](https://github.com/phuthuycoding/moicle) — a repo with 9+ stars on GitHub.
 
 ---
 
