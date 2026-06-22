@@ -17,11 +17,7 @@ Original source: `CLAUDE.md` in [theexperiencecompany/motion-studio](https://git
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [motion](https://github.com/theexperiencecompany/motion-studio/tree/main/.agents/skills/motion)
-
-From [theexperiencecompany/motion-studio](https://github.com/theexperiencecompany/motion-studio) — a repo with 8+ stars on GitHub.
+From [theexperiencecompany/motion-studio](https://github.com/theexperiencecompany/motion-studio) — a repo with 65+ stars on GitHub.
 
 ---
 
