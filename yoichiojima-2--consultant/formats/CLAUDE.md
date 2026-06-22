@@ -19,6 +19,10 @@ A Claude Code plugin providing 50+ consulting frameworks from McKinsey, BCG, Bai
 ## Project Structure
 
 ```
+commands/
+├── consult.md         # /consult — full engagement flow on a problem
+├── analyze.md         # /analyze — PESTEL → 5 Forces → SWOT/3C analysis
+└── case-practice.md   # /case-practice — mock case interview with scoring
 skills/consulting/
 ├── SKILL.md           # Entry point
 ├── problem-solving.md # MECE, Pyramid, Issue Tree, McKinsey 7-Step, SCQ
@@ -30,6 +34,9 @@ skills/consulting/
 ├── operations.md      # Lean, Six Sigma, 5 Whys, Fishbone, PDCA
 └── templates/         # Ready-to-use templates
 ```
+
+When versions change, keep `.claude-plugin/plugin.json` and
+`.claude-plugin/marketplace.json` in sync (CI enforces this).
 
 ## Adding New Frameworks
 
@@ -51,4 +58,4 @@ Do not include AI-generated attribution in commit messages.
 
 ---
 > Source: [yoichiojima-2/consultant](https://github.com/yoichiojima-2/consultant) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-05-10 -->
+<!-- tomevault:4.0:claude_md:2026-06-22 -->
