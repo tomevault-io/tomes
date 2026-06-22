@@ -37,63 +37,8 @@
       "platform": "Windsurf"
     }
   ],
-  "skills": [
-    {
-      "name": "api-integration",
-      "path": "assets/skills/api-integration",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/api-integration",
-      "description": ""
-    },
-    {
-      "name": "deprecation",
-      "path": "assets/skills/deprecation",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/deprecation",
-      "description": ""
-    },
-    {
-      "name": "documentation",
-      "path": "assets/skills/documentation",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/documentation",
-      "description": ""
-    },
-    {
-      "name": "go-module",
-      "path": "assets/skills/go-module",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/go-module",
-      "description": ""
-    },
-    {
-      "name": "new-feature",
-      "path": "assets/skills/new-feature",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/new-feature",
-      "description": ""
-    },
-    {
-      "name": "onboarding",
-      "path": "assets/skills/onboarding",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/onboarding",
-      "description": ""
-    },
-    {
-      "name": "pr-review",
-      "path": "assets/skills/pr-review",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/pr-review",
-      "description": ""
-    },
-    {
-      "name": "refactor",
-      "path": "assets/skills/refactor",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/refactor",
-      "description": ""
-    },
-    {
-      "name": "tdd",
-      "path": "assets/skills/tdd",
-      "github_url": "https://github.com/phuthuycoding/moicle/tree/main/assets/skills/tdd",
-      "description": ""
-    }
-  ],
+  "skills": [],
   "source_url": "https://github.com/phuthuycoding/moicle",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-04-26T19:35:04Z"
+  "distributed_at": "2026-06-22T05:30:53Z"
 }
