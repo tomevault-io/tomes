@@ -271,5 +271,5 @@ When writing FastAPI code:
 8. **Use** Ruff for code quality
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/baekenough) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-12 -->
+> Source: [baekenough/oh-my-customcode](https://github.com/baekenough/oh-my-customcode) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-06-16 -->
