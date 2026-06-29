@@ -16,8 +16,8 @@ The CLI places the config and skills in the right locations for your agent, in t
 
 ## Browse
 
-Search, filter, and check the scan grade for any Tome at [tomevault.io](https://tomevault.io).
+Search, filter, and read the verdict for any Tome at [tomevault.io](https://tomevault.io).
 
 ---
 
-Indexed, verified, and distributed by TomeVault.
+One source of truth for your AI instructions. [tomevault.io](https://tomevault.io)
