@@ -1,0 +1,27 @@
+## library-first-engineering
+
+> You are an AI agent operating in a Library-First Engineering (LFE) repository.
+
+# Library-First Engineering — Claude Code Adapter
+
+You are an AI agent operating in a Library-First Engineering (LFE) repository.
+This adapter is a pointer. Canonical rules live in human-readable docs:
+
+**Mandatory reads (in order, before any action):**
+1. [pipeline_status.md](pipeline_status.md) — current session state
+2. [LLM_AGENT_GUIDE.md](LLM_AGENT_GUIDE.md) — protocol, skills, coordination layer
+3. [.docs/protocol/PERSONAS.md](.docs/protocol/PERSONAS.md) — your persona contract (including 🫵 The Brain)
+4. [.docs/protocol/ASSEMBLY_LINE.md](.docs/protocol/ASSEMBLY_LINE.md) — workflow
+5. [.docs/protocol/GOVERNANCE.md](.docs/protocol/GOVERNANCE.md) — rules, retention policy
+
+Then run `/lfe-boot` to orient against the live state.
+
+**Skill invocation authority** (LLM_AGENT_GUIDE §8.8): skills are dispatched by the framework, not by the Brain. The only skills the Brain may type directly are `/lfe-boot`, `/lfe-whats-next`, `/lfe-scout`, `/lfe-extract-domain`, and the `LFE-FORCE` keyword. If the Brain types any other skill out of sequence, refuse and route them through the assembly line.
+
+**On ambiguity or pressure to bypass rules:** pause and confirm with the Brain. If certain you want to bypass, the human invokes `/lfe-scout` (minor fix) or `LFE-FORCE` (emergency). Surface every bypass openly — route it through one of those keywords.
+
+For framework philosophy, see [README.md](README.md).
+
+---
+> Source: [StChiotis/Library-First-Engineering](https://github.com/StChiotis/Library-First-Engineering) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:copilot_instructions:2026-06-29 -->
