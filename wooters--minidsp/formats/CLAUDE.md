@@ -1,0 +1,62 @@
+# minidsp
+
+> A small C library for audio DSP: signal measurement, FFT spectrum analysis, biquad filtering, GCC-PHAT delay estimation, and audio I/O.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/minidsp/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# miniDSP
+
+A small C library for audio DSP: signal measurement, FFT spectrum analysis, biquad filtering, GCC-PHAT delay estimation, and audio I/O.
+
+## Core Engineering Principles
+
+1. **Clarity over cleverness** — Write code that's maintainable, not impressive
+2. **Explicit over implicit** — No magic. Make behavior obvious
+3. **Composition over inheritance** — Small units that combine
+4. **Fail fast, fail loud** — Surface errors at the source
+5. **Delete code** — Less code = fewer bugs. Question every addition
+6. **Verify, don't assume** — Run it. Test it. Prove it works
+
+## Memory management
+
+- **FFT plan caching** — `src/minidsp_spectrum.c` and `src/minidsp_gcc.c` keep static FFTW plans and buffers, allocated on first use and reallocated only when signal length changes. Call `MD_shutdown()` to free them.
+- **Mel filterbank caching** — Filterbank matrices are cached by `(N, sample_rate, num_mels, min_freq_hz, max_freq_hz)` and released from `MD_shutdown()`.
+
+## API design contract
+
+- **Error handling** — The library never calls `abort()` or `assert()`. Precondition violations are reported via a configurable error handler (default: `fprintf(stderr, ...)`), then the function returns a safe default (`0.0` for double, `0` for unsigned, `-1` for int, no-op for void). Use `MD_CHECK(cond, code, msg, retval)` or `MD_CHECK_VOID(cond, code, msg)` macros (defined in `src/minidsp_internal.h`) for all precondition checks. Error codes: `MD_ERR_NULL_POINTER`, `MD_ERR_INVALID_SIZE`, `MD_ERR_INVALID_RANGE`, `MD_ERR_ALLOC_FAILED`.
+- **Sentinel returns** — Sentinel values (e.g. `0.0` from `MD_f0_autocorrelation` when no peak is found) are valid-but-unresolved runtime outcomes, NOT errors — they must not trigger the error handler.
+- **Module boundaries** — FFT-dependent APIs belong in `src/minidsp_spectrum.c`; time-domain/stateless analysis belongs in `src/minidsp_core.c`. Error handler state lives in `src/minidsp_error.c`.
+- **MFCC contract** — HTK mel mapping, one-sided PSD mel energies, natural-log floor at `1e-12`, DCT-II with `sqrt(1/M)` for `C0` and `sqrt(2/M)` for higher coefficients, `C0` returned at index 0.
+- **Spectrum frequency bounds** — Check structural misuse via `MD_CHECK`; clamp runtime frequency ranges to `[0, Nyquist]`; return finite outputs for valid-but-empty clamped ranges.
+
+## Documentation conventions
+
+- **"Reading the formula in C" sections** — Use direct loops/arithmetic (not library wrappers) with explicit variable mapping comments (e.g. `i -> n`, `out[i] -> w[n]`).
+- **Comparative visuals** — Keep plot settings fixed across variants (same tap length, FFT visualization length, dB floor/range) for meaningful comparison.
+- **Guide assets** — When adding generated HTML plots/audio, update `Doxyfile` `HTML_EXTRA_FILES` and ensure every embedded iframe source is listed there.
+
+## Versioning
+
+- **Single source of truth** — The `VERSION` file at the repo root contains the semver string (e.g., `0.1.0`). The root Makefile reads it and injects `-DMINIDSP_VERSION*` flags.
+- **Header macros** — `minidsp.h` provides `MINIDSP_VERSION` (string), `MINIDSP_VERSION_MAJOR`, `MINIDSP_VERSION_MINOR`, `MINIDSP_VERSION_PATCH` (integers) with `#ifndef` defaults for standalone compilation.
+- **Git tags** — Releases are tagged `vMAJOR.MINOR.PATCH` (e.g., `v0.1.0`). The tag must match the `VERSION` file content.
+- **Release checklist** — (1) Update `VERSION` file, (2) commit, (3) `git tag -a vX.Y.Z -m "vX.Y.Z — description"`, (4) `git push --tags`.
+- **Install** — `make install PREFIX=/path` copies `libminidsp.a` and public headers. Default prefix is `/usr/local`.
+
+## Build quirks
+
+- **C17 standard** — The codebase targets `-std=c17 -Wall -Wextra -pedantic`. Use `NULL` (not `nullptr`), `#include <stdbool.h>` for `bool`, and `__attribute__((deprecated))` (not `[[deprecated]]`).
+- **Legacy demo programs** in `tests/` (`gcc_phat_test`, `testliveio`, etc.) require gnuplot_i and/or PortAudio at link time — unlike the main test suite which only needs FFTW3, math, and libsndfile.
+
+---
+> Source: [wooters/miniDSP](https://github.com/wooters/miniDSP) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-06-29 -->
