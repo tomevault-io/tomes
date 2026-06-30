@@ -208,5 +208,5 @@ When working on AI projects, always consider:
 - Scalability and performance requirements
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/tao12345666333) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-11 -->
+> Source: [tao12345666333/amcp](https://github.com/tao12345666333/amcp) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-06-30 -->
