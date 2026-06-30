@@ -17,15 +17,13 @@ Original source: `AGENTS.md` in [tao12345666333/amcp](https://github.com/tao1234
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (8)
+## Bundled Skills (6)
 
 - [ai-engineer](https://github.com/tao12345666333/amcp/tree/main/examples/skills/ai-engineer)
 - [code-review](https://github.com/tao12345666333/amcp/tree/main/examples/skills/code-review)
 - [gh-ci-analyzer](https://github.com/tao12345666333/amcp/tree/main/.amcp/skills/gh-ci-analyzer)
-- [mobile-developer](https://github.com/tao12345666333/amcp/tree/main/examples/skills/mobile-developer)
 - [python-expert](https://github.com/tao12345666333/amcp/tree/main/examples/skills/python-expert)
 - [react-developer](https://github.com/tao12345666333/amcp/tree/main/examples/skills/react-developer)
-- [security-best-practices](https://github.com/tao12345666333/amcp/tree/main/examples/plugins/security-guidance/skills/security-best-practices)
 - [skill-creator](https://github.com/tao12345666333/amcp/tree/main/src/amcp/builtin_skills/skill-creator)
 
 Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/tao12345666333/amcp](https://github.com/tao12345666333/amcp)
