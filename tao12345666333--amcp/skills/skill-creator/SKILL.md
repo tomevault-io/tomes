@@ -187,10 +187,31 @@ When editing the skill, remember it is being created for another instance of the
 
 #### Frontmatter
 
-Write the YAML frontmatter with `name` and `description`:
+Write the YAML frontmatter with these fields:
 
-- `name`: The skill name
-- `description`: This is the primary triggering mechanism. Include both what the skill does and specific triggers/contexts for when to use it. Include all "when to use" information here, not in the body.
+- `name` (required): The skill name
+- `description` (required): This is the primary triggering mechanism. Include both what the skill does and specific triggers/contexts for when to use it. Include all "when to use" information here, not in the body.
+- `auto_trigger` (optional, default: `true`): Whether the agent can automatically use this skill when relevant. Set to `false` for skills that should only be invoked explicitly via `/skill:<name>`.
+- `parameters` (optional): List of parameters that can be passed when invoking the skill explicitly.
+
+Example frontmatter with all fields:
+
+```yaml
+---
+name: deploy
+description: Deploy the application to a specified environment. Use when the user wants to deploy code.
+auto_trigger: false
+parameters:
+  - name: env
+    description: Target environment
+    required: true
+    enum: [staging, production]
+  - name: version
+    description: Version to deploy
+    required: false
+    default: latest
+---
+```
 
 #### Body
 
@@ -216,5 +237,5 @@ After testing the skill, iterate based on real usage:
 4. Implement changes and test again
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/tao12345666333) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-11 -->
+> Source: [tao12345666333/amcp](https://github.com/tao12345666333/amcp) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-06-30 -->
