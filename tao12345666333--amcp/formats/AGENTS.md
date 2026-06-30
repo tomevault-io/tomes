@@ -136,4 +136,4 @@ uvx amcp-agent -v
 
 ---
 > Source: [tao12345666333/amcp](https://github.com/tao12345666333/amcp) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-05-02 -->
+<!-- tomevault:4.0:agents_md:2026-06-30 -->
