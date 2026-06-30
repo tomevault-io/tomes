@@ -57,12 +57,6 @@
       "description": ""
     },
     {
-      "name": "mobile-developer",
-      "path": "examples/skills/mobile-developer",
-      "github_url": "https://github.com/tao12345666333/amcp/tree/main/examples/skills/mobile-developer",
-      "description": ""
-    },
-    {
       "name": "python-expert",
       "path": "examples/skills/python-expert",
       "github_url": "https://github.com/tao12345666333/amcp/tree/main/examples/skills/python-expert",
@@ -75,12 +69,6 @@
       "description": ""
     },
     {
-      "name": "security-best-practices",
-      "path": "examples/plugins/security-guidance/skills/security-best-practices",
-      "github_url": "https://github.com/tao12345666333/amcp/tree/main/examples/plugins/security-guidance/skills/security-best-practices",
-      "description": ""
-    },
-    {
       "name": "skill-creator",
       "path": "src/amcp/builtin_skills/skill-creator",
       "github_url": "https://github.com/tao12345666333/amcp/tree/main/src/amcp/builtin_skills/skill-creator",
@@ -89,5 +77,5 @@
   ],
   "source_url": "https://github.com/tao12345666333/amcp",
   "distributed_by": "TomeVault",
-  "distributed_at": "2026-05-02T21:40:34Z"
+  "distributed_at": "2026-06-30T06:31:01Z"
 }
