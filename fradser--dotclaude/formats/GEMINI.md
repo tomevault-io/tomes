@@ -10,9 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **Claude Code plugin marketplace** (`frad-dotclaude`) containing 15 plugins across development and productivity categories. Each plugin follows auto-discovery conventions—place components in `commands/`, `agents/`, `skills/` directories and Claude discovers them automatically.
 
-**Active plugins:** git, gitflow, github, refactor, swiftui, claude-config, office, plugin-optimizer, superpowers, next-devtools
+**Active plugins:** git, gitflow, github, refactor, swiftui, office, plugin-optimizer, superpowers, frontend, antigravity
 
-**Non-active plugins:** acpx, shadcn, code-context, utils, meeseeks-vetted
+**Non-active plugins:** acpx, code-context, utils, meeseeks-vetted
 
 ## Plugin Structure
 
@@ -55,7 +55,9 @@ Exit codes: 0 = passed, 1 = MUST violations, 2 = token budget critical.
 
 **Branch Strategy:** develop -> main (merge commits)
 
-**Version sync:** Plugin versions in individual `plugin.json` files are authoritative. Keep `.claude-plugin/marketplace.json` entries in sync when bumping versions.
+**Version sync:** Plugin versions in individual `plugin.json` files are authoritative. Keep `.claude-plugin/marketplace.json` entries in sync when bumping versions. `README.md` / `README.zh-CN.md` are a third sync target — their plugin listings drift silently (currently still mention removed `next-devtools`/`shadcn`), so run `/utils:update-readme` whenever you add, remove, or rename a plugin.
+
+**`strict` field in marketplace.json:** Default is `true`. Set `"strict": false` on a plugin entry (see `office`) to relax marketplace validation for plugins that intentionally bundle non-standard content.
 
 **Token budgets (official best practices):**
 - Level 1 (Metadata): ~100 tokens for name + description - always loaded at startup
@@ -71,7 +73,8 @@ Validation script enforces these limits with exit codes:
 1. `mkdir -p plugin-name/{.claude-plugin,skills,agents}`
 2. Add `plugin.json` with name, description, author, version, keywords, license
 3. Add entry to `.claude-plugin/marketplace.json` with matching version
-4. Validate with plugin-optimizer before committing
+4. Run `/utils:update-readme` to sync `README.md` and `README.zh-CN.md`
+5. Validate with plugin-optimizer before committing
 
 **Required plugin.json fields:**
 ```json
@@ -90,7 +93,7 @@ Validation script enforces these limits with exit codes:
 
 ## Git Commit Conventions
 
-**Scopes:** acpx, cldc, cod, git, gitflow, github, mve, devtools, office, po, shadcn, sp, swiftui, utils
+**Scopes:** acpx, ag, as, cctx, fe, git, gitflow, github, hw, office, po, refactor, sp, storm, swiftui, utils
 
 **Types:** feat, fix, docs, refactor, test, chore, perf
 
@@ -159,4 +162,4 @@ Best practices and file pattern examples live inside `plugin-optimizer/skills/pl
 
 ---
 > Source: [FradSer/dotclaude](https://github.com/FradSer/dotclaude) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:gemini_md:2026-05-04 -->
+<!-- tomevault:4.0:gemini_md:2026-07-07 -->
