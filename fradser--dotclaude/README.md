@@ -17,11 +17,7 @@ Original source: `CLAUDE.md` in [FradSer/dotclaude](https://github.com/FradSer/d
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (1)
-
-- [best-practices](https://github.com/FradSer/dotclaude/tree/main/refactor/skills/best-practices)
-
-From [FradSer/dotclaude](https://github.com/FradSer/dotclaude) — a repo with 539+ stars on GitHub.
+From [FradSer/dotclaude](https://github.com/FradSer/dotclaude) — a repo with 573+ stars on GitHub.
 
 ---
 
