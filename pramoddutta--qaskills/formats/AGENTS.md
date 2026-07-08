@@ -164,4 +164,4 @@ Each skill is a markdown file with YAML frontmatter. See `seed-skills/*/SKILL.md
 
 ---
 > Source: [PramodDutta/qaskills](https://github.com/PramodDutta/qaskills) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-04-21 -->
+<!-- tomevault:4.0:agents_md:2026-07-08 -->
