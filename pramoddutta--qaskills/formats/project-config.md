@@ -95,4 +95,4 @@ This is a critical pattern used throughout the app to avoid RSC errors:
 
 ---
 > Source: [PramodDutta/qaskills](https://github.com/PramodDutta/qaskills) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:windsurf_rules:2026-04-21 -->
+<!-- tomevault:4.0:windsurf_rules:2026-07-08 -->
