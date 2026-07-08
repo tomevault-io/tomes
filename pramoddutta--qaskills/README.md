@@ -17,11 +17,6 @@ Original source: `CLAUDE.md` in [PramodDutta/qaskills](https://github.com/Pramod
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (2)
-
-- [vue-test-utils-testing](https://github.com/PramodDutta/qaskills/tree/main/seed-skills/vue-test-utils)
-- [django-testing-patterns](https://github.com/PramodDutta/qaskills/tree/main/seed-skills/django-testing)
-
 Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/PramodDutta/qaskills](https://github.com/PramodDutta/qaskills)
 
 ---
