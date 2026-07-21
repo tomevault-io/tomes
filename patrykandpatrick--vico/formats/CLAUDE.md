@@ -1,0 +1,46 @@
+# vico
+
+> Vico is a multiplatform chart library written in Kotlin, supporting Compose
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/vico/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# Vico—agent instructions
+
+## Overview
+
+Vico is a multiplatform chart library written in Kotlin, supporting Compose
+Multiplatform.
+
+## Build and test
+
+JDK 17 is required. Builds target JVM 11.
+
+```bash
+# Compile
+./gradlew compileDebugSources
+
+# Test
+./gradlew test
+```
+
+For code changes, run the relevant compile and test tasks before committing when
+practical. Documentation-only and other non-code changes usually do not need a
+full test run. Formatting is handled by the `Lefthook` pre-commit hook and
+enforced by CI on every push and PR.
+
+## Key guidance
+
+1. **Explicit API mode:** All library modules require explicit visibility
+   modifiers on public API.
+
+---
+> Source: [patrykandpatrick/vico](https://github.com/patrykandpatrick/vico) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-07-21 -->
