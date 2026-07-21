@@ -1,0 +1,27 @@
+# personal-api-skill
+
+> Read `ME.md` first, then `AGENT.md`.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/personal-api-skill/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# OpenAI / Codex Agent Adapter
+
+Read `ME.md` first, then `AGENT.md`.
+
+Use `00.context/now.md` for current focus and `50.maps/index.md` for navigation.
+
+When working under `30.knowledge/`, read `30.knowledge/00.system/methodology.md` before creating, moving, or rewriting notes.
+
+Track A identity files are human-owned. Do not rewrite `ME.md`, `10.identity/`, or core behavior rules unless the user explicitly asks.
+
+---
+> Source: [beiyuii/personal-api-skill](https://github.com/beiyuii/personal-api-skill) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-07-21 -->
