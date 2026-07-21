@@ -241,5 +241,5 @@ gh api repos/streamlit/streamlit/issues/{PR_NUMBER}/comments \
 | Uncommitted changes | Warn user first |
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/streamlit/streamlit)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/streamlit) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
