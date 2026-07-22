@@ -1,0 +1,204 @@
+---
+name: hass-declarative
+description: > Use when this capability is needed.
+metadata:
+  author: edmundmiller
+---
+
+# HA Declarative Entity Management
+
+All HA automations, scenes, and scripts are defined in Nix under
+`modules/services/hass/_domains/`. A post-deploy sweep service removes
+anything not in the declared set.
+
+## Architecture
+
+```
+_lib.nix                       ← shared helpers (ensureEnabled)
+_domains/                      ← domain files (Nix modules)
+  ambient.nix                  ← lighting schedules, plant lights
+  aranet.nix                   ← CO2 monitoring
+  conversation.nix             ← voice intents
+  lighting.nix                 ← adaptive lighting, AL sleep mode
+  modes.nix                    ← DND, guest mode, everything_off script
+  sleep/default.nix            ← bedtime flow, wake detection, 8Sleep sync
+  tv.nix                       ← TV idle timer, sleep timer
+  vacation.nix                 ← presence-based vacation mode
+
+sweep-unmanaged.nix            ← extracts declared IDs at build time
+sweep-unmanaged.py             ← runtime: removes orphans via WS API
+_tests/eval-automations.nix    ← structural assertions (flake check)
+```
+
+## Entity Identity
+
+How HA maps Nix config → entity registry:
+
+| Domain     | Nix declaration                  | Entity ID                 | Unique ID (registry)  |
+| ---------- | -------------------------------- | ------------------------- | --------------------- |
+| automation | `id = "winding_down";`           | `automation.winding_down` | Same as `id` field    |
+| scene      | `name = "Good Morning";`         | `scene.good_morning`      | HA-generated UUID     |
+| script     | `script.everything_off = {...};` | `script.everything_off`   | Same as attribute key |
+
+Scene slugs: HA lowercases the name and replaces spaces/hyphens with
+underscores. Keep names ASCII-alphanumeric + spaces to avoid slug surprises.
+
+## Adding Entities
+
+### Automation
+
+Add to the `automation = lib.mkAfter (ensureEnabled [...])` list in the
+appropriate domain file. Every automation **must** have a unique `id` field
+— the sweep service uses it.
+
+**Always wrap with `ensureEnabled`** (from `_lib.nix`) — it injects
+`initial_state = true` so automations re-enable on HA restart. Without it,
+HA silently persists "off" state from the entity registry and automations
+stay disabled forever. The eval test catches missing wrappers at build time.
+
+```nix
+{ lib, ... }:
+let
+  inherit (import ../_lib.nix) ensureEnabled;
+in {
+  services.home-assistant.config.automation = lib.mkAfter (ensureEnabled [
+    {
+      alias = "Human-Readable Name";
+      id = "unique_snake_case_id";
+      description = "What it does";
+      trigger = { platform = "time"; at = "22:00:00"; };
+      condition = [];
+      action = [{ action = "scene.turn_on"; target.entity_id = "scene.foo"; }];
+    }
+  ]);
+}
+```
+
+Individual automations can override with `initial_state = false` if ever needed
+(the `//` merge gives right-hand precedence), but we never want this in practice.
+
+### Scene
+
+Add to `scene = lib.mkAfter [...]`. Scenes use `name` as their identity.
+
+```nix
+{
+  name = "My Scene";
+  icon = "mdi:icon-name";
+  entities = {
+    "light.some_light" = "on";
+    "switch.some_switch" = "off";
+  };
+}
+```
+
+### Script
+
+Add to `script = lib.mkAfter {...}` (attrset, not list). The attribute
+key becomes the entity_id.
+
+```nix
+my_script_key = {
+  alias = "Human Name";
+  icon = "mdi:icon";
+  sequence = [{ action = "light.turn_off"; target.entity_id = "light.foo"; }];
+};
+```
+
+Or directly on config: `script.my_key = {...};` (as in `modes.nix`).
+
+## Removing Entities
+
+1. Delete from the domain `.nix` file
+2. Deploy (`hey nuc`)
+3. `hass-sweep-unmanaged` service auto-removes the orphan from HA's entity registry
+
+No manual cleanup needed. Check sweep results:
+
+```bash
+hey nuc-service hass-sweep-unmanaged
+ssh nuc "sudo journalctl -u hass-sweep-unmanaged --no-pager -n 30"
+```
+
+## Sweep Service
+
+`sweep-unmanaged.nix` creates a systemd oneshot that runs after HA starts.
+
+**Build time:** Evaluates NixOS config to extract:
+
+- `automation_ids` — from `haConfig.automation[].id`
+- `scene_entity_ids` — from `haConfig.scene[].name` → `scene.<slug>`
+- `script_entity_ids` — from `haConfig.script` keys → `script.<key>`
+
+Writes these to a JSON manifest in the Nix store.
+
+**Runtime** (`sweep-unmanaged.py`):
+
+1. Waits for HA to be ready (120s timeout)
+2. Connects via WebSocket, authenticates with `agent-automation` JWT
+3. Lists all entity registry entries
+4. For each `automation.*` / `scene.*` / `script.*` not in the manifest:
+   - Checks `platform` to avoid removing integration-created entities
+   - Removes from entity registry via `config/entity_registry/remove`
+5. Wipes UI YAML files (`automations.yaml`, `scenes.yaml`, `scripts.yaml`)
+
+**Platform filtering** (safety):
+
+- Automations: only removes `platform = "automation"` (YAML-sourced)
+- Scenes: only removes `platform = "homeassistant"` (YAML-sourced)
+- Scripts: only removes `platform = "script"` (YAML-sourced)
+- Integration-created entities (Ecobee scenes, etc.) are never touched
+
+## Eval Test Assertions
+
+`_tests/eval-automations.nix` runs as `nix flake check` and pre-commit hook.
+Tests structural properties:
+
+- **Every automation has `initial_state = true`** — catches missing `ensureEnabled` wrappers
+- Required automations/scenes exist
+- Time guards present on wake detection (the "4:47 AM fix")
+- Good Morning has presence-aware conditions
+- Winding Down resets awake booleans
+
+Add assertions when adding automations with critical invariants.
+
+### initial_state enforcement
+
+The `initial_state` assertion is global — it iterates all automations in the
+final merged config. No per-automation opt-in needed. If you add an automation
+anywhere without `ensureEnabled`, the build fails:
+
+```
+automation 'My Thing' missing initial_state = true (use ensureEnabled from _lib.nix)
+```
+
+**Why this matters:** HA's `initial_state` defaults to "restore from entity
+registry." If an automation was ever toggled off in the UI (or the registry
+entry drifts), it stays off across restarts — silently. With
+`configWritable = false`, the UI toggle is especially dangerous since there's
+no way to re-enable it without redeploying. `ensureEnabled` + the eval
+assertion make this class of bug impossible.
+
+## Debugging
+
+```bash
+# Check what the sweep would do (dry-run)
+ssh nuc "sudo systemctl cat hass-sweep-unmanaged"  # see ExecStart paths
+ssh nuc "sudo /path/to/python3 /path/to/sweep-unmanaged.py /path/to/manifest.json --dry-run"
+
+# View the build-time manifest
+nix eval --json '.#nixosConfigurations.nuc.config.services.home-assistant.config.automation' 2>/dev/null | python3 -c "import json,sys; print([a['id'] for a in json.load(sys.stdin) if a.get('id')])"
+
+# Run eval assertions locally
+nix build '.#checks.x86_64-linux.ha-automation-assertions' --dry-run
+```
+
+## References
+
+| File                             | Contents                                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------ |
+| `references/entity-lifecycle.md` | How HA stores entities internally, the .storage files, and what "ghost" entities are |
+
+---
+> Source: [edmundmiller/dotfiles](https://github.com/edmundmiller/dotfiles) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-20 -->
