@@ -1,0 +1,41 @@
+---
+name: giip-dev-agent
+description: 스킬(Skill)은 에이전트가 특정 도구나 기술을 다룰 수 있도록 해주는 **전문 지식 패키지**입니다. 복잡한 명령어를 직접 입력하지 않아도 에이전트가 알아서 도구를 활용하게 합니다. Use when this capability is needed.
+metadata:
+  author: LowyShin
+---
+# 에이전트 구성 요소: 스킬 (Skills)
+
+스킬(Skill)은 에이전트가 특정 도구나 기술을 다룰 수 있도록 해주는 **전문 지식 패키지**입니다. 복잡한 명령어를 직접 입력하지 않아도 에이전트가 알아서 도구를 활용하게 합니다.
+
+## 📝 스킬의 정의
+스킬은 에이전트의 기능을 확장하는 "플러그인"과 같습니다. 예를 들어, `pdf` 스킬은 PDF 파일을 읽고 쓰는 법을, `webapp-testing` 스킬은 브라우저를 이용해 테스트하는 법을 에이전트에게 가르칩니다.
+
+## 🛠️ 작성 및 유지 관리 방법
+*   **저장 위치**: `.agent/skills/{스킬명}/SKILL.md`
+*   **구성 요소**:
+    *   **YAML Frontmatter**: 스킬 이름(`name`), 설명(`description`), 실행 조건(`triggers`)을 정의합니다.
+    *   **Detailed Instructions**: 해당 도구를 사용할 때의 구체적인 절차와 주의사항을 마크다운으로 작성합니다.
+    *   **Helper Scripts**: 필요한 경우 스킬 폴더 내에 실행 가능한 스크립트를 포함할 수 있습니다.
+*   **유지 관리**: `skill-creator` 스킬을 사용하여 새로운 스킬을 생성하거나 기존 스킬의 효율성을 분석하고 최적화할 수 있습니다.
+
+## 🧭 SKILL.md 작성 원칙 (skill-creator 기준)
+Anthropic 공식 [`skill-creator`](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md)(본 레포 `.agent/skills/skill-creator/`에 이식)가 정의하는 핵심 원칙입니다.
+
+*   **description = 트리거 (가장 중요)**: `description`에 "무엇을 하는가"와 "언제 써야 하는가"를 모두 담습니다. '언제'에 대한 정보는 본문이 아니라 반드시 `description`에 둡니다. Claude는 스킬을 **언더트리거(써야 할 때 안 씀)** 하는 경향이 있으므로, 설명을 다소 **pushy하게** 작성해 관련 맥락에서 확실히 발동되게 합니다.
+*   **프로그레시브 디스클로저(3단 로딩)**: ① 메타데이터(name+description, ~100단어) → ② SKILL.md 본문(가급적 **500줄 이내**) → ③ 필요 시 로드되는 번들 리소스. 큰 내용은 본문에 다 넣지 말고 리소스로 분리합니다.
+*   **폴더 구조**: `SKILL.md`(필수) + `scripts/`(실행 코드) + `references/`(300줄 초과 시 목차 포함) + `assets/`(템플릿·아이콘·폰트).
+*   **eval 기반 반복 개선**: 객관적으로 검증 가능한 산출물(파일 변환·데이터 추출·코드 생성)이면 2~3개의 현실적 테스트 케이스로 검증하고 반복합니다. 스타일·예술처럼 주관적 산출물은 생략 가능합니다. (본 레포는 `/aioptimize`·`skillopt`로 trace 기반 자동 최적화 연동)
+
+## 👤 유저가 해야 할 부분
+*   **트리거 사용**: 스킬 설명에 정의된 '트리거 키워드'를 대화 중에 사용하면 에이전트가 관련 스킬을 자동으로 인식합니다.
+*   **스킬 요구**: "이 작업을 위한 새로운 스킬을 만들어줘"라고 요청하여 반복적인 도구 사용 패턴을 자동화할 수 있습니다.
+
+## 🤖 AI가 자동으로 해주는 부분
+*   **자동 로딩**: 사용자의 대화 맥락에서 트리거 키워드를 감지하면 해당 스킬의 내용을 즉시 읽고 작업에 적용합니다.
+*   **도구 조합**: 복잡한 문제를 해결하기 위해 여러 스킬을 유기적으로 조합하여 최적의 해결책을 찾아냅니다.
+*   **스킬 최적화**: `/aioptimize` 워크플로우를 통해 실제 사용 기록(Trace)을 바탕으로 스킬의 지침을 더 정확하게 자동 개선합니다.
+
+---
+> Source: [LowyShin/giip-dev-agent](https://github.com/LowyShin/giip-dev-agent) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-19 -->
