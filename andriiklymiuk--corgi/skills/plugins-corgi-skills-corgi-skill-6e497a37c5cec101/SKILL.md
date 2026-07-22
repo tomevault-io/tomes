@@ -1,0 +1,104 @@
+---
+name: corgi
+description: Author and explain corgi-compose.yml files and the corgi CLI. Use when writing or editing a corgi-compose.yml, picking db drivers / healthchecks / tunnels, or explaining corgi concepts, commands, and flags. Corgi is a Go CLI (`brew install andriiklymiuk/homebrew-tools/corgi`) that spins up databases, services, and required tools from one yml file — think docker-compose for services plus databases plus tool checks. NOT for starting a stack (use the run skill) or diagnosing a broken one (use the debug skill). Use when this capability is needed.
+metadata:
+  author: Andriiklymiuk
+---
+
+# Corgi
+
+Corgi (https://github.com/Andriiklymiuk/corgi) runs multi-service projects from a single `corgi-compose.yml`. It handles: cloning service repos, starting databases in Docker, seeding from dumps, generating `.env` files with cross-service URLs, and running all services concurrently.
+
+When this skill activates, you are the expert on corgi. Do not fall back to generic docker-compose / npm advice if a `corgi-compose.yml` is present — corgi is the authoritative entry point for that project.
+
+## Critical: `corgi run` is long-running
+
+`corgi run` blocks indefinitely and streams logs. **Never run it synchronously** — it will hang your shell. For agents, prefer `corgi run --detach` (returns immediately; see the lifecycle line below). See `references/long-running.md` before invoking it foreground.
+
+Safe synchronous probes:
+- `corgi doctor` (alias `check`) — preflight: tools installed, Docker up, ports free
+- `corgi status` (aliases `health`, `healthcheck`) — post-run: TCP/HTTP probe each port
+
+Both exit 0 on success, 1 on failure. Add global `--json` for machine-readable output. Driving corgi from an agent: see `../../../docs/agents.md`.
+
+### Driving corgi as an agent
+
+Corgi auto-detects non-interactive mode (CI/agent env vars like `CLAUDECODE`, or no TTY) and errors with exit code 2 instead of prompting; `--interactive` forces prompts back. Global `--json` emits pure JSON on stdout (`doctor`, `status`, `list`, `config`, `ps`, `docs --json-schema`; `run --json` prints a startup summary then streams logs to stderr). Exit codes: 0 success, 1 failure, 2 usage/missing input. Full guide + recipes: `../../../docs/agents.md`.
+
+Detached lifecycle (preferred for agents): `corgi run --detach` (starts services that outlive corgi, returns immediately, errors `ALREADY_RUNNING` if already running — use `--force`), then `corgi ps`/`status` for real running/crashed status, `corgi stop [--service x]` to tear down, `corgi restart` for full-stack restart. See the "Lifecycle (detached)" section in `../../../docs/agents.md`.
+
+`corgi tunnel` is also long-running (one tunnel subprocess per service, blocks until Ctrl+C). Background it the same way you background `corgi run`. See `references/long-running.md` if invoking from an agent.
+
+## Routing: when to read what
+
+| Task | Read |
+|------|------|
+| Writing a new `corgi-compose.yml` | `references/yml-schema.md` then `references/db-drivers.md` |
+| Picking a db driver (port, image, env prefix) | `references/db-drivers.md` |
+| Adding `healthCheck:` to a service or db | `references/healthchecks.md` |
+| `corgi doctor` or `corgi run` failed | `references/debugging.md` |
+| Explaining / choosing a CLI flag | `references/commands.md` |
+| Setting up webhook tunnels (Stripe/GitHub/e-sign/etc.) | `../../../docs/tunnel.md` (full) or `references/commands.md#corgi-tunnel-services` |
+| Producing a service map / relation diagram for the project | run `/corgi-describe` (see `references/describe-output.md`) |
+| Running `corgi run` inside an agent loop | `references/long-running.md` |
+| Driving corgi non-interactively (`--json`, exit codes, scaffolding flags) | `../../../docs/agents.md` |
+| Driving corgi from an MCP client (Claude Code/Desktop tools) | `../../../docs/mcp.md` |
+| Persisting / re-reading service logs after a crash | `references/commands.md#corgi-logs` (`corgi run --logs` + `corgi logs`) |
+| Opening a DB shell (psql / redis-cli / mongosh / …) | `references/commands.md#corgi-db-shell-service-name` |
+| Running corgi in CI / disabling spinners and color | `references/commands.md#corgi-run-flags` (`--ci`, auto-detected from `CI` env) |
+| Desktop notifications on service crash | `references/commands.md#corgi-notifications` (`corgi notifications on\|off\|test`) |
+
+Load only what the task needs. Do not read every reference every time.
+
+## Common workflows
+
+**Fresh project from scratch:** use the `/corgi-new` slash command, or: write `corgi-compose.yml` → `corgi doctor` → start `corgi run` in background → `corgi status`.
+
+**Document an existing project:** `/corgi-describe` parses `corgi-compose.yml` and writes a detailed Markdown doc (services, dbs, env wiring, tunnels, scripts) plus a Mermaid relationship diagram to `docs/corgi-services.md`. Read-only — does not touch services. Built-in `corgi --describe` only prints per-service JSON during parse (and does **not** short-circuit — the underlying command, e.g. `run`, still executes); the slash command is the richer, side-effect-free alternative.
+
+**Existing repo with `corgi-compose.yml`:** this file is the single source of truth for how services start. Do not invent `npm run dev`, `docker compose up`, or per-service shell commands — use `corgi run`. Look at `db_services:` to know what databases exist and at `services:` to know what service repos are expected.
+
+**User says "start the project" / "run the backend":** check for `corgi-compose.yml` first (`ls corgi-compose.yml` or `ls *.corgi-compose.yml`). If present, corgi is the answer.
+
+## Quick command cheatsheet
+
+```
+corgi run                  # start everything (long-running, background it)
+corgi run --logs           # also persist each service's stdout/stderr to corgi_services/.logs/
+corgi run --ci             # CI-friendly: suppress spinners, banners, colors (auto-on when CI=true)
+corgi run --service-branch api=feat/x   # run a service on a branch in an isolated reused worktree (non-destructive)
+corgi run --service-dir api=/path       # run a service from an existing dir (e.g. a git worktree); repeatable, mix freely
+corgi worktree list|prune               # list / remove worktrees corgi made for --service-branch
+corgi logs                 # interactive picker: browse + tail persisted logs (needs prior --logs run)
+corgi logs --service api   # skip service picker, jump to run picker for "api"
+corgi logs --all           # merge newest run of every service into one timestamp-sorted stream
+corgi logs --idle 0        # tail forever (default exits after 30s of dead-air)
+corgi logs --prune         # delete all captured logs
+corgi doctor               # preflight checks (tools, docker, ports)
+corgi validate             # statically validate corgi-compose.yml
+corgi test --service api   # run a service's `test` script in its resolved env (--ensure-deps waits on deps)
+corgi exec api -- <cmd>    # one-off command in a service's resolved env (migrate/seed/etc); --ensure-deps to wait on deps
+corgi env api              # print a service's fully-resolved environment (read-only)
+corgi config               # show current user settings (~/.corgi/config.yml)
+corgi notifications on|off|test            # toggle/test desktop crash notifications
+corgi status               # health check (one-shot)
+corgi status --ready       # block until all healthy / timeout (CI-friendly)
+corgi status --watch       # live monitor, transitions only
+corgi tunnel               # public HTTPS tunnels (long-running) — default cloudflared
+corgi db shell [name]                       # interactive DB shell inside running container (psql/redis-cli/mongosh/…)
+corgi db shell [name] -e "SELECT 1"         # one-shot query, exit; CI-friendly
+corgi db snapshot [name] [svc]              # fast physical Postgres snapshot (built indexes+matviews); postgres family only
+corgi db restore  [name] [svc]              # restore pgdata from a snapshot → up on built data, zero recompute
+corgi init                 # scaffold db_services/ + cloned repos
+corgi create               # interactive yml editor
+corgi clean -i db          # stop+remove db containers (also: services, corgi_services, all)
+corgi pull                 # git pull in every service dir
+corgi version              # show installed version
+corgi --describe           # built-in: per-service JSON during parse; does NOT short-circuit. Use /corgi-describe for a rendered doc + Mermaid diagram
+```
+
+Full surface in `references/commands.md`.
+
+---
+> Source: [Andriiklymiuk/corgi](https://github.com/Andriiklymiuk/corgi) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-09 -->
