@@ -1,0 +1,55 @@
+---
+name: nyx-rebuild
+description: Run the correct rebuild command for the current Nyx host. Use when the user wants to apply config changes, switch configurations, or rebuild the system. Detects platform automatically. Use when this capability is needed.
+metadata:
+  author: mwdavisii
+---
+
+The user wants to rebuild and apply their Nyx configuration.
+
+## Step 1: Detect platform
+
+Run `uname -s` and `uname -n` to get the OS and hostname.
+
+## Step 2: Apply the correct rebuild
+
+Use this decision table:
+
+| Platform | Command |
+|---|---|
+| macOS (Darwin) | `sudo --preserve-env=SSH_AUTH_SOCK darwin-rebuild switch --flake .` |
+| Arch Linux (`/etc/arch-release` exists) | `setup/arch/02-install-packages.sh --sync && home-manager switch --show-trace --flake .#<hostname>` |
+| Nix-on-Droid (user = `nix-on-droid`) | `nix-on-droid switch --show-trace --flake .` |
+| NixOS (default) | `sudo nixos-rebuild switch --show-trace --flake .#<hostname>` |
+
+Or just run `./switch.sh` which auto-detects and runs the right command.
+
+## Useful variants
+
+- **Dry run (build without activating):**
+  - NixOS: `sudo nixos-rebuild dry-build --flake .#<hostname>`
+  - Darwin: `sudo darwin-rebuild dry-build --flake .`
+
+- **Validate syntax first:** `nix flake show`
+
+- **Build without switching:** `nix build .#nixosConfigurations.<hostname>.config.system.build.toplevel`
+
+- **With verbose trace on error:** add `--show-trace` (already included in switch.sh defaults)
+
+## Hosts reference
+
+| Hostname | Platform | buildTarget |
+|---|---|---|
+| `hephaestus` | NixOS | nixos |
+| `hydra` | NixOS | nixos |
+| `ares` | NixOS WSL | wsl |
+| `nixos` | NixOS WSL | wsl |
+| `mwdavis-workm1` | Darwin | darwin |
+| `L241729` | Darwin | darwin |
+| `L242731` | Arch | home-manager |
+| `prometheus` | Arch | home-manager |
+| `default` | Nix-on-Droid | droid |
+
+---
+> Source: [mwdavisii/nyx](https://github.com/mwdavisii/nyx) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-10 -->
