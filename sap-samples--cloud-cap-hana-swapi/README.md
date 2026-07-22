@@ -1,0 +1,30 @@
+# AI instruction files for cloud-cap-hana-swapi
+
+> Sourced from [SAP-samples/cloud-cap-hana-swapi](https://github.com/SAP-samples/cloud-cap-hana-swapi), graded against the public Tome Standard and kept consistent across every major platform by [TomeVault](https://tomevault.io)
+
+## All Platforms Config
+
+The `TOME.json` file in this directory is the project config converted for All Platforms.
+Original source: `AGENTS.md` in [SAP-samples/cloud-cap-hana-swapi](https://github.com/SAP-samples/cloud-cap-hana-swapi).
+
+## Also available for
+
+- **Claude Code** — `CLAUDE.md`
+- **GitHub Copilot** — `copilot-instructions.md`
+- **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
+- **Windsurf** — `project-config.md`
+
+## Bundled Skills (3)
+
+- [cloud-cap-hana-swapi](https://github.com/SAP-samples/cloud-cap-hana-swapi/tree/main/.claude/skills/load-and-test/SKILL.md)
+- [cloud-cap-hana-swapi](https://github.com/SAP-samples/cloud-cap-hana-swapi/tree/main/.claude/skills/scrape-and-load/SKILL.md)
+- [cloud-cap-hana-swapi](https://github.com/SAP-samples/cloud-cap-hana-swapi/tree/main/.github/skills/cap-change-workflow/SKILL.md)
+
+Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/SAP-samples/cloud-cap-hana-swapi](https://github.com/SAP-samples/cloud-cap-hana-swapi)
+
+---
+
+Own this repo? Install the TomeVault Relay to keep every platform's copy in sync on every push: [https://tomevault.io/install](https://tomevault.io/install).
+
+<!-- genome:a-c-p -->
