@@ -1,6 +1,6 @@
 # dominion
 
-> This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+> This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Usage
 
@@ -12,9 +12,9 @@ Read and follow the instructions in .claude/skills/dominion/SKILL.md
 
 Or copy the instructions below directly into your CLAUDE.md:
 
-# AGENTS.md
+# CLAUDE.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -257,4 +257,4 @@ This project does not have automated unit tests. All testing is done manually on
 
 ---
 > Source: [LunaDeerMC/Dominion](https://github.com/LunaDeerMC/Dominion) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-20 -->
+<!-- tomevault:4.0:claude_md:2026-07-22 -->
