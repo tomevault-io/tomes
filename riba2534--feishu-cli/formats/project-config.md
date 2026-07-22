@@ -32,6 +32,26 @@ go test ./...                     # 运行所有测试
 go vet ./...                      # 静态检查
 ```
 
+### 质量标准（任何改动提交前必须满足）
+
+1. **实物验证铁律：任何改动，都必须使用实际编译的二进制产物进行验证。**
+   先 `go build -o feishu-cli .`（或 `make build`）编译当前代码，再用编译出的二进制
+   实跑受影响的命令确认行为符合预期（读操作真实调用；写操作优先 `--dry-run`，必要时
+   在测试文档/画板上真实执行）。禁止只凭 `go vet`、单元测试或静态读代码就宣告完成；
+   文档/技能中对 CLI 行为的描述，同样以新编译二进制的实跑结果为准。
+2. **基线全绿**：`gofmt -l cmd internal` 无输出、`go test ./...`、`go vet ./...` 通过。
+3. **结论附证据**：报告"已完成/已修复"必须附带验证命令及其输出（或退出码/截图），
+   不做未验证的声明。
+4. **可执行文档必须实跑**：README / skills 里给出的命令、脚本、示例，改动后逐条实跑；
+   涉及可视化配色的改动，从仓库根运行
+   `node skills/feishu-cli-visual/references/workflows/dataviz/scripts/validate_palette.js` 复验定稿色板、
+   `node skills/feishu-cli-visual/references/workflows/dataviz/scripts/check_docs.js` 核查文档一致性，全绿才算完成。
+5. **Skill 结构校验**：修改 `skills/`、CLI 命令或源码中的 Skill 路径后运行 `make check-skills`；
+   该目标会先从当前源码重新构建 `bin/feishu-cli`，再检查 Skill 结构、引用和命令唯一归属。
+6. **隐私扫描**：提交前按下方"开发规范"第 6 条检查敏感信息。
+
+发版有更严格的完整清单，见「发布 Release 规范」。
+
 ### 开发规范
 
 1. **错误处理**：使用中文错误信息，提供解决建议
@@ -39,7 +59,10 @@ go vet ./...                      # 静态检查
 3. **代码注释**：关键逻辑使用中文注释
 4. **提交信息**：遵循 Conventional Commits 规范
 5. **指针解引用**：使用 `internal/client/helpers.go` 中的 `StringVal/BoolVal/IntVal` 等工具函数
-6. **隐私安全（开源项目，必须遵守）**：
+6. **错误码分支判定**：用 `client.HasAPICode(err, 码)`（词边界安全，`internal/client/api_code.go`），禁止对 err.Error() 做数字 substring 匹配（会撞 log_id 同数字串）
+7. **命令组守卫**：`cmd/command_guard.go` 在 Execute 时给所有命令组注入未知子命令守卫（报错+拼写建议+exit 1）；新增命令组无需额外处理，但**不要**给纯分组命令手写 RunE
+8. **发送者名字**：读消息统一带 `with_sender_name=true`，服务端回填名经 `internal/client/sender_names.go` 进程级注册表采集，`ResolveSenderNames` 三步解析（服务端回填 → mentions → contact 兜底）
+9. **隐私安全（开源项目，必须遵守）**：
    - 代码、文档、技能文件中**禁止出现任何真实的个人邮箱、密码、Token、密钥**
    - 示例邮箱统一使用 `user@example.com`，示例 Token 使用 `cli_xxx`、`u-xxx` 等占位符
    - 新增或修改文件前，检查是否包含 `@bytedance.com`、`@lark.com` 等内部邮箱域名
@@ -64,96 +87,13 @@ export FEISHU_APP_SECRET=xxx
 
 通过 **OAuth 2.0 Device Flow（RFC 8628）** 获取 User Access Token，用于搜索、审批任务查询等需要用户授权的功能。**无需配置重定向 URL 白名单**（v1.18+ 已删除 Authorization Code Flow）。
 
-**Token 使用策略**：
-- **默认使用 App Token**（租户身份）：wiki、msg、calendar、task 等 55+ 个命令默认通过 `resolveOptionalUserToken` 使用 App Token，不会自动加载 User Token
-- **显式使用 User Token**：通过 `--user-access-token` 参数或 `FEISHU_USER_ACCESS_TOKEN` 环境变量覆盖为用户身份
-- **必须 User Token**：搜索命令（`search docs/messages/apps`）通过 `resolveRequiredUserToken` 走优先级链：
-  1. `--user-access-token` 参数
-  2. `FEISHU_USER_ACCESS_TOKEN` 环境变量
-  3. `~/.feishu-cli/token.json`（过期自动用 refresh_token 刷新）
-  4. `config.yaml` 中的 `user_access_token`
-- **审批任务查询**：`approval task query` 会调用 `/authen/v1/user_info` 推断 `open_id`，缓存到 `~/.feishu-cli/user_profile.json`，`auth logout` 时自动清理
-
-**登录命令四种模式**：
-- `auth login --scope "..."`：显式请求 scope，阻塞轮询
-- `auth login --domain <name> --recommend`：按业务域申请推荐 scope（推荐）
-- `auth login --json`：JSON 事件流输出（AI Agent 推荐，配合 `run_in_background`）
-- `auth login --no-wait --json` + `auth login --device-code <code> --json`：两步模式
-
-**scope 策略**：登录时显式声明 scope，不再依赖后台全量兜底。`offline_access` 和 `auth:user.id:read` 自动注入。AI Agent 执行业务前应先 `auth check --scope "REQ_SCOPES"` 预检。
-
-**审批输出模式**：不传 `--output` 输出文本摘要；`--output json` CLI 归一化 JSON；`--output raw-json` 原始响应。
-
-### Markdown ↔ 飞书文档双向转换
-
-**导入**：`feishu-cli doc import doc.md --title "文档" --verbose`
-**导出**：`feishu-cli doc export <doc_id> -o output.md`
-
-支持的语法：标题、段落、列表（无限深度嵌套）、任务列表、代码块、引用（QuoteContainer）、Callout（6 种类型）、表格、分割线、图片（默认 `--upload-images` 上传）、链接、公式、粗体/斜体/删除线/下划线/行内代码/高亮
-
-### Mermaid / PlantUML 图表转画板
-
-**推荐 Mermaid**，导入时自动转画板。支持 8 种 Mermaid 类型：flowchart（含 subgraph）、sequenceDiagram、classDiagram、stateDiagram-v2、erDiagram、gantt、pie、mindmap。PlantUML 支持时序图、活动图、类图、用例图、组件图、ER 图、思维导图等全部类型。
-
-### 表格智能处理
-
-- **自动拆分**：飞书 API 限制单表格最多 9 行 × 9 列，超出自动拆分并保留表头/首列
-- **列宽自动计算**：中文 14px，英文 8px，最小 80px，最大 400px
-- **单元格多块支持**：单元格内可混合 bullet/heading/text
-
-### 图表导入容错
-
-- 服务端错误自动重试（最多 10 次，1s 间隔）
-- Parse error / Invalid request parameter 不重试，直接降级为代码块
-- 失败回退：删除空画板块，在原位置插入代码块
-
-### 三阶段并发管道（导入架构）
-
-1. **阶段一（顺序）**：按文档顺序创建所有块，收集图表和表格任务
-2. **阶段二（并发）**：图表 worker 池 + 表格 worker 池并发处理
-3. **阶段三（逆序）**：处理失败图表，降级为代码块
-
-**CLI flags**：`--diagram-workers`（默认 5）、`--table-workers`（默认 3）、`--diagram-retries`（默认 10）、`--upload-images`（默认开启）、`--image-workers`（默认 2，API 限制 5 QPS）
-
-## 命令速查
-
-完整命令清单见 [README.md](README.md) 和对应 skill 文档。关键入口：
-
-```bash
-# 认证
-feishu-cli auth login --domain <name> --recommend       # 按业务域登录
-feishu-cli auth check --scope "REQ_SCOPES"              # 预检 scope
-feishu-cli auth status                                   # 查看授权状态
-
-# 文档导入/导出（核心功能）
-feishu-cli doc import input.md --title "..." --upload-images --verbose
-feishu-cli doc export <doc_id> -o output.md
-feishu-cli doc content-update <doc_id> --mode <mode> --markdown "..."
-#   mode: append / overwrite / replace_range / delete_range / insert_after
-
-# 多维表格（统一用 --base-token，底层 base/v3 API）
-feishu-cli bitable {create|get|copy} ...
-feishu-cli bitable {table|field|record|view|role} <action> ...
-feishu-cli bitable view view-{filter|sort|group|visible-fields|timebar|card}-{get|set} ...
-feishu-cli bitable advperm {enable|disable} --base-token ...
-feishu-cli bitable {data-query|workflow list} ...
-
-# 邮件（User Token 必需，默认存草稿，--confirm-send 才发送）
-feishu-cli mail {triage|send|draft-create|reply|forward|message|thread} ...
-
-# 云盘增强
-feishu-cli drive {upload|download|export|import|move|add-comment|task-result} ...
-
-# 视频会议与妙记（全部需 User Token）
-feishu-cli vc {search|notes|recording} ...
-feishu-cli minutes {get|download} --minute-tokens ...
-
-# 其他模块：doc / msg / sheet / calendar / task / tasklist / chat / wiki / file / perm / board / search / user / dept / comment / media
-```
-
+**Token 使用策略**（按命令分四类，对应 `cmd/utils.go` 四个 helper）：
+- **读类 · User 优先 + Tenant 兜底**（`resolveOptionalUserTokenWithFallback`，约 85 个命令）：`msg history/list/get/mget/thread-messages/resource-download`、`chat list`、`doc read`、`sheet table-get`、`task get/list/subtask list/comment list/tasklist get/list/tasks`、`calendar get/list/primary/agenda/freebusy/suggestion/room-find/event get/list/search/attendee list`、`file meta/stats/list/version list/get/download`、`board image/nodes/export-code/lint`、`user read`、`wiki get/nodes/spaces/export/member list`、`drive pull/push/status`、`vc bot meeting-events`（端点拒收 Tenant Token，User 优先）、**sheet 全家桶**（所有 sheet 子命令含写）等。优先级链：`--user-access-token` → `FEISHU_USER_ACCESS_TOKEN` → `~/.feishu-cli/token.json`（过期自动刷新）→ `config.yaml` 的 `user_access_token` → App Token 兜底。
+- **写类 · 默认 Bot 身份**（`resolveOptionalUserToken`）：所有 `add/create/update/delete/move/copy/import/upload/send/reply/forward/merge-forward` 类命令、`comment reply`、`doc content-update / table 写`、`file version revert`、`wiki move-to-drive`、`msg delete`（Bot 自撤回）等。**不会自动加载 token.json**，仅当显式传 `--user-access-token` 或 `FEISHU_USER_ACCESS_TOKEN` 时切到 User Token。`vc bot meeting-join/leave` 同属默认 Bot 身份，但用更严格的 `resolveFlagUserToken`：**只认 `--user-access-token` flag，连 `FEISHU_USER_ACCESS_TOKEN` 环境变量都不读**。
+- **必须 User Token**（`resolveRequiredUserToken` / `requireUserToken`）：`search docs/messages/apps`、`approval task query/approve/reject/transfer`、`approval instance get/cancel/cc`、`task my`（`my_tasks`）、`msg pin/reaction/search-chats/flag`、`chat get/update/delete/member`、`vc search/notes/recording/detail`、`vc note detail/transcript`、`task search`、`minutes/mail` 全部（含 `minutes search/apply-permission`、`mail message-modify/message-trash/draft-send`）、`drive secure-label`、`drive upload/download/export/import/move/add-comment/task-result/search`、`calendar rsvp`、`markdown create/fetch/overwrite/diff` 等。失败直接报错。
 
 <!-- Content truncated to meet Windsurf 6KB limit -->
 
 ---
 > Source: [riba2534/feishu-cli](https://github.com/riba2534/feishu-cli) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:windsurf_rules:2026-04-20 -->
+<!-- tomevault:4.0:windsurf_rules:2026-07-22 -->
