@@ -1,0 +1,86 @@
+---
+name: tsa-index
+description: | Use when this capability is needed.
+metadata:
+  author: aimasteracc
+---
+
+# tsa-index — Cache / index ops
+
+> Not a daily skill. Most agents never need it. Pull when index is stale or
+> a language plugin behaves oddly.
+
+## Tool routing
+
+| Goal                                           | Tool                              |
+|------------------------------------------------|-----------------------------------|
+| Status / stats of the AST cache                | `index action=cache` (mode=status) |
+| Force rebuild                                  | `index action=full`                |
+| Incremental refresh                            | `index action=cache` (mode=index)  |
+| Watch a directory and auto-refresh             | `index action=cache` (mode=watch_start) |
+| AST-level diff of one file across commits      | `edit action=ast_diff`            |
+| First-time index for a freshly-cloned repo     | `index action=auto`               |
+| Full bulk reindex (large monorepo)             | `index action=full`               |
+| "Is the python plugin / swift plugin ready"    | `project action=parser`           |
+
+## Procedure
+
+### When to force rebuild
+
+The auto-cache is usually correct. Force rebuild only when:
+- `--callees` / `--callers` returns `callee_resolution: unknown` consistently
+  AND the symbols clearly exist (means imports not indexed)
+- Schema migration happened (e.g., new column added — pre-existing rows have defaults)
+- Files were renamed/moved en masse (mtime-based invalidation may miss this)
+
+```bash
+uv run tree-sitter-analyzer --ast-cache --ast-cache-mode index --ast-cache-force
+# OR safer (preserves what works):
+uv run tree-sitter-analyzer --ast-cache --ast-cache-mode index
+```
+
+### AST diff
+
+For structural change detection (not text):
+
+```yaml
+edit action=ast_diff file_path="..." base_ref="HEAD~5" head_ref="HEAD"
+# returns: {nodes_added: n, nodes_removed: n, nodes_modified: n,
+#           classification_hints: [...]}
+```
+
+Useful for distinguishing pure formatting from real change.
+
+### Parser readiness
+
+```yaml
+project action=parser language="swift"
+# returns: {status: "stable|beta|stub", supported_queries: [...], limitations: [...]}
+```
+
+Avoid asking "why doesn't swift work" — query this first.
+
+## CLI equivalents
+
+```bash
+uv run tree-sitter-analyzer --ast-cache --ast-cache-mode stats
+uv run tree-sitter-analyzer --ast-cache --ast-cache-mode index --ast-cache-force
+uv run tree-sitter-analyzer --ast-diff --ast-diff-file <file> --ast-diff-old-ref HEAD~5 --ast-diff-new-ref HEAD
+uv run tree-sitter-analyzer --parser-readiness swift
+uv run tree-sitter-analyzer --autoindex            # index action=auto
+uv run tree-sitter-analyzer --full-index           # index action=full
+# WARNING: slow — can exceed 60s on medium-large repos (~2000 files / 100K+ edges).
+# Prefer `--ast-cache --ast-cache-mode index` for an incremental refresh.
+# `--full-index` defaults to mode 'incremental'; pass `--full-index-mode full` for a
+# true full rebuild, and `--full-index-max-files N` (default 20000) to cap scope.
+```
+
+## Anti-patterns
+
+- DON'T force-rebuild on every agent turn — the cache is correct 99% of the time
+- DON'T run `--full-index` on a small project — `--ast-cache --ast-cache-mode index` is faster
+- DON'T mix `--watch` and `--watch-health` in the same process — see tsa-health-watch
+
+---
+> Source: [aimasteracc/tree-sitter-analyzer](https://github.com/aimasteracc/tree-sitter-analyzer) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-20 -->
