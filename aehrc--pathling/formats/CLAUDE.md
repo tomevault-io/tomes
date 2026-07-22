@@ -21,4 +21,4 @@ codebase:
 
 ---
 > Source: [aehrc/pathling](https://github.com/aehrc/pathling) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-20 -->
+<!-- tomevault:4.0:claude_md:2026-07-22 -->
