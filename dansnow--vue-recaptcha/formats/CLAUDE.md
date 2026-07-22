@@ -38,4 +38,4 @@ discuss? → propose → apply ⇄ ingest → archive
 
 ---
 > Source: [DanSnow/vue-recaptcha](https://github.com/DanSnow/vue-recaptcha) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-20 -->
+<!-- tomevault:4.0:claude_md:2026-07-22 -->
