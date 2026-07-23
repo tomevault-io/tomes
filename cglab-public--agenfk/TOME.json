@@ -1,0 +1,57 @@
+{
+  "name": "agenfk",
+  "owner": "cglab-public",
+  "repo": "agenfk",
+  "description": "",
+  "type": "tome",
+  "source_format": "CLAUDE.md",
+  "formats": [
+    {
+      "format": "claude_md",
+      "display": "CLAUDE.md",
+      "platform": "Claude Code"
+    },
+    {
+      "format": "agents_md",
+      "display": "AGENTS.md",
+      "platform": "Codex"
+    },
+    {
+      "format": "copilot_instructions",
+      "display": "copilot-instructions.md",
+      "platform": "GitHub Copilot"
+    },
+    {
+      "format": "cursor_mdc",
+      "display": ".cursor/rules/*.mdc",
+      "platform": "Cursor"
+    },
+    {
+      "format": "gemini_md",
+      "display": "GEMINI.md",
+      "platform": "Gemini CLI"
+    },
+    {
+      "format": "windsurf_rules",
+      "display": ".windsurf/rules/*.md",
+      "platform": "Windsurf"
+    }
+  ],
+  "skills": [
+    {
+      "name": "agenfk",
+      "path": "skills/opencode/agenfk-flow/SKILL.md",
+      "github_url": "https://github.com/cglab-public/agenfk/tree/main/skills/opencode/agenfk-flow/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "agenfk",
+      "path": "skills/claude-code/agenfk-flow/SKILL.md",
+      "github_url": "https://github.com/cglab-public/agenfk/tree/main/skills/claude-code/agenfk-flow/SKILL.md",
+      "description": ""
+    }
+  ],
+  "source_url": "https://github.com/cglab-public/agenfk",
+  "distributed_by": "TomeVault",
+  "distributed_at": "2026-07-23T23:51:38Z"
+}
