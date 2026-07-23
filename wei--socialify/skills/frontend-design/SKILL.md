@@ -39,5 +39,5 @@ NEVER use generic AI-generated aesthetics like overused font families (Inter, Ro
 Interpret creatively and make unexpected choices that feel genuinely designed for the context.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/wei/socialify)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/wei) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
