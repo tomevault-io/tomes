@@ -1,0 +1,28 @@
+# react-native-codeditor
+
+> Tome by [burdiuz](https://github.com/burdiuz/react-native-codeditor), graded and kept true across every major AI platform by [TomeVault](https://tomevault.io)
+
+## All Platforms Config
+
+The `TOME.json` file in this directory is the project config converted for All Platforms.
+Original source: `CLAUDE.md` in [burdiuz/react-native-codeditor](https://github.com/burdiuz/react-native-codeditor).
+
+## Also available for
+
+- **Codex** — `AGENTS.md`
+- **GitHub Copilot** — `copilot-instructions.md`
+- **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
+- **Windsurf** — `project-config.md`
+
+## Bundled Skills (1)
+
+- [react-native-codeditor](https://github.com/burdiuz/react-native-codeditor/tree/main/SKILL.md)
+
+From [burdiuz/react-native-codeditor](https://github.com/burdiuz/react-native-codeditor) — a repo with 34+ stars on GitHub.
+
+---
+
+Own this repo? Install the TomeVault Relay to keep every platform's copy in sync on every push: [https://tomevault.io/install](https://tomevault.io/install).
+
+<!-- genome:t-c-s -->
