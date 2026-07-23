@@ -65,5 +65,5 @@ Reference commit `121e569b9899851f1df90cfcdaca6e7fa6e2739d`:
 - Prefer Simple Icons when available; custom icons only when necessary.
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/wei/socialify)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/wei) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
