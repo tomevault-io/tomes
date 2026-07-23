@@ -1,4 +1,4 @@
-# OpenAI / Codex Agent Adapter
+# Claude Code Adapter
 
 Read `ME.md` first, then `AGENT.md`.
 
@@ -10,4 +10,4 @@ Track A identity files are human-owned. Do not rewrite `ME.md`, `10.identity/`, 
 
 ---
 > Source: [beiyuii/personal-api-skill](https://github.com/beiyuii/personal-api-skill) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-07-21 -->
+<!-- tomevault:4.0:agents_md:2026-07-23 -->
