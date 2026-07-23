@@ -48,5 +48,5 @@ Vite is a modern build tool for frontend development featuring instant server st
 | Backend Integration | Integrating Vite with traditional backends | [advanced-backend](references/advanced-backend.md) |
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/oyjt/uniapp-vue3-template)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/oyjt) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
