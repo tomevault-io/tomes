@@ -1,6 +1,6 @@
-# AGENTS.md
+# CLAUDE.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What This Is
 
@@ -43,4 +43,4 @@ A VS Code extension ("Partial Diff") that lets users compare text selections wit
 
 ---
 > Source: [ryu1kn/vscode-partial-diff](https://github.com/ryu1kn/vscode-partial-diff) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-07-21 -->
+<!-- tomevault:4.0:agents_md:2026-07-23 -->
