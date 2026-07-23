@@ -1,6 +1,6 @@
 # k8e
 
-> This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+> This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Usage
 
@@ -12,9 +12,9 @@ Read and follow the instructions in .claude/skills/k8e/SKILL.md
 
 Or copy the instructions below directly into your CLAUDE.md:
 
-# AGENTS.md
+# CLAUDE.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -38,7 +38,6 @@ The repository is organized as a **Zig-based Go project**:
 │   │   ├── root.go                # App setup, global flags
 │   │   ├── server.go              # Server struct + all server flags
 │   │   ├── agent.go               # Agent struct + all agent flags
-│   │   ├── sandbox.go             # sandbox CLI command group
 │   │   └── sandbox_gateway.go     # sandbox-gateway command
 │   ├── server/                    # Server daemon orchestration
 │   ├── agent/                     # Agent daemon orchestration
@@ -68,7 +67,7 @@ The repository is organized as a **Zig-based Go project**:
 ├── proto/sandbox/v1/              # Protobuf definitions for sandbox gRPC service
 ├── sandbox/                       # Sandbox container runtime shim (sandboxd)
 ├── sandboxd/                      # Runtime daemon in Zig (exec, files, networking)
-│── skills/k8e-sandbox/            # SKILL.md for agent CLI integration
+├── skills/k8e-sandbox/            # SKILL.md for agent CLI integration
 └── tests/unit.go                  # Test helper utilities
 ```
 
@@ -157,4 +156,4 @@ See `docs/agents/` for the configuration files that engineering skills consume:
 
 ---
 > Source: [xiaods/k8e](https://github.com/xiaods/k8e) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-21 -->
+<!-- tomevault:4.0:claude_md:2026-07-23 -->
