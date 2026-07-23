@@ -61,5 +61,5 @@ Vue is a progressive JavaScript framework for building user interfaces. It build
 - **Extract composables** for reusable stateful logic
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io) | [Claim this content](https://tomevault.io/claim/oyjt/uniapp-vue3-template)
-<!-- tomevault:3.0:skill_md:2026-04-07 -->
+> Converted and distributed by [TomeVault](https://tomevault.io/claim/oyjt) — claim your Tome and manage your conversions.
+<!-- tomevault:4.0:skill_md:2026-04-11 -->
