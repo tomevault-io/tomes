@@ -1,6 +1,6 @@
 # convex-helpers
 
-> When doing a task that involves modifying complex TypeScript types, run `npm run typecheck` in the root of the repository to ensure that the types are correct.
+> <!-- convex-ai-start -->
 
 ## Usage
 
@@ -11,13 +11,6 @@ Read and follow the instructions in .claude/skills/convex-helpers/SKILL.md
 ```
 
 Or copy the instructions below directly into your CLAUDE.md:
-
-When doing a task that involves modifying complex TypeScript types, run `npm run typecheck` in the root of the repository to ensure that the types are correct.
-Do not install node modules in packages/convex-helpers. Install all packages in the root directory.
-The convex/ directory is example usage exercising the package as in a real app.
-The packages/convex-helpers/dist directory is the package we publish.
-
-Run `npm run format` to format the code before committing.
 
 <!-- convex-ai-start -->
 
@@ -31,4 +24,4 @@ Convex agent skills for common tasks can be installed by running `npx convex ai-
 
 ---
 > Source: [get-convex/convex-helpers](https://github.com/get-convex/convex-helpers) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-21 -->
+<!-- tomevault:4.0:claude_md:2026-07-23 -->
