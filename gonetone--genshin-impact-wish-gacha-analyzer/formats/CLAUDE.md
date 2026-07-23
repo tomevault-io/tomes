@@ -53,4 +53,4 @@ Or copy the instructions below directly into your CLAUDE.md:
 
 ---
 > Source: [GoneTone/genshin-impact-wish-gacha-analyzer](https://github.com/GoneTone/genshin-impact-wish-gacha-analyzer) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-22 -->
+<!-- tomevault:4.0:claude_md:2026-07-23 -->
