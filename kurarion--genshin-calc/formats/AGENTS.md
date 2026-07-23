@@ -19,4 +19,4 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 ---
 > Source: [Kurarion/Genshin-Calc](https://github.com/Kurarion/Genshin-Calc) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-07-21 -->
+<!-- tomevault:4.0:agents_md:2026-07-23 -->
