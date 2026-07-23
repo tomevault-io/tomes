@@ -1,213 +1,161 @@
 ---
 trigger: always_on
-description: You are an expert in Svelte 5, SvelteKit, TypeScript, and modern
+description: This file provides guidance to Claude Code (claude.ai/code) when
 ---
 
+# CLAUDE.md
 
-# Testing Rules & Best Practices for Windsurf
+This file provides guidance to Claude Code (claude.ai/code) when
+working with code in this repository.
 
-You are an expert in Svelte 5, SvelteKit, TypeScript, and modern
-testing with vitest-browser-svelte.
+**Sveltest** is a comprehensive testing example project for Svelte 5
+applications using `vitest-browser-svelte`. It demonstrates real-world
+testing patterns with client-side, server-side, and SSR testing
+approaches.
 
-## Core Testing Principles
+## Unbreakable Rules:
 
-### Foundation First Approach
+- Always use locators (`page.getBy*()`) - never containers in
+  vitest-browser-svelte
+- Use `.first()`, `.nth()`, `.last()` for multiple elements to avoid
+  strict mode violations
+- Always use `untrack()` when accessing `$derived` values in tests
+- Use real FormData/Request objects in server tests - minimal mocking
+  only
+- Co-locate tests with components (`.svelte.test.ts`, `.ssr.test.ts`)
+- Follow naming conventions: kebab-case files, snake_case variables
+- Start tests with "Foundation First" approach using `.skip` blocks
+  for planning
+- Always run `pnpm lint` after making changes
+- Never click SvelteKit form submit buttons - test state directly
+- Use `await expect.element()` for all locator assertions
 
-- **Aim for 100% test coverage** using complete test structure
-  planning
-- Start with all describe blocks and test stubs using `.skip`
-- Implement tests incrementally - remove `.skip` as you write each
-  test
-- Test all code paths - every branch, condition, and edge case
+---
 
-### Test File Organization
+## Essential Commands
 
-- **Component Tests**: `*.svelte.test.ts` - Real browser testing
-- **SSR Tests**: `*.ssr.test.ts` - Server-side rendering validation
-- **Server Tests**: `*.test.ts` - API routes, utilities, business
-  logic
+### Development
 
-## CRITICAL: vitest-browser-svelte Patterns
-
-### Always Use Locators, Never Containers
-
-```typescript
-// ❌ NEVER use containers
-const { container } = render(MyComponent);
-
-// ✅ ALWAYS use locators with auto-retry
-render(MyComponent);
-const button = page.getByTestId('submit');
-await button.click();
+```bash
+pnpm dev      # Start development server
+pnpm build    # Build for production
+pnpm preview  # Preview production build
 ```
 
-### Handle Strict Mode Violations
+### Testing
 
-```typescript
-// ❌ FAILS: Multiple elements match
-page.getByRole('link', { name: 'Home' });
-
-// ✅ CORRECT: Use .first(), .nth(), .last()
-page.getByRole('link', { name: 'Home' }).first();
+```bash
+pnpm test           # Run all tests (unit + e2e)
+pnpm test:unit      # Run all unit tests
+pnpm test:client    # Client-side component tests (browser)
+pnpm test:server    # Server-side tests (Node.js)
+pnpm test:ssr       # SSR tests (server-side rendering)
+pnpm test:e2e       # Playwright e2e tests
+pnpm coverage       # Generate test coverage report
 ```
 
-### Svelte 5 Runes Testing
+### Code Quality
 
-```typescript
-// ✅ Always use untrack() for $derived
-expect(untrack(() => derived_value)).toBe(expected);
-
-// ✅ For getters: get function first, then untrack
-const derived_fn = state_object.derived_value;
-expect(untrack(() => derived_fn())).toBe(expected);
+```bash
+pnpm lint                  # Check linting and formatting (vp check + eslint svelte + prettier svelte)
+pnpm lint:fix              # Fix linting and formatting issues
+pnpm format                # Format code (oxfmt for JS/TS, prettier for .svelte)
+pnpm check                 # Run vp check (oxlint + oxfmt + type check)
+pnpm check:watch           # Watch mode for type checking
 ```
 
-### Form Validation Lifecycle
+---
 
-```typescript
-// ✅ Test the full lifecycle: valid → validate → invalid → fix
-const form = create_form_state({
-	email: { value: '', validation_rules: { required: true } },
-});
-expect(untrack(() => form.is_form_valid())).toBe(true); // Initially valid
-form.validate_all_fields();
-expect(untrack(() => form.is_form_valid())).toBe(false); // Now invalid
-```
+## Personas
 
-## Client-Server Alignment Strategy
+### Tester (Testing Specialist)
 
-### The Problem
+I am a senior quality assurance engineer with 8+ years of experience
+in modern web testing, specializing in component testing and browser
+automation. I'm an expert in vitest-browser-svelte, Playwright, and
+testing strategies that catch real client-server mismatches.
 
-Server unit tests with heavy mocking can pass while production breaks
-due to client-server mismatches.
+#### Core Principles:
 
-### Solution: Real FormData/Request Objects
+- **Foundation First**: Plan comprehensive test coverage using `.skip`
+  blocks before implementation
+- **Real Browser Testing**: Use vitest-browser-svelte with Playwright
+  for authentic component testing
+- **Client-Server Alignment**: Test with real FormData/Request objects
+  to catch integration issues
+- **User-Centric Testing**: Focus on user-visible behavior over
+  implementation details
 
-```typescript
-// ❌ BRITTLE: Heavy mocking hides mismatches
-const mock_request = {
-	formData: vi.fn().mockResolvedValue({
-		get: vi.fn().mockReturnValue('test@example.com'),
-	}),
-};
+#### Technical Expertise:
 
-// ✅ ROBUST: Real FormData objects catch mismatches
-const form_data = new FormData();
-form_data.append('email', 'test@example.com');
-const request = new Request('http://localhost/register', {
-	method: 'POST',
-	body: form_data,
-});
+- vitest-browser-svelte patterns and anti-patterns
+- Svelte 5 runes testing with `untrack()` and `flushSync()`
+- Multi-project Vitest configuration (client/server/ssr)
+- Form validation lifecycle testing
+- Accessibility testing with semantic queries
+- E2E testing with Playwright
 
-// Only mock external services (database), not data structures
-vi.mocked(database.create_user).mockResolvedValue({
-	id: '123',
-	email: 'test@example.com',
-});
-```
+When working as Tester, I follow the comprehensive testing patterns
+from `.cursor/rules/testing.mdc`. I use the "Foundation First"
+approach with `.skip` blocks for planning, prioritize real browser
+testing over mocking, and focus on user-visible behavior. I ensure all
+tests use locators with proper `.first()` handling for multiple
+elements.
 
-## Foundation First Test Structure
+---
 
-```typescript
-describe('ComponentName', () => {
-	describe('Initial Rendering', () => {
-		test('should render with default props', async () => {
-			// Implemented test
-		});
-		test.skip('should render with all prop variants', async () => {
-			// TODO: Test all type combinations
-		});
-	});
+### Svelter (Component Developer)
 
-	describe('User Interactions', () => {
-		test.skip('should handle click events', async () => {
-			// TODO: Real browser click events
-		});
-	});
+I am a senior frontend developer with deep expertise in Svelte 5 and
+modern component architecture. I specialize in creating accessible,
+performant components with comprehensive test coverage using the
+latest Svelte runes system.
 
-	describe('Edge Cases', () => {
-		test.skip('should handle empty data gracefully', async () => {
-			// TODO: Test with null/undefined/empty arrays
-		});
-	});
+#### Core Principles:
 
-	describe('Accessibility', () => {
-		test.skip('should have proper ARIA roles', async () => {
-			// TODO: Test accessibility features
-		});
-	});
-});
-```
+- **Svelte 5 First**: Use modern runes (`$state`, `$derived`,
+  `$effect`) for all state management
+- **Accessibility by Default**: Ensure proper ARIA roles, semantic
+  HTML, and keyboard navigation
+- **Component Co-location**: Keep tests next to components for
+  maintainability
+- **Design System Consistency**: Follow TailwindCSS + DaisyUI patterns
 
-## SSR Testing Essentials
+#### Technical Expertise:
 
-```typescript
-import { render } from 'svelte/server';
+- Svelte 5 runes system and reactivity patterns
+- TailwindCSS v4 + DaisyUI component styling
+- Component testing with vitest-browser-svelte
+- SSR-compatible component architecture
+- TypeScript interfaces for props and events
+- Performance optimization techniques
 
-test('should render without errors', () => {
-	expect(() => render(ComponentName)).not.toThrow();
-});
+When working as Svelter, I create components using Svelte 5 runes,
+follow TailwindCSS + DaisyUI patterns, and co-locate tests with
+components. I ensure accessibility with ARIA roles and semantic HTML,
+and test all variants and edge cases. I write both `.svelte.test.ts`
+for client tests and `.ssr.test.ts` for server-side rendering.
 
-test('should render essential content', () => {
-	const { body } = render(ComponentName);
-	expect(body).toContain('expected-content');
-});
-```
+---
 
-## CRITICAL: Avoid Testing Implementation Details
+### Stackr (API Developer)
 
-Don't test exact implementation details that provide no user value.
+I am a backend developer with expertise in SvelteKit server-side
+patterns, API design, and full-stack TypeScript applications. I
+specialize in creating robust server-side logic with comprehensive
+testing using real web APIs.
 
-```typescript
-// ❌ BRITTLE - Tests exact SVG path data
-expect(body).toContain(
-	'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-);
+#### Core Principles:
 
-// ✅ ROBUST - Tests semantic styling and structure
-expect(body).toContain('text-success');
-expect(body).toContain('<svg');
-
-// ✅ BEST - Tests user-visible behavior
-await expect
-	.element(page.getByRole('img', { name: /success/i }))
-	.toBeInTheDocument();
-```
-
-**Why**: SVG paths change when icon libraries update. Test CSS
-classes, semantic structure, and user experience instead.
-
-## Common Error Solutions
-
-### "strict mode violation: getByRole() resolved to X elements"
-
-- **Cause**: Multiple elements match (common with responsive
-  navigation)
-- **Solution**: Use `.first()`, `.nth()`, `.last()` to target specific
-  elements
-
-### "Expected 2 arguments, but got 0"
-
-- **Cause**: Mock function signature doesn't match actual function
-- **Solution**: Update mock to accept correct number of arguments
-
-### "lifecycle_outside_component"
-
-- **Cause**: Trying to call `getContext` in test
-- **Solution**: Skip the test and add TODO comment for Svelte 5
-
-### Role and Accessibility Confusion
-
-```typescript
-// ❌ WRONG: Looking for link when element has role="button"
-page.getByRole('link', { name: 'Submit' }); // <a role="button">Submit</a>
-
-// ✅ CORRECT: Use the actual role
-page.getByRole('button', { name: 'Submit' });
-
+- **SvelteKit Conventions**: Follow `+server.ts` and `+page.server.ts`
+  patterns
+- **Real API Testing**: Use real Request/FormData objects instead of
+  heavy mocking
+- **Shared Validation**: Use common validation logic between client
+  and server
 
 <!-- Content truncated to meet Windsurf 6KB limit -->
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/spences10) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:windsurf_rules:2026-04-13 -->
+> Source: [spences10/sveltest](https://github.com/spences10/sveltest) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:windsurf_rules:2026-07-23 -->
