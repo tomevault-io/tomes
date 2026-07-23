@@ -326,4 +326,4 @@ document.addEventListener('livewire:init', function () {
 
 ---
 > Source: [sib-swiss/glittr](https://github.com/sib-swiss/glittr) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-07-21 -->
+<!-- tomevault:4.0:agents_md:2026-07-23 -->
