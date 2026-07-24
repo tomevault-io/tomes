@@ -1,0 +1,765 @@
+---
+name: etwanalyzer
+description: This skill should be used to interact with the ETWAnalyzer (Model Context Protocol) server. The MCP server provides tools to analyze ETW (Event Tracing for Windows) performance traces without needing to manually run command-line tools. Use when this capability is needed.
+metadata:
+  author: Siemens-Healthineers
+---
+
+# ETWAnalyzer MCP Server - Agent Documentation
+
+This document describes how to use the ETWAnalyzer MCP (Model Context Protocol). The MCP server provides tools to analyze ETW (Event Tracing for Windows) performance traces without needing to manually run command-line tools.
+
+## Overview
+
+The ETWAnalyzer MCP server exposes ETWAnalyzer functionality as callable tools that can:
+- Extract raw ETW recordings (.etl/.7z/.zip) into queryable .json7z extract files
+- Extract only one or more trace relative time sub ranges (seconds since trace start) into separate extract files
+- Load and manage ETW trace files (.json7z/.json extracts)
+- Query CPU, memory, disk, network, exception, and other performance data
+- Analyze cpu issues, memory and handle leaks, thread pool starvation, and other runtime issues
+- All without switching to command-line tools manually
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Data Extraction](#data-extraction)
+- [Session Management](#session-management)
+- [Available Tools](#available-tools)
+- [Common Patterns](#common-patterns)
+- [Real-World Examples](#real-world-examples)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+1. **Extracted ETW data**: ETWAnalyzer works with extracted JSON files (.json7z or .json). Raw .etl/.7z/.zip files can be converted into extracts with `etw_extract` / `etw_extract_timerange`
+   For extraction use the default MS symbol server or check config file ETWAnalyzer.dll.config which is besides ETWAnalyzer.exe. Look for xml nodes with name attribute values like SymbolServerxx where xx is symbol server shorthand name. Ask back
+   which symbol server should be used and remember it for future extractions.
+2. **File path**: Know the full path to your .etl file or extracted trace file(s)
+
+### Basic Workflow
+
+```
+0. Optional: Extract .etl → etw_extract / etw_extract_timerange (produces .json7z files)
+1. Load trace file(s)    → etw_load
+2. Query data            → etw_dump_* (cpu, memory, process, etc.)
+3. Analyze results       → Interpret output
+4. Optional: Unload      → etw_unload
+```
+
+---
+
+## Data Extraction
+
+ETWAnalyzer analyzes extracted `.json7z`/`.json` files. Raw ETW recordings (`.etl`, or `.7z`/`.zip` archives containing an `.etl`) must first be
+extracted. The MCP server can perform the extraction for you (each extraction job runs in its own ETWAnalyzer.exe process) so you do not need to run the command-line tool manually.
+
+- Use `etw_extract` to extract a **full** trace.
+- Use `etw_extract_timerange` to extract only one or more **time sub ranges** of the trace.
+
+Both tools accept a single `.etl`/`.7z`/`.zip` file or a directory containing such files. The produced `.json7z` extract files are written by
+default to an `Extract` subfolder besides the input file and can afterwards be loaded with `etw_load`.
+
+### Choosing a Symbol Server
+
+Extraction resolves method names using a symbol server. The default is the Microsoft public symbol server (`MS`). Additional shortcuts may be
+configured in the `ETWAnalyzer.dll.config` file besides `ETWAnalyzer.exe` (look for xml nodes with a `name` attribute like `SymbolServerxx`).
+If unsure which symbol server to use, ask the user and remember the choice for subsequent extractions. Pass it via `arguments`, e.g. `-symServer MS`.
+
+### Extract a Full Trace
+
+```
+etw_extract:
+  etlFile: "C:\Traces\Issue.etl"
+  extractors: "All"
+  arguments: "-symServer MS"
+```
+
+The `extractors` argument selects which data is extracted (default `All`). It is a space separated list, e.g. `CPU Disk File TCP Stacktag`.
+
+### Extract Only Time Sub Ranges
+
+`etw_extract_timerange` extracts only one or more trace relative time regions expressed in **seconds since trace start**. Each region is written to
+its own `xxx_Time_<start>-<end>.json7z` file which additionally records the `ExtractStartTime`/`ExtractEndTime` properties. Only the CPU, Disk,
+File, TCP and Stacktag extractors honor the time region; all other extractors are extracted unfiltered.
+
+```
+etw_extract_timerange:
+  etlFile: "C:\Traces\Issue.etl"
+  regions: "1.0 2.0 3.0 4.0"
+```
+
+The `regions` value is a space separated list of start/end pairs. The example above extracts two regions: 1.0 - 2.0 s and 3.0 - 4.0 s.
+An end value prefixed with `+` is a duration relative to its start, so `regions: "1.0 +2"` extracts the region 1.0 - 3.0 s.
+
+After extraction, load the produced files with `etw_load` and query them with the `etw_dump_*` tools.
+
+---
+
+## Session Management
+
+### Loading Files
+
+**Load a single extracted trace file:**
+```
+User: "E:\Unsynced\Carbon\UserHandleLeak\Extract\ContainerStart.json7z"
+```
+
+The agent will call `etw_load` automatically. Files remain loaded for the entire session.
+
+**Load multiple files or directories:**
+```
+etw_load:
+  filePaths: "C:\Extract\Test1.json7z,C:\Extract\Test2.json7z"
+  
+etw_load:
+  filePaths: "C:\Extract"
+  recursive: true
+```
+
+**Add files to existing session (don't replace):**
+```
+etw_load:
+  filePaths: "C:\Extract\NewTrace.json7z"
+  keepOldFiles: true
+```
+
+### Listing Loaded Files
+
+**Check what's currently loaded:**
+```
+User: "What files are loaded?"
+→ Agent calls: etw_list
+```
+
+### Unloading Files
+
+**Unload all files:**
+```
+etw_unload
+```
+
+**Unload specific files:**
+```
+etw_unload:
+  filePaths: "C:\Extract\Test1.json7z"
+```
+
+---
+
+## Available Tools
+
+### Data Extraction Tools
+
+These tools convert raw `.etl` / `.7z` / `.zip` recordings into `.json7z` extract files which can then be loaded with `etw_load` and analyzed with the `etw_dump_*` tools.
+
+| Tool | Purpose | Key Arguments |
+|------|---------|---------------|
+| `etw_extract` | Extract ETW data from an .etl/.7z/.zip file or directory into .json7z extract files | `etlFile`, `extractors` (default `All`), `arguments` (e.g. `-symServer MS -outdir ...`) |
+| `etw_extract_timerange` | Extract only one or more trace relative time regions (seconds since trace start). Only CPU/Disk/File/TCP/Stacktag honor the region; each region is written to its own `xxx_Time_<start>-<end>.json7z` file containing ExtractStartTime/ExtractEndTime | `etlFile`, `regions` (e.g. `1.0 2.0 3.0 4.0` or `1.0 +2`), `extractors` (default `CPU Disk File TCP Stacktag`), `arguments` |
+
+**Extract a full trace:**
+```
+etw_extract:
+  etlFile: "C:\Traces\Issue.etl"
+  extractors: "All"
+```
+
+**Extract only specific time regions (start end pairs, seconds since trace start):**
+```
+etw_extract_timerange:
+  etlFile: "C:\Traces\Issue.etl"
+  regions: "1.0 2.0 3.0 4.0"
+```
+An end value prefixed with `+` is a duration relative to its start, so `regions: "1.0 +2"` extracts the region 1.0 - 3.0 seconds.
+
+### Core Analysis Tools
+
+| Tool | Purpose | Key Arguments |
+|------|---------|---------------|
+| `etw_dump_cpu` | CPU consumption by process/method | `-topN`, `-topNMethods`, `-Methods`, `-StackTags`, `-ProcessName` |
+| `etw_dump_memory` | Memory usage (WorkingSet, Commit) | `-topN`, `-ProcessName`, `-SortBy`, `-GlobalDiffMB` |
+| `etw_dump_process` | Process info (start/stop, command line, return code) | `-ProcessName`, `-NewProcess`, `-SortBy`, `-Crash` |
+| `etw_dump_exception` | .NET exceptions with stacks | `-Type`, `-ShowStack`, `-ProcessName` |
+| `etw_dump_disk` | Disk I/O per directory/file/process | `-DirLevel`, `-ProcessName`, `-PerProcess`, `-MinMaxSize` |
+| `etw_dump_file` | File I/O operations (read/write/open/close) | `-DirLevel`, `-ProcessName`, `-PerProcess`, `-FileOperation`, `-fileName` |
+| `etw_dump_tcp` | TCP connection statistics | `-SortBy`, `-MinMaxRetransCount` |
+| `etw_dump_dns` | DNS query latency and results | `-DnsQueryFilter`, `-MinMaxTime` |
+| `etw_dump_stats` | Trace metadata (OS, CPU, duration, etc.) | `-Properties *` |
+| `etw_dump_version` | Module/DLL versions | `-dll`, `-ProcessName` |
+| `etw_dump_objectref` | Handle/object tracking (leaks) | `-Leak`, `-ShowStack`, `-ProcessName` |
+| `etw_dump_virtualalloc` | VirtualAlloc memory allocations | `-Details`, `-ShowStack`, `-TopNStacks` |
+| `etw_dump_threadpool` | .NET ThreadPool starvation events | `-ProcessName` |
+| `etw_dump_marker` | ETW marker events | `-MarkerFilter`, `-ZeroTime` |
+| `etw_dump_tracelog` | Tracelogging events | `-Provider *:*` |
+| `etw_dump_power` | Power profile settings | `-details`, `-Diff` |
+| `etw_dump_pmc` | Performance Monitoring Counters | `-pn` |
+| `etw_dump_lbr` | Last Branch Record CPU profiling | `-pn`, `-topnmethods`, `-showcaller` |
+
+### Getting Help
+
+**Get help for a specific command:**
+```
+etw_help:
+  command: "CPU"
+```
+
+---
+
+## Common Patterns
+
+### 1. Initial Trace Investigation
+
+**Load and get basic stats:**
+```
+etw_load → "E:\Traces\Issue.json7z"
+etw_dump_stats → arguments: "-Properties *"
+```
+
+**Find top CPU consumers:**
+```
+etw_dump_cpu:
+  arguments: "-topN 10"
+```
+
+**See process timeline:**
+```
+etw_dump_process:
+  arguments: "-ProcessFmt s -SortBy StartTime"
+```
+
+### 2. CPU Analysis
+
+**Top processes with method breakdown:**
+```
+etw_dump_cpu:
+  arguments: "-topN 5 -topNMethods 150"
+```
+
+**Analyze specific process with stacktags:**
+```
+etw_dump_cpu:
+  arguments: "-ProcessName *syngo.Viewing* -StackTags * -ShowTotal Process"
+```
+
+**Find methods waiting longest:**
+```
+etw_dump_cpu:
+  arguments: "-Methods * -topNMethods 150 -SortBy wait"
+```
+
+**Find top CPU consumer methods deepest in stacktrace. Useful to find CPU hogs which a nearly stacktrace view by using aggregates.**
+```
+etw_dump_cpu:
+  arguments: "-Methods * -topNMethods 150 -SortBy stackdepth"
+```
+
+**Find methods consuming most CPU:**
+```
+etw_dump_cpu:
+  arguments: "-Methods * -topNMethods 150 -SortBy CPU"
+```
+
+**Show first/last occurrence of methods (for duration analysis):**
+```
+etw_dump_cpu:
+  arguments: "-ProcessName myapp.exe -Methods *Initialize* -fld s s"
+```
+
+**Include thread count and module info:**
+```
+etw_dump_cpu:
+  arguments: "-ProcessName myapp.exe -Methods * -ThreadCount -ShowModuleInfo"
+```
+
+**Filter by CPU time:**
+```
+etw_dump_cpu:
+  arguments: "-MinMaxCpuMs 100 -ProcessName myapp.exe"
+```
+
+### 3. Memory Analysis
+
+**Top memory consumers:**
+```
+etw_dump_memory:
+  arguments: "-topN 10 -SortBy Commit"
+```
+
+**Find memory leaks across multiple traces:**
+```
+etw_dump_memory:
+  arguments: "-GlobalDiffMB 500"
+```
+
+**Total machine memory:**
+```
+etw_dump_memory:
+  arguments: "-TotalMemory"
+```
+
+### 4. Process Analysis
+
+**Find crashed processes:**
+```
+etw_dump_process:
+  arguments: "-Crash"
+```
+
+**Show process tree:**
+```
+etw_dump_process:
+  arguments: "-SortBy Tree"
+```
+
+**New processes started during trace:**
+```
+etw_dump_process:
+  arguments: "-NewProcess 1"
+```
+
+**Filter by process name:**
+```
+etw_dump_process:
+  arguments: "-ProcessName *chrome*;!*chromers*"
+```
+
+### 5. Exception Analysis
+
+**All exceptions with stacks:**
+```
+etw_dump_exception:
+  arguments: "-ShowStack"
+```
+
+**Filter by exception type:**
+```
+etw_dump_exception:
+  arguments: "-Type *TimeoutException* -ShowStack"
+```
+
+### 6. Handle Leak Investigation
+
+**Find handle leaks:**
+```
+etw_dump_objectref:
+  arguments: "-Leak -ShowStack -ProcessName myapp.exe"
+```
+
+**Show top stack traces:**
+```
+etw_dump_virtualalloc:
+  arguments: "-Details -ShowStack -TopNStacks 10 -ProcessName myapp.exe"
+```
+
+### 7. Disk and File I/O
+
+**Disk I/O by directory:**
+```
+etw_dump_disk:
+  arguments: "-DirLevel 3 -PerProcess"
+```
+
+**File operations:**
+```
+etw_dump_file:
+  arguments: "-PerProcess -fileName E:\\Data\\*"
+```
+
+### 8. Network Analysis
+
+**TCP connections with retransmissions:**
+```
+etw_dump_tcp:
+  arguments: "-SortBy RetransmissionCount -MinMaxRetransCount 1"
+```
+
+**DNS queries taking too long:**
+```
+etw_dump_dns:
+  arguments: "-MinMaxTime 20ms"
+```
+
+### 9. Extended CPU Metrics
+
+**Show detailed CPU data with frequency and ready percentile times:**
+```
+etw_dump_cpu:
+  arguments: "-topN 3 -topNMethods 10 -Details"
+```
+
+**Normalized CPU time (for frequency comparison):**
+```
+etw_dump_cpu:
+  arguments: "-topN 5 -Details -Normalize"
+```
+
+**Hide specific columns:**
+```
+etw_dump_cpu:
+  arguments: "-topN 5 -Details -NoFrequency -NoReady"
+```
+
+---
+
+## Real-World Examples
+
+### Example 1: Investigating UI Hang
+
+**Scenario:** Application UI becomes unresponsive for several seconds
+
+```
+1. Load trace
+   etw_load → "C:\Traces\UIHang.json7z"
+
+2. Check CPU during hang window
+   etw_dump_cpu → "-Methods * -MinMaxFirst 45 50 -topNMethods 30"
+   
+3. Look for long waits
+   etw_dump_cpu → "-SortBy Wait -topN 5 -topNMethods 50"
+   
+4. Check for exceptions
+   etw_dump_exception → "-ShowStack"
+```
+
+### Example 2: Memory Leak Detection
+
+**Scenario:** Process memory grows over time
+
+```
+1. Load multiple sequential traces
+   etw_load → "C:\Traces\LongRun" (directory with multiple files)
+   recursive: true
+   
+2. Find leaking processes
+   etw_dump_memory → "-GlobalDiffMB 100"
+   
+3. Investigate VirtualAlloc patterns
+   etw_dump_virtualalloc → "-ProcessName leaky.exe -Details -ShowStack -TopNStacks 20"
+   
+4. Check handle leaks
+   etw_dump_objectref → "-Leak -ProcessName leaky.exe -ShowStack"
+```
+
+### Example 3: Slow Startup Investigation
+
+**Scenario:** Application startup time has regressed
+
+```
+1. Load trace
+   etw_load → "C:\Traces\Startup.json7z"
+   
+2. See process start order
+   etw_dump_process → "-ProcessFmt s -SortBy StartTime"
+   
+3. Analyze startup CPU
+   etw_dump_cpu → "-ProcessName myapp.exe -Methods * -fld s s -SortBy CPU -topnmethods 150"
+
+4. Analyze startup wait
+   etw_dump_cpu → "-ProcessName myapp.exe -Methods * -fld s s -SortBy wait -topnmethods 150"
+   
+5. Check for file I/O delays
+   etw_dump_file → "-ProcessName myapp.exe -PerProcess"
+   
+6. Look for network delays
+   etw_dump_tcp → "-ProcessName myapp.exe"
+   etw_dump_dns → "-MinMaxTime 50ms"
+```
+
+### Example 4: Finding Virus Scanner Impact
+
+**Scenario:** Suspecting AV software slowing down operations
+
+```
+1. Load trace
+   etw_load → "C:\Traces\Performance.json7z"
+   
+2. Check for AV drivers
+   etw_dump_cpu → "-ShowModuleInfo Driver -topN 50"
+   
+3. Look for antivirus stacktaqs
+   etw_dump_cpu → "-StackTags *Virus*"
+   
+4. Check disk I/O patterns
+   etw_dump_disk → "-PerProcess"
+```
+
+### Example 5: Thread Pool Starvation
+
+**Scenario:** .NET application has delayed task execution
+
+```
+1. Load trace
+   etw_load → "C:\Traces\ThreadIssue.json7z"
+   
+2. Check for thread starvation events
+   etw_dump_threadpool → "-ProcessName myapp.exe"
+  
+3. Analyze wait times
+   etw_dump_cpu → "-ProcessName myapp.exe -SortBy Wait -topNMethods 150"
+```
+
+### Example 6: Comparing Performance Between Versions
+
+**Scenario:** Need to compare two builds
+
+```
+1. Load both traces
+   etw_load → "C:\Traces\Baseline.json7z"
+   etw_load → "C:\Traces\New.json7z" (keepOldFiles: true)
+   
+2. Compare CPU totals
+   etw_dump_cpu → "-ProcessName myapp.exe -ShowTotal Process"
+   
+3. Compare specific methods
+   etw_dump_cpu → "-Methods *Initialize* -ProcessName myapp.exe"
+   
+4. Compare memory usage
+   etw_dump_memory → "-ProcessName myapp.exe"
+```
+
+### Example 7: Extracting a Raw .etl Recording
+
+**Scenario:** You only have a raw `.etl` recording and need to analyze it
+
+```
+1. Extract the full trace into .json7z files
+   etw_extract → etlFile: "C:\Traces\Issue.etl", extractors: "All", arguments: "-symServer MS"
+
+2. Load the produced extract
+   etw_load → "C:\Traces\Extract\Issue.json7z"
+
+3. Query the data
+   etw_dump_stats → "-Properties *"
+   etw_dump_cpu   → "-topN 10"
+```
+
+### Example 8: Extracting Only a Time Sub Range
+
+**Scenario:** A large trace where only a few seconds around the problem are relevant
+
+```
+1. Extract only the interesting time window (seconds since trace start)
+   etw_extract_timerange → etlFile: "C:\Traces\Big.etl", regions: "45.0 50.0"
+   (or a duration relative to start: regions: "45.0 +5")
+
+2. Load the time sliced extract
+   etw_load → "C:\Traces\Extract\Big_Time_45-50.json7z"
+
+3. Focus analysis on that window
+   etw_dump_cpu → "-Methods * -topNMethods 50 -SortBy CPU"
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**1. "No files loaded"**
+- Make sure to call `etw_load` before dump commands
+- Check file path is correct (use full absolute path)
+- Verify file extension is .json7z or .json
+
+**2. "No data found"**
+- The extractor may not have included this data type
+- Check what was extracted: `etw_dump_stats`
+- Re-extract with needed extractors (see ETWAnalyzer documentation)
+
+**3. Empty results**
+- Process name filter may be too restrictive
+- Try without filters first: `etw_dump_process` to see all processes
+- Use wildcards: `-ProcessName *partial*`
+
+**4. Too much output**
+- Use `-topN` to limit processes
+- Use `-topNMethods` to limit methods
+- Filter by CPU/time: `-MinMaxCpuMs 100`
+
+**5. Need more detail**
+- Add `-Details` for extended metrics
+- Use `-ShowStack` for exception/objectref
+- Use `-ShowModuleInfo` for version info
+- Use `-ThreadCount` for thread information
+
+### Filter Syntax
+
+ETWAnalyzer uses consistent filter syntax:
+
+- **Multiple filters:** Separate with `;`
+  - Example: `*chrome*;*firefox*`
+
+- **Exclusions:** Prefix with `!`
+  - Example: `*chrome*;!*chromers*`
+
+- **Wildcards:** 
+  - `*` matches zero or more characters
+  - `?` matches zero or one character
+
+- **Case-insensitive:** All filters are case-insensitive
+
+### Time Formats
+
+Many commands support `-TimeFmt` for time display:
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `s` | Seconds since trace start | `45.123` |
+| `Local` | Local time with date | `2024-04-28 11:55:20.123` |
+| `LocalTime` | Local time without date | `11:55:20.123` |
+| `UTC` | UTC time with date | `2024-04-28 09:55:20.123` |
+| `UTCTime` | UTC time without date | `09:55:20.123` |
+
+### Process Filters
+
+`-NewProcess` values:
+
+| Value | Meaning |
+|-------|---------|
+| `0` | Processes running entire trace |
+| `1` | Processes started during trace |
+| `-1` | Processes exited during trace |
+| `2` | Started but not stopped |
+| `-2` | Stopped but not started |
+
+---
+
+## Advanced Features
+
+### StackTags
+
+StackTags group CPU consumption by semantic categories (e.g., .NET GC, JIT, WPF rendering, SQL queries).
+
+**View all stacktags:**
+```
+etw_dump_cpu:
+  arguments: "-StackTags * -ProcessName myapp.exe -ShowTotal Method"
+```
+
+**Filter specific categories:**
+```
+etw_dump_cpu:
+  arguments: "-StackTags *GC*;*JIT* -ShowTotal Process"
+```
+
+### Zero Time
+
+Shift time baseline for relative analysis:
+
+**Relative to first method occurrence:**
+```
+etw_dump_cpu:
+  arguments: "-Methods *Initialize* -ZeroTime First *OnClick* -fld s s"
+```
+
+**Relative to process start:**
+```
+etw_dump_cpu:
+  arguments: "-ZeroTime ProcessStart -ZeroProcessName myapp.exe -fld s s"
+```
+
+### Marker Events
+
+Correlate with custom ETW markers:
+
+```
+etw_dump_marker:
+  arguments: "-MarkerFilter *TestStart* -ZeroTime marker *TestStart*"
+```
+
+### CSV Export
+
+All dump commands support `-csv` for exporting to files. These can be examined further. 
+
+```
+etw_dump_cpu:
+  arguments: "-ProcessName myapp.exe -Methods * -csv C:\\Results\\cpu_data.csv"
+```
+
+---
+
+## Best Practices
+
+1. **Start broad, then narrow:**
+   - Begin with `-topN 10` to see big picture
+   - Drill down with `-ProcessName` filters
+   - Use `-Methods *pattern*` or `-Stacktags *pattern*` for specific investigations
+
+2. **Use appropriate metrics:**
+   - CPU analysis: Focus on `-topNMethods` and stacktags
+   - Memory leaks: Use `-GlobalDiffMB` across traces
+   - Hangs: Check `-SortBy Wait` and exception data
+
+3. **Leverage multiple data sources:**
+   - CPU + Exception + File I/O gives complete picture
+   - Process + Memory + ObjectRef for leak investigations
+   - TCP + DNS for network issues
+
+4. **Time correlation:**
+   - Use `-fld s s` to see when methods execute
+   - Use `-ProcessFmt s` to see process timelines
+   - Use `-ZeroTime` to align multiple traces
+
+5. **Documentation:**
+   - Use `etw_help` for command-specific details
+   - Check `etw_dump_stats` for trace metadata
+   - Verify data availability before deep analysis
+
+---
+
+## Useful Queries Quick Reference
+
+```bash
+# Quick overview
+etw_dump_stats → "-Properties *"
+etw_dump_process → "-SortBy StartTime"
+etw_dump_cpu → "-topN 10"
+
+# CPU deep dive
+etw_dump_cpu → "-ProcessName myapp* -StackTags * -ShowTotal Method -topNMethods 150"
+
+# Memory investigation
+etw_dump_memory → "-topN 10 -Details"
+etw_dump_virtualalloc → "-Details -ShowStack -TopNStacks 10"
+
+# Exception analysis
+etw_dump_exception → "-Type * -ShowStack"
+
+# Network issues
+etw_dump_tcp → "-SortBy RetransmissionCount"
+etw_dump_dns → "-MinMaxTime 100ms"
+
+# File I/O
+etw_dump_file → "-PerProcess -fileName C:\\*"
+etw_dump_disk → "-DirLevel 3"
+
+# Handle leaks
+etw_dump_objectref → "-Leak -ShowStack"
+
+# Process crashes
+etw_dump_process → "-Crash"
+```
+
+---
+
+## Additional Resources
+
+- **ETWAnalyzer GitHub:** https://github.com/Alois-xx/ETWAnalyzer
+- **WPA (Windows Performance Analyzer):** For visual correlation with trace data
+- **ETW Recording:** Use ETWController or wpr.exe to capture traces
+- **Symbol Servers:** Configure `-SymServer` during extraction for full method names
+
+---
+
+## Version Information
+
+This documentation is based on ETWAnalyzer version 4.5.0.1+ with MCP server integration.
+
+For questions or issues with the MCP server, contact the ETWAnalyzer team or file an issue on the GitHub repository.
+
+---
+> Source: [Siemens-Healthineers/ETWAnalyzer](https://github.com/Siemens-Healthineers/ETWAnalyzer) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-24 -->
