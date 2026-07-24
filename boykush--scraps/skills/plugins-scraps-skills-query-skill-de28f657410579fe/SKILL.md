@@ -1,0 +1,85 @@
+---
+name: query
+description: Answer questions about the wiki by searching, reading, and synthesizing relevant scraps with `[[Title]]` citations. Use this when the user wants to query the wiki, ask what they have written about a topic, compare scraps, find related notes, or pull a synthesized overview from existing scraps. Use when this capability is needed.
+metadata:
+  author: boykush
+---
+
+# Query
+
+Answer a question against the wiki and return a citation-rich synthesis.
+
+Implements Karpathy's *Query* primitive for Scraps: search the wiki, read relevant scraps, and synthesize an answer that references its sources by `[[Title]]`. Citations make the answer auditable and ready to be filed back as a new scrap if the user chooses.
+
+## When to use
+
+- "What do I have on X?" / "What did I write about Y?"
+- "Compare X and Y across my notes"
+- "Summarize what I know about Z"
+- "Find scraps related to W"
+
+## Workflow
+
+1. **Understand the question**
+   - Identify the core topic and any constraints (time range, ctx folder, tag, etc.)
+   - If the question is ambiguous, ask one clarifying question before searching
+
+2. **Search (broad → narrow)**
+   - `scraps search "<keyword>" --json` for each main keyword
+   - Try multiple phrasings if the first search returns few results
+   - For tag-driven questions: `scraps tag backlinks "<tag>" --json`
+
+3. **Select candidates**
+   - From search results, pick the 5–15 most relevant scraps
+   - Prefer scraps that span the question (different ctx, different tags) over many near-duplicates
+
+4. **Read selected scraps**
+   - `scraps get "<title>" [--ctx <ctx>] --json` for each candidate
+   - Use field projection to save context when appropriate, e.g. `--json body`, `--json headings`, or `--json code_blocks`
+   - If a link result includes `heading`, read just that section with `scraps get "<title>" [--ctx <ctx>] --heading "<heading>" --json body`
+   - For graph-shaped questions, also use:
+     - `scraps links "<title>" --json` (outbound)
+     - `scraps backlinks "<title>" --json` (inbound)
+
+5. **Synthesize with citations**
+   - Write the answer in plain Markdown
+   - Cite every claim that comes from a scrap as `[[Title]]` (or `[[Ctx/Title]]` when needed)
+   - Do not invent information beyond what the scraps and the user's question support
+   - Choose the output shape that fits the question:
+     - prose paragraph for narrative questions
+     - GFM table for comparisons
+     - bullet list for enumerations
+     - mermaid diagram for relationships
+
+6. **Stop**
+   - Do not auto-offer to save the answer. If the user wants the synthesis saved as a new scrap, they invoke the `ingest` skill on the answer markdown.
+
+## Citation rules
+
+- Every non-trivial claim should trace to a `[[Title]]` citation.
+- If a claim has no source in the wiki, mark it as outside the wiki ("not in the current scraps"); do not bluff.
+- Use the exact `title` value returned by `scraps search --json` / `scraps get --json` so the citation resolves cleanly.
+- For ctx-disambiguated scraps, use `[[Ctx/Title]]`.
+- `scraps links --json` may return a `heading`; use it for targeted reads, but cite the scrap as `[[Title]]` or `[[Ctx/Title]]` unless the answer specifically needs a heading reference.
+
+## CLI used
+
+- `scraps search <query> [--logic and|or] --json`
+- `scraps get <title> [--ctx <ctx>] [--heading <heading>] --json [fields]`
+- `scraps links <title> [--ctx <ctx>] --json` (returns `{ kind, title, ctx, heading }` refs)
+- `scraps backlinks <title> [--ctx <ctx>] --json`
+- `scraps tag list --json`
+- `scraps tag backlinks <tag> --json`
+- `scraps todo [--status open|done|deferred|all] --json`
+
+These commands are shown with `--json` because this skill consumes structured output — without it Scraps prints human-formatted text that is unstable to parse, so `--json` is part of the command, not an option. Use `scraps <cmd> --help` only as a fallback for a rare flag not listed here, not as a routine discovery step; for deeper syntax or spec questions, consult the `scraps-llm-wiki-schema` agent (it reads the official docs).
+
+## Further reading
+
+- Scraps docs: <https://boykush.github.io/scraps/>
+- Karpathy's *Ingest / Query / Lint* framing: <https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f>
+- Composition with other primitives, dialogue / catch-up patterns, and primitive boundaries: see the `scraps-llm-wiki-schema` agent.
+
+---
+> Source: [boykush/scraps](https://github.com/boykush/scraps) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-20 -->
