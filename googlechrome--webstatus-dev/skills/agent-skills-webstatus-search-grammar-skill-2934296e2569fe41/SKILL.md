@@ -1,0 +1,60 @@
+---
+name: webstatus-search-grammar
+description: Use when modifying the ANTLR search grammar, adding new search terms, or working with the query parser and builder.
+metadata:
+  author: GoogleChrome
+---
+
+# webstatus-search-grammar
+
+This skill provides instructions for modifying the feature search syntax in `webstatus.dev`, which is built on ANTLR v4.
+
+## Architecture
+
+For a technical breakdown of the ANTLR grammar, search node transformation, and the `FeaturesSearchVisitor` implementation, see [references/architecture.md](references/architecture.md).
+
+## Source of Truth
+
+- The canonical source of truth for the search syntax is `antlr/FeatureSearch.g4`.
+- **DON'T** edit the generated parser files in `lib/gen/featuresearch/parser/` directly.
+
+## General Guidelines
+
+- **DO** cross-reference all Go and test code against the official Google Go Style Guide. If you are unsure about a specific style rule, DO NOT assume; you MUST ask the user for clarification.
+
+## How to Add a New Search Term (e.g., `is:discouraged`)
+
+1. **Update Grammar (`antlr/FeatureSearch.g4`)**:
+   - Add the new term to the `search_criteria` rule in the grammar file (e.g., add `| discouraged_term`).
+   - Define the new rule: `discouraged_term: 'is' ':' 'discouraged';`.
+2. **Regenerate Parser**:
+   - Run `make antlr-gen`. This will update the files in `lib/gen/featuresearch/parser/`. Note: If you do not have the `devcontainer` open or do not have the right Java dependency versions, **ask the user** to run this step for you.
+3. **Update Visitor (`lib/gcpspanner/searchtypes/`)**:
+   - Add a new `SearchIdentifier` for your term in `searchtypes.go` (e.g., `IdentifierIsDiscouraged`).
+   - In **[FeaturesSearchVisitor.go](../../lib/gcpspanner/searchtypes/features_search_visitor.go)**, implement the `VisitDiscouraged_termContext` method. This visitor is the **source-of-truth** for how grammar terms are translated into Spanner SQL.
+4. **Update Query Builder (`lib/gcpspanner/feature_search_query.go`)**:
+   - In `FeatureSearchFilterBuilder.traverseAndGenerateFilters`, add a `case` for your new `SearchIdentifier`.
+   - This case should generate the appropriate Spanner SQL `WHERE` clause for the filter.
+5. **Add Tests**:
+   - Add a parsing test in `lib/gcpspanner/searchtypes/features_search_parse_test.go`.
+   - Add a SQL generation test in `lib/gcpspanner/feature_search_query_test.go`.
+   - Add an integration test in `lib/gcpspanner/feature_search_test.go`.
+6. **Update Frontend UI**:
+   - Add the new search term to the search builder UI vocabulary in `frontend/src/static/js/utils/constants.ts` to make it discoverable to users.
+
+## Documentation Updates
+
+When you add a new search grammar term or modify parsing:
+
+- Trigger the "Updating the Knowledge Base" prompt in `GEMINI.md` to ensure I am aware of the changes.
+- Ensure that `docs/ARCHITECTURE.md` is updated if there are broader system impacts.
+
+## Error Handling & Query Validation
+
+- **Query Execution Errors:** When translating search logic into Spanner SQL or exploring `saved:` references via `expandSavedSearches`, unexpected edge cases (e.g. `backendtypes.ErrSavedSearchNotFound`, or cyclic references) MUST NOT crash the request and MUST NOT return `500 Internal Server Error`.
+- **400 Bad Request Mapping:** Endpoint handlers (e.g., `get_features.go`, `create_saved_search.go`) MUST explicitly catch these semantic validation errors and map them to HTTP `400 Bad Request` JSON responses. The frontend relies on these 400s to render in-app warning banners for invalid subsets of an otherwise valid query string.
+- **Reference Validation:** Always ensure that `ValidateQueryReferences` (or equivalent dry-run query validators) intercepts invalid cycles or missing queries before a database mutation is committed.
+
+---
+> Source: [GoogleChrome/webstatus.dev](https://github.com/GoogleChrome/webstatus.dev) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-19 -->
