@@ -1,0 +1,35 @@
+---
+name: gsd-audit-milestone
+description: Audit milestone completion against original intent before archiving Use when this capability is needed.
+metadata:
+  author: Truthan49
+---
+
+<objective>
+Verify milestone achieved its definition of done. Check requirements coverage, cross-phase integration, and end-to-end flows.
+
+**This command IS the orchestrator.** Reads existing VERIFICATION.md files (phases already verified during execute-phase), aggregates tech debt and deferred gaps, then spawns integration checker for cross-phase wiring.
+</objective>
+
+<execution_context>
+@.agent/get-shit-done/workflows/audit-milestone.md
+</execution_context>
+
+<context>
+Version: $ARGUMENTS (optional — defaults to current milestone)
+
+Core planning files are resolved in-workflow (`init milestone-op`) and loaded only as needed.
+
+**Completed Work:**
+Glob: .planning/phases/*/*-SUMMARY.md
+Glob: .planning/phases/*/*-VERIFICATION.md
+</context>
+
+<process>
+Execute the audit-milestone workflow from @.agent/get-shit-done/workflows/audit-milestone.md end-to-end.
+Preserve all workflow gates (scope determination, verification reading, integration check, requirements coverage, routing).
+</process>
+
+---
+> Source: [Truthan49/Antigravity-Everywhere](https://github.com/Truthan49/Antigravity-Everywhere) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-15 -->
