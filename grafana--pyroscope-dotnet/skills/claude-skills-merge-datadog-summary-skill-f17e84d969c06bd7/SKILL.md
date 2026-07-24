@@ -1,0 +1,75 @@
+---
+name: pyroscope-dotnet
+description: Summarize a datadog merge PR with diff overview and profiler-related commit log Use when this capability is needed.
+metadata:
+  author: grafana
+---
+
+# Merge Datadog Summary
+
+Generate a summary for a PR created by the `merge-datadog` skill and update
+the PR description.
+
+If the conversation already contains PR information (number, URL, branch name),
+use that directly — do NOT run `gh pr list` to re-discover it.
+
+Only as a last resort, if no PR info is available in context, find the most
+recent open PR with the `datadog-merge` label:
+```
+gh pr list --repo grafana/pyroscope-dotnet --label datadog-merge --state open --limit 1
+```
+
+## Steps
+
+1. **Identify the PR and the DataDog tag**
+   - Get PR metadata: `gh pr view <pr> --repo grafana/pyroscope-dotnet --json number,title,baseRefName,headRefName,url`
+   - Extract the tag from the PR title (e.g. `merge datadog v3.35.0` → `v3.35.0`)
+
+2. **Get the PR diff and find profiler-related changes**
+   ```
+   gh pr diff <pr> --repo grafana/pyroscope-dotnet
+   ```
+   Read through the diff and identify all changes that touch `profiler/` or
+   `Profiler` paths. Also collect the commit SHAs from the PR:
+   ```
+   gh pr view <pr> --repo grafana/pyroscope-dotnet --json commits --jq '.commits[] | [.oid[:8], .oid, .messageHeadline] | @tsv'
+   ```
+   For each profiler-related commit, build the DataDog GitHub URL:
+   `https://github.com/DataDog/dd-trace-dotnet/commit/<full-sha>`
+
+3. **Write the summary**
+
+   Compose a PR description in this format:
+
+   ```markdown
+   Merge dd-trace-dotnet <tag> into the fork.
+
+   ## Summary
+
+   <2-5 sentence high-level summary of what changed in the profiler, based on
+   the diff and commit messages. Focus on functional changes, not mechanical
+   merge details.>
+
+   ## Upstream profiler commits
+
+   | Commit | Message |
+   |--------|---------|
+   | [<short-sha>](https://github.com/DataDog/dd-trace-dotnet/commit/<full-sha>) | <first line of commit message> |
+   | ... | ... |
+
+   If there are no profiler-related commits, write "No profiler-specific commits
+   in this release." instead of the table.
+   ```
+
+4. **Update the PR description**
+   ```
+   gh pr edit <pr> --repo grafana/pyroscope-dotnet --body "<summary>"
+   ```
+   Use a heredoc to pass the body to avoid quoting issues.
+
+5. **Report back** — show the user the generated summary and confirm the PR was
+   updated. Include the PR URL.
+
+---
+> Source: [grafana/pyroscope-dotnet](https://github.com/grafana/pyroscope-dotnet) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-20 -->
