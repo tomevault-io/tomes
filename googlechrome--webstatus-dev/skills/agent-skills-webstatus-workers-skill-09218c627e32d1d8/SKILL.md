@@ -1,0 +1,84 @@
+---
+name: webstatus-workers
+description: Use when working with the webstatus notification pipeline, event producer, push delivery, or push workers (e.g., Email, Webhooks), and Pub/Sub subscribers.
+metadata:
+  author: GoogleChrome
+---
+
+# webstatus-workers
+
+This skill provides architectural and implementation details for the `workers/` directory in `webstatus.dev`, which houses the event-driven notification pipeline.
+
+## Architecture
+
+For a detailed breakdown of the notification pipeline architecture, including the event producer, push delivery dispatcher, and email sender, see [references/architecture.md](references/architecture.md).
+
+For guidance on adding future integrations (like Webhooks), see [references/how-to-add-a-worker.md](references/how-to-add-a-worker.md).
+
+## Canonical Data Transport & Event Semantics
+
+Workers must use the shared structs in [lib/workertypes/types.go](../../lib/workertypes/types.go) for all incoming and outgoing messages. This ensures that a change in the Spanner schema or API doesn't immediately break the worker pipeline (decoupling).
+
+**Strict Rules for Data Sync:**
+
+- **Event Payload Purity**: Do not add display metadata (e.g., human-readable `SearchName` or user PII) to core data-sync pub/sub event schemas (e.g., `FeatureDiffEvent`, `RefreshSearchCommand`). Core events should represent the raw state change via canonical IDs (`SearchID`, `EventID`). Any display data needed for emails or UI should be fetched from Spanner at the last possible moment (Delivery/Render phase).
+- **Feature Differ "Added" Semantics**: Within a `FeatureDiff`, the `Added` array represents features that _newly matched_ the search query since the last run. It does NOT mean the feature just entered the web platform. **Do not attempt to calculate baseline or status transitions against a "zero state" for features in the `Added` array**, as this falsely reports them as "becoming" newly/widely available when they merely entered the search results.
+- **Browser Implementation Grouping**: When formatting browser data for consumption (like combining Chrome Desktop and Chrome Android into a single row), the two implementations can ONLY be grouped if their entire transition state is identical. You must verify that `From.Status`, `To.Status`, `To.Version`, and `To.Date` perfectly match before combining them.
+
+## Error Handling and Serialization Patterns
+
+- **Structured Errors for Future-Proofing**: When storing errors in shared structures like `EventSummary`, use a custom struct instead of a simple slice of strings, even if it has only one field initially. This prevents breaking serialization when adding fields in the future.
+- **Enums for Rendering Decisions**: Use enum codes in shared summary structures instead of full human-readable messages. This leaves the decision of how to render the error to the specific renderer (email, Slack, etc.) and avoids hardcoding presentation logic in the pipeline source.
+- **Documenting Dropped Fields**: Always add comments to explain why a field is omitted (e.g., dropping `Message` in favor of `Code` enum) to preserve design intent for future maintainers.
+- **Leaf Package Pattern for Circular Dependencies**: Use a leaf package (like `lib/backendtypes`) to house shared simple types and error codes to break cyclic dependencies between generic orchestrators and versioned data handlers.
+- **Schema Isolation**: Workers handling versioned state blobs (like `v1.FeatureDiffSnapshot`) must use the types and enums defined within that specific schema's package (e.g., `v1.QueryErrorCode`) rather than importing internal `backendtypes`. This ensures the worker pipeline remains fully insulated from backend internal changes.
+- **Orchestrator Data Ownership**: To prevent leaking translation logic into isolated schema interfaces (e.g. adding getters for errors), the orchestrator should hold and compare the data directly if it already possesses it (e.g. in `executionData`).
+- **Multi-Layer Enum Strategy for Serialization Safety**: When definitions of query error codes seem to be duplicated across different packages (e.g., `lib/workertypes/comparables`, `lib/workertypes`, and storage `blobtypes/v1`), understand that this is an intentional application of the Multi-Layer Enum Strategy. This ensures service boundaries are respected and we decouple internal pipeline logic from the external storage schema. We use exhaustive switch statements (enforced by the linter) to map between these layers, ensuring that adding a new error code forces updates across all layers without silent failures or brittle type casting.
+
+## Local Development
+
+- The workers run locally via Skaffold and connect to local emulators for Spanner (`spanner:9010`) and Pub/Sub (`pubsub:8060`).
+- The `FRONTEND_BASE_URL` locally is usually `http://localhost:5555`.
+
+## Infrastructure Abstraction (The Adapter Pattern)
+
+All workers must be decoupled from GCP-specific SDKs.
+
+- **Interfaces**: Define the "What" (e.g., `interface EmailSender`) in the worker's package.
+- **Implementations**: Put the "How" (e.g., `struct PubSubSender`) in `lib/gcppubsub/gcppubsubadapters`.
+- This ensures workers are testable without Pub/Sub or GCS emulators.
+
+## General Guidelines
+
+- **DO** cross-reference all code against the official Google Go Style Guide. If you are unsure about a specific style rule, DO NOT assume; you MUST ask the user for clarification.
+- **DO** write tests for all new parsers, generators, and differ logic using table-driven tests.
+- **DO** use the `generic.OptionallySet[T]` pattern when defining blob structures or canonical in-memory state to handle forward/backward compatibility gracefully (quiet rollouts).
+- **DON'T** modify generated code.
+- **DO** ensure the worker uses `slog` for logging and bubbles up transient errors using `errors.Join(event.ErrTransientFailure, err)` to NACK the message for retry.
+
+## Testing & Linting
+
+- **Precommit Suite**: Run `make precommit` to execute the full suite of Go tests, formatting, and linting.
+- **Linting**: Run `make go-lint` to lint all Go code using `golangci-lint`.
+- **Quick Test Iteration**: Because this project uses a multi-module workspace (`go.work`), to run tests quickly for a single package without running the whole suite, execute `go test` from _within_ the specific module directory:
+  ```bash
+  cd workers/<worker_name> && go test -v ./...
+  ```
+
+## Documentation Updates
+
+When you add a new worker, update the notification pipeline, or change data flow:
+
+- Update `docs/ARCHITECTURE.md` to reflect the new pipeline step.
+- Trigger the "Updating the Knowledge Base" prompt in `GEMINI.md` to ensure I am aware of the changes.
+- Update these very skills files if you introduce new structural patterns or rules.
+
+## Critical Infrastructure Requirements
+
+When adding a new worker, you **MUST** ensure that the manual instance counts are updated across all environments.
+
+- **Strict Object Types**: The `worker_manual_instance_counts` variable in `infra/variables.tf` is an `object` type. This means that if you add a new field (e.g., `webhook`) to the object definition, **every** environment's `.tfvars` file (e.g., [`infra/.envs/staging.tfvars`](../../../infra/.envs/staging.tfvars), [`infra/.envs/prod.tfvars`](../../../infra/.envs/prod.tfvars)) **MUST** be updated to include that field, or Terraform execution will fail.
+
+---
+> Source: [GoogleChrome/webstatus.dev](https://github.com/GoogleChrome/webstatus.dev) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-19 -->
