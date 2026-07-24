@@ -1,0 +1,28 @@
+# localess
+
+> Follow these steps to refresh Claude Code's local environment, ensuring that their agent skills and plugins are fully up-to-date.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/localess/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# Refresh Claude Code Local Environment
+
+Follow these steps to refresh Claude Code's local environment, ensuring that their agent skills and plugins are fully up-to-date.
+
+Use Claude Code's native plugin manager instead of `npx`.
+
+1. **Update the Plugin:** Run the specific CLI command to update the Firebase plugin:
+   ```bash
+   claude plugin update firebase@firebase
+   ```
+
+---
+> Source: [Lessify/localess](https://github.com/Lessify/localess) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-07-24 -->
