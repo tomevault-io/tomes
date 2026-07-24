@@ -359,5 +359,5 @@ Results are stored in `~/.seomator/` for later retrieval with `seomator report`.
 - **CLI help**: `seomator --help` and `seomator <command> --help`
 
 ---
-> Converted and distributed by [TomeVault](https://tomevault.io/claim/seo-skills) — claim your Tome and manage your conversions.
-<!-- tomevault:4.0:skill_md:2026-04-11 -->
+> Source: [seo-skills/seo-audit-skill](https://github.com/seo-skills/seo-audit-skill) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-09 -->
