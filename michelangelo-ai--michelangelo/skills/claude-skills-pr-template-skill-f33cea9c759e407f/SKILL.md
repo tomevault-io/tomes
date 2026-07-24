@@ -1,0 +1,48 @@
+---
+name: pr-template
+description: Create or update a GitHub PR using the repo's pull_request_template.md format. Use when creating a new PR or updating an existing PR body. Use when this capability is needed.
+metadata:
+  author: michelangelo-ai
+---
+
+Create or update a GitHub PR following the repo's pull request template.
+
+## Template Format
+
+Read the template from `.github/pull_request_template.md` and use it as the exact structure for the PR body.
+
+## Your Task
+
+1. Run `git diff main...HEAD` (or `git diff HEAD~1` if already on main) to understand the changes
+2. Infer the PR type(s) from the diff and check the applicable boxes
+3. Fill in all sections — keep each answer concise (1-3 sentences or bullet points)
+4. **If creating a new PR:**
+   - Check if already on a non-main branch; if on main, ask the user for a branch name
+   - Push the branch if not yet pushed: `git push -u origin <branch>`
+   - Create the PR: `gh pr create --title "<title>" --body "<body>"`
+5. **If updating an existing PR:**
+   - Get the current PR number: `gh pr view --json number -q '.number'`
+   - Update the body: `gh pr edit <number> --body "<body>"`
+
+## PR Title
+
+- Use conventional commit format: `<type>(<scope>): <short description>`
+- Types: `feat`, `fix`, `docs`, `ci`, `refactor`, `chore`, `test`, `perf`
+- Scopes (optional): `python`, `helm`, `ci`, `npm`, `ui`, `go`
+- Keep under 70 characters
+- Examples: `docs(contributing): add PR template skill`, `ci(release): add PyPI publishing step`
+
+## Filling in the Template
+
+- **What changed?** — What the code does differently now. Be concrete.
+- **Why?** — The motivation: bug, user need, cleanup, requirement.
+- **How did you test it?** — Commands run, manual steps, or "no functional changes".
+- **Potential risks** — Anything that could break in production. Default to "None" for docs/chore changes.
+- **Breaking Changes** — Check applicable boxes: API (Go/Python), Proto (enums/fields), Helm (values), Config/deployment (env vars/ports). Check "No breaking changes" if none apply. If any breaking change is checked, use `BREAKING CHANGE:` footer or `!` suffix in the commit.
+- **Migration guide** — Required if any breaking change box is checked. Describe step-by-step upgrade instructions with before/after examples. Delete section if no breaking changes.
+- **Release notes** — Only notable if it's a schema change, migration, or config change. Otherwise "N/A".
+- **Documentation Changes** — Note any doc updates or "N/A".
+
+---
+> Source: [michelangelo-ai/michelangelo](https://github.com/michelangelo-ai/michelangelo) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-20 -->
