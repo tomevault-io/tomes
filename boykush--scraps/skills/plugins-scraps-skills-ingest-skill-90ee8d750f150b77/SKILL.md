@@ -1,0 +1,105 @@
+---
+name: ingest
+description: Create a new scrap from a source (prompt, URL, or arbitrary markdown), update cross-links in related scraps, and run a sanity check. Use this when the user wants to add a scrap, summarize an article, save synthesized content to the wiki, or file back a Q&A result. Use when this capability is needed.
+metadata:
+  author: boykush
+---
+
+# Ingest
+
+Add a new scrap to the wiki and integrate it into the existing graph.
+
+Implements Karpathy's *Ingest* primitive for Scraps: read a source, draft a new scrap, update related scraps with cross-links, and sanity-check the result. A single ingest typically touches the new scrap plus 1–5 existing scraps.
+
+## When to use
+
+- "Write a scrap about X" / "Add a scrap on Y" (prompt source)
+- "Summarize this article" / a pasted URL (web source)
+- "Save this answer as a scrap" / file-back from a query (markdown source)
+
+## Source types
+
+| Source | Provided as | First step |
+| --- | --- | --- |
+| prompt | user's topic, instruction, or ready-to-use content (e.g., a `/query` synthesis) | if the input is complete content, use as-is; otherwise gather context (search related scraps) and ask one clarifying question only when scope is unclear |
+| URL | pasted link | `WebFetch <url>`, extract title and key content |
+| term | an atomic term surfaced in discussion (often unknown until just now) | treat the term itself as the title; skip clarifying questions |
+
+## Workflow
+
+1. **Identify source and topic**
+   - URL: `WebFetch` → use OGP / heading title as initial title
+   - prompt: if the input is complete content (e.g., a `/query` synthesis), use as-is; if it's a topic, ask one clarifying question only when scope is unclear
+   - term: the term is the title; do not ask clarifying questions (the discussion already established scope). Proceed to step 2 with the term as the search keyword.
+
+2. **Research existing wiki state**
+   - `scraps search "<keyword>" --json` to find related scraps
+   - `scraps tag list --json` to find relevant tags
+   - Read 3–8 of the most related scraps via `scraps get "<title>" --json`
+   - Use `scraps get "<title>" --json headings` first when only the outline is needed
+
+3. **Decide title and ctx**
+   - Pick a clear, atomic title
+   - If the title collides with an existing scrap, add a context folder: `scraps/<ctx>/<title>.md`
+   - ctx depth ≤ 3
+
+4. **Decide max-lines (familiarity heuristic)**
+   - Count related scraps from step 2 (low: 0–5, medium: 6–15, high: 16+)
+   - Low → 5–7 lines (protect working memory)
+   - Medium → 10–12 lines (schema is forming, more detail welcome)
+   - High → 5–7 lines (avoid redundant explanation; prefer link-rich brevity)
+   - Skip this step if the user specified `--max-lines` explicitly (CLI flag is authoritative)
+   - If the user signals depth in conversation ("go deeper" / "longer" / "厚めに" etc.), bump one band upward; "shorter" / "ライトに" etc. bumps downward. Conversation cue overrides the heuristic but stays below the explicit `--max-lines` flag.
+
+5. **Draft the scrap**
+   - Plain Markdown with `[[link]]` for references and `#[[tag]]` for tags
+   - **Link vs tag**: reference a scrap with `[[Title]]`, never `#[[Tag]]` (tags are only existing categories from step 2). A `[[Title]]` must resolve to a real scrap — a concept that *should* exist but doesn't yet stays **plain text**, since an unresolved `[[Title]]` is a broken link (step 7), not a forward reference.
+   - **Link direction & fidelity (outbound)**: links flow concrete → abstract — a concrete scrap links out to the abstractions it depends on; the reverse is the anti-pattern (concrete scraps link IN instead, step 6), and siblings link only on a direct, asymmetric relation. From a source, add only what it attests — never a concrete entity it doesn't name (a CVE, product, person), though an abstraction it genuinely instantiates is fine.
+   - Include source autolink if URL: `<https://...>`
+   - Stay within max-lines
+
+6. **Cross-link inbound mentions** (Karpathy's "update related entity and concept pages")
+   - Existing scraps that already name the new title in plain text should link IN to it. This is the reverse of step 5's outbound links — here you edit the *existing* scraps. Discover candidates with Grep, judge each in context, then convert.
+   - **Discover (Grep, high recall)**: now that the title is fixed (step 3), `Grep` the wiki for the literal title across `*.md`, with surrounding context. `scraps search` is fuzzy over title+body and returns no match location, so it misses and mislocates mentions — do not use it for discovery.
+   - **Judge each hit (review, high precision)**: Grep is a substring match, so review every hit in context and keep only a *standalone-term* occurrence of the title. Skip a hit that is merely part of a longer term — title `GitHub` inside `GitHub App` / `GitHub Actions`, or title `状態` inside `状態管理` (Japanese has no word boundaries, so context judgement is mandatory, not a regex `\b`). If that longer term is itself a scrap or should be one, leave it intact rather than splitting it.
+   - **Convert**: turn each surviving plain-text mention into `[[new title]]` (use `[[new title|surface form]]` for an inflected or aliased form). Skip occurrences already inside `[[...]]`/`#[[...]]` and skip the new scrap's own file. Do not invent mentions Grep did not find.
+   - Cover **every** scrap that survives review — do not stop at the first one or two.
+   - Backlinks are auto-computed by Scraps; explicit reverse links are redundant
+
+7. **Post-write sanity check**
+   - **Tag check**: list every `#[[tag]]` you wrote and confirm each already appeared in the `scraps tag list --json` from step 2. A tag that was not in that list was almost certainly meant to be a `[[link]]` — convert it. Add a genuinely new tag only when you deliberately intend a new cross-cutting category. (Broken-link lint cannot catch this: a stray tag is valid syntax, it just creates a single-use tag.)
+   - `scraps lint --rule broken-link` (purpose: confirm the new scrap introduced no broken references)
+   - For non-trivial violations, hand off to the `lint-rule-handler` agent
+
+## Wiki-link syntax
+
+| Syntax | Meaning |
+| --- | --- |
+| `[[Title]]` | normal link |
+| `[[Title|Display]]` | alias |
+| `[[Ctx/Title]]` | context-disambiguated link |
+| `[[Title#Heading]]` | heading reference |
+| `#[[Tag]]` | tag |
+| `<https://...>` | autolink (renders as OGP card) |
+
+`[[ ]]` and `#[[ ]]` are disjoint namespaces: `[[Title]]` references a scrap; `#[[Tag]]` declares or joins a tag. Using `#[[ ]]` to point at a scrap does not link — it silently creates a stray single-use tag.
+
+## CLI used
+
+- `scraps search <query> --json`
+- `scraps get <title> [--ctx <ctx>] [--heading <heading>] --json [fields]`
+- `scraps tag list --json`
+- `scraps tag backlinks <tag> --json`
+- `scraps lint --rule <rule>`
+
+These commands are shown with `--json` because this skill consumes structured output — without it Scraps prints human-formatted text that is unstable to parse, so `--json` is part of the command, not an option. Use `scraps <cmd> --help` only as a fallback for a rare flag not listed here, not as a routine discovery step; for deeper syntax or spec questions, consult the `scraps-llm-wiki-schema` agent (it reads the official docs).
+
+## Further reading
+
+- Scraps docs: <https://boykush.github.io/scraps/>
+- Karpathy's *Ingest / Query / Lint* framing: <https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f>
+- Composition with other primitives, dialogue / catch-up patterns, and primitive boundaries: see the `scraps-llm-wiki-schema` agent.
+
+---
+> Source: [boykush/scraps](https://github.com/boykush/scraps) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-20 -->
