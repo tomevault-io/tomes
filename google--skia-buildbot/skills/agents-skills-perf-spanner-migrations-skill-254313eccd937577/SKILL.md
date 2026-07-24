@@ -1,0 +1,90 @@
+---
+name: perf-spanner-migrations
+description: >- Use when this capability is needed.
+metadata:
+  author: google
+---
+
+# Performance Dashboard (perf) Cloud Spanner Schema Migrations
+
+Use this skill when modifying the database schema, adding new database tables, writing SQL migrations, or regenerating Go/JSON schema target files in `perf/go/sql`.
+
+## Workflow for Schema Changes
+
+When modifying the database schema, follow these sequential steps:
+
+### 1. Create a New Migration File
+
+Add a new sequence-numbered SQL file inside `perf/go/sql/expectedschema/migrations/`:
+
+- Format: `000X_description.sql` (e.g., `0004_add_metadata_column.sql`).
+- Sequence numbers must be strictly sequential (no gaps or duplicate versions).
+- Cloud Spanner has strict schema modification constraints (e.g., you cannot change a column's type to `ARRAY` or to incompatible types directly; add a new column instead).
+
+> [!IMPORTANT] > **Write Idempotent DDL Queries**
+> In Spanner, DDL queries are non-transactional. This means DDL statements (like `CREATE TABLE` or `ALTER TABLE`) and updating the `schema_migrations` tracking table are not atomic. If the program crashes or is interrupted after the DDL completes but before the version is recorded, the maintenance runner will try to rerun the DDL on the next execution, resulting in errors (e.g., "Duplicate name in schema").
+>
+> Always write DDL queries in an idempotent way so they are safe to rerun:
+>
+> ```sql
+> -- Example: Create Table
+> CREATE TABLE IF NOT EXISTS dummytable (
+>   id TEXT PRIMARY KEY,
+>   dummy_value TEXT
+> );
+>
+> -- Example: Add Column
+> ALTER TABLE dummytable ADD COLUMN IF NOT EXISTS extra_value TEXT;
+> ```
+
+### 2. Update Table Structs
+
+Modify the Go structs representing the table layouts in [tables.go](../../../perf/go/sql/tables.go) to match the new schema layout.
+
+### 3. Regenerate the Go Schema File
+
+Regenerate [schema_spanner.go](../../../perf/go/sql/spanner/schema_spanner.go) from the structs:
+
+```bash
+cd perf/go/sql
+go generate
+```
+
+_(This executes `//perf/go/sql/tosql` under the hood to write the target SQL declarations)._
+
+### 4. Regenerate the expected JSON Catalog Description
+
+Regenerate [schema_spanner.json](../../../perf/go/sql/expectedschema/schema_spanner.json):
+
+> [!IMPORTANT]
+> Because Bazel runs commands inside sandboxed output directories, passing a relative path to `--out` will write the file into Bazel's output cache instead of your actual workspace.
+> **Always use an absolute path** (e.g. `$(pwd)/...` or `$(git rev-parse --show-toplevel)/...`) for the output file:
+
+```bash
+cd perf
+bazelisk run --config=mayberemote //perf/go/sql/exportschema -- \
+    --out $(pwd)/go/sql/expectedschema/schema_spanner.json \
+    --databaseType spanner
+```
+
+### 5. Verify and Run Unit Tests
+
+To run database tests locally against the emulator:
+
+1. **Launch a clean Spanner Emulator instance**:
+   ```bash
+   make -C perf run-spanner-emulator
+   ```
+2. **Export the connection environment variables**:
+   ```bash
+   export PGADAPTER_HOST=localhost:5432
+   export SPANNER_EMULATOR_HOST=localhost:9010
+   ```
+3. **Run the SQL package tests**:
+   ```bash
+   bazelisk test //perf/go/sql/...
+   ```
+
+---
+> Source: [google/skia-buildbot](https://github.com/google/skia-buildbot) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-14 -->
