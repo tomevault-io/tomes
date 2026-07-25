@@ -1,0 +1,30 @@
+# hiero-consensus-node
+
+> Read [`README.md`](README.md) for this module's description, dependency rules, and links to
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/hiero-consensus-node/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+Read [`README.md`](README.md) for this module's description, dependency rules, and links to
+the relevant consensus-layer knowledge base docs.
+
+**Navigation.** Start at [`architecture/overview.md`](../docs/consensus-layer/architecture/overview.md).
+Vocabulary lives in [`glossary.md`](../docs/consensus-layer/glossary.md) and
+[`concepts/`](../docs/consensus-layer/concepts/); rationale in
+[`decisions/`](../docs/consensus-layer/decisions/); properties to preserve in
+[`invariants/`](../docs/consensus-layer/invariants/) and
+[`rules/`](../docs/consensus-layer/rules/); tunable parameters in
+[`tunables.md`](../docs/consensus-layer/tunables.md); known incidents and diagnostics in
+[`scenarios/`](../docs/consensus-layer/scenarios/) and
+[`heuristics/`](../docs/consensus-layer/heuristics/).
+
+---
+> Source: [hiero-ledger/hiero-consensus-node](https://github.com/hiero-ledger/hiero-consensus-node) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-07-25 -->
