@@ -1,0 +1,59 @@
+---
+name: nix-darwin-reference
+description: > Use when this capability is needed.
+metadata:
+  author: edmundmiller
+---
+
+# nix-darwin reference workflow
+
+Use this skill for Darwin/macOS Nix work in this repo. Keep it out of the global agent rules: this is reference workflow, not behavior that belongs in every prompt.
+
+## First checks
+
+- Verify the host before host-specific rebuilds or Darwin/NixOS decisions: `hostname` and `uname -a`.
+- Edit repo sources, not generated targets. Runtime files under `~/.config`, `~/.claude`, `~/.pi`, and similar paths are usually Nix-store symlinks.
+- Prefer repo wrappers for validation: `hey check` for current Darwin host, `hey re` or full `darwin-rebuild` for local rebuilds.
+- Avoid generic `nix flake check` on macOS in this repo because it evaluates NUC outputs and can hit known cross-system noise.
+
+## Primary references
+
+Use the narrowest reference that answers the question:
+
+| Need                               | Reference                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| nix-darwin modules/options         | `darwin-help`, `man 5 configuration.nix`, or https://nix-darwin.github.io/nix-darwin/manual/index.html |
+| nix-darwin install/bootstrap       | https://github.com/nix-darwin/nix-darwin                                                               |
+| Lix install/upgrade on macOS/Linux | https://lix.systems/install/#on-any-other-linuxmacos-system                                            |
+| Legacy `nix-build` behavior        | https://nix.dev/manual/nix/2.34/command-ref/nix-build.html                                             |
+
+## Option lookup order
+
+1. Use local docs first when available:
+   - `darwin-help` for browser-based reference.
+   - `man 5 configuration.nix` for terminal lookup.
+2. Use the online nix-darwin reference when local docs are unavailable or stale.
+3. Search this repo for existing patterns before adding a second convention.
+4. Use source-level nix-darwin docs only when option reference docs are not enough.
+
+## Install notes
+
+- nix-darwin requires a Nix implementation; Nix and Lix are both supported.
+- The nix-darwin README recommends the Lix installer because the official Nix installer has no automated uninstaller, manual macOS uninstallation is complex, and Lix supports both flake-based and channel-based setups.
+- The installer does not decide which Nix interpreter the system uses later: nix-darwin manages the Nix installation by default and defaults to upstream Nix. To keep Lix, set `nix.package = pkgs.lix` in configuration.
+- Flake-based nix-darwin installs use `darwin-rebuild switch`; before `darwin-rebuild` is installed, bootstrap with `sudo nix run nix-darwin/<branch>#darwin-rebuild -- switch`.
+
+## `nix-build` notes
+
+Use `nix-build` only when a legacy/channel workflow needs it. Prefer `nix build` or repo wrappers for normal flake work.
+
+Important details from the Nix manual:
+
+- `nix-build` is distinct from `nix build`; use `man nix3-build` or `nix build --help` for the modern command.
+- Successful `nix-build` creates `result` symlinks by default, which become GC roots until removed.
+- `--no-out-link` avoids creating the symlink and GC root.
+- Common useful flags: `-A/--attr`, `--arg`, `--argstr`, `--dry-run`, `--out-link`.
+
+---
+> Source: [edmundmiller/dotfiles](https://github.com/edmundmiller/dotfiles) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-25 -->
