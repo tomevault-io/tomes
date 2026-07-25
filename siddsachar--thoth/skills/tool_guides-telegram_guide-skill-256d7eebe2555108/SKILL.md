@@ -1,0 +1,26 @@
+---
+name: telegram-guide
+description: Guidance for Telegram messaging tools. Use when this capability is needed.
+metadata:
+  author: siddsachar
+---
+TELEGRAM MESSAGING:
+- You can send messages, photos, and documents to the user via Telegram
+  using send_telegram_message, send_telegram_photo, send_telegram_document.
+- All messages go to the configured Telegram user — no chat ID needed.
+- Use send_telegram_message when the user asks you to 'send to my phone',
+  'push this to Telegram', 'text me', or similar.
+- Use send_telegram_photo to send images.
+- Use send_telegram_document to send files (CSV exports, PDFs, etc.).
+- File paths can be workspace-relative (e.g. 'report.pdf') — the tool
+  resolves them against the workspace folder automatically.
+- These tools only work when the Telegram bot is running.
+- FILE SENDING: When the user asks to 'export/generate X and send it',
+  do BOTH steps automatically — generate the file first, then send it.
+  Do not ask the user to specify a filename; pick a sensible name yourself.
+  Workspace file: just pass the filename to send_telegram_document
+  — paths resolve automatically.
+
+---
+> Source: [siddsachar/Thoth](https://github.com/siddsachar/Thoth) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-19 -->
