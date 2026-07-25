@@ -1,0 +1,28 @@
+# semiotic
+
+> Source: [nteract/semiotic](https://github.com/nteract/semiotic). Graded, signed and kept in sync across platforms by [TomeVault](https://tomevault.io)
+
+## All Platforms Config
+
+The `TOME.json` file in this directory is the project config converted for All Platforms.
+Original source: `CLAUDE.md` in [nteract/semiotic](https://github.com/nteract/semiotic).
+
+## Also available for
+
+- **Codex** — `AGENTS.md`
+- **GitHub Copilot** — `copilot-instructions.md`
+- **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
+- **Windsurf** — `project-config.md`
+
+## Bundled Skills (1)
+
+- [semiotic](https://github.com/nteract/semiotic/tree/main/agent-skill/semiotic-charts/SKILL.md)
+
+Graded against the Tome Standard, TomeVault's public ruleset for whether AI instructions load, read clearly and stay safe. Source: [github.com/nteract/semiotic](https://github.com/nteract/semiotic)
+
+---
+
+Explore more instruction files on [TomeVault](https://tomevault.io), the platform that grades AI instruction files and catches silent drift across every major tool.
+
+<!-- genome:d-e-q -->
