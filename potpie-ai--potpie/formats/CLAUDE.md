@@ -1,0 +1,26 @@
+# potpie
+
+> <!-- potpie-start -->
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/potpie/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+<!-- potpie-start -->
+Potpie is durable project memory: repo/source mappings, decisions, infra,
+changes, bugs, docs, and preferences for agents. Use it when it can materially
+help with repo context, prior decisions, architecture, bugs, or durable history.
+Do not run Potpie checks for simple Q&A or trivial edits. When useful, check
+mapping/graph health once per session (`potpie --json source list`,
+`potpie --json graph status`; skip if unavailable). Record only durable learnings.
+<!-- potpie-end -->
+
+---
+> Source: [potpie-ai/potpie](https://github.com/potpie-ai/potpie) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-07-25 -->
