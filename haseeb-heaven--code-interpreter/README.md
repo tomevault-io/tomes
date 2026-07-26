@@ -5,14 +5,14 @@
 ## All Platforms Config
 
 The `TOME.json` file in this directory is the project config converted for All Platforms.
-Original source: `GEMINI.md` in [haseeb-heaven/code-interpreter](https://github.com/haseeb-heaven/code-interpreter).
+Original source: `AGENTS.md` in [haseeb-heaven/code-interpreter](https://github.com/haseeb-heaven/code-interpreter).
 
 ## Also available for
 
 - **Claude Code** — `CLAUDE.md`
-- **Codex** — `AGENTS.md`
 - **GitHub Copilot** — `copilot-instructions.md`
 - **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
 ## Bundled Skills (16)
