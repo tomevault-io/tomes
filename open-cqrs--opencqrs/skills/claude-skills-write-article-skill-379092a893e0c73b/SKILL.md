@@ -1,0 +1,207 @@
+---
+name: write-article
+description: Write well-structured professional articles. Use when creating blog posts, technical articles, or thought leadership content. Use when this capability is needed.
+metadata:
+  author: open-cqrs
+---
+
+# Article Writing Skill
+
+Write a professional article based on the following input: $ARGUMENTS
+
+> **Layout reference:** the full artifact layout for the article pipeline is specified in `.claude/article-pipeline.md`. This skill reads `brief.md` (and optionally `dialogue.md`) from a session folder under `.article-work/{YYYY-MM-DD}-{slug}/`, writes the published article into `mkdocs/docs/blog/posts/`, and **appends** to the cumulative `enrichment-notes.md` in the same session folder.
+
+## Workflow
+
+### Step 1: Determine Input Type
+
+Examine the input carefully. It falls into one of three categories:
+
+**A) Reference to a Brief Artifact** — The input contains a path to a file at `.article-work/{date}-{slug}/brief.md` (or, for legacy sessions, `.claude/article-briefs/`). This is the standard handoff from `brainstorm-article`. Do this:
+
+1. Read the brief file. Its frontmatter contains `title`, `slug`, `date`, optionally `dialogue_transcript`, and `status`. Its body is the full Article Brief as approved by the user.
+2. Check the frontmatter for a `dialogue_transcript` field. If present, the original dialogue is available at that path (relative to the session folder, typically `dialogue.md`) as a **secondary reference**. Do not read it eagerly — but reach for it when you need:
+   - the user's actual phrasing for a section that needs their voice
+   - a specific example or argument they made in conversation that the brief may have compressed
+   - clarification on a section where the brief is terse
+3. Treat the brief as the contract: structure, sections, key insights, technical details, audience — all of those are decided. The dialogue is a deepening source, not an override.
+4. Note the session folder path — you will need it for the enrichment-notes append in Step 5.
+5. Skip Step 2 entirely. Proceed directly to Step 3 (Writing).
+
+**B) Inline Structured Article Brief** — The input string itself contains an Article Brief (with `**Title:**`, `**Slug:**`, `**Category:**`, sections, key insights, etc.) rather than a path. This is the older handoff style. Use the brief as-is. Skip Step 2 entirely. Proceed directly to Step 3.
+
+**C) Loose topic or instructions** — The input is a free-form topic, a rough idea, or a set of instructions without a structured brief. In this case, proceed to Step 2 to gather the information you need before writing.
+
+### Step 2: Lightweight Intake (only if no Article Brief)
+
+This step only runs when the input is a loose topic without a structured brief.
+
+First, ask the user whether this article should be **based on a specific repository or codebase**, or whether it should be **written freely** without a code reference. Use AskUserQuestion for this.
+
+- If the user chooses a **codebase-oriented article**, ask for the repository path (or confirm the current working directory). Then explore the codebase thoroughly — read relevant source files, understand the domain model, identify patterns, and extract code examples that can serve as inspiration for the article. **Do not copy code verbatim from the codebase into the article.** Instead, understand the patterns and re-express them using a fictional domain that fits the article's narrative.
+- If the user chooses a **freely written article**, proceed based on the provided topic and your own knowledge.
+
+Then confirm the following with the user via AskUserQuestion:
+
+- **Title** for the article
+- **Category** (e.g., "Event Sourcing", "Architecture", "Testing")
+- **Tags** (3-5 relevant tags)
+- **Author** (default: `kersten` — confirm or ask for a different author key from `.authors.yml`)
+- Whether this article is **part of a series** (and if so, which series and position)
+
+### Step 3: Writing
+
+Write the article following all the style and formatting rules defined below. If an Article Brief was provided, follow its structure, sections, key insights, and technical details closely. Present the full article to the user for review before saving.
+
+### Step 4: MkDocs Integration
+
+Once the user approves the article, save it into the mkdocs blog structure. The companion `enrichment-notes.md` lives under `.article-work/{date}-{slug}/` (not next to the article) — see Step 5.
+
+1. **Determine the next post number** by listing existing files in `mkdocs/docs/blog/posts/` and incrementing the highest number found.
+2. **Create the post file** at `mkdocs/docs/blog/posts/post-{N}-{slug}.md` with the following front matter format:
+
+```yaml
+---
+title: <Article Title>
+date: <YYYY-MM-DD>
+authors:
+  - <author-key>
+categories:
+  - <Category>
+tags:
+  - <tag1>
+  - <tag2>
+  - <tag3>
+slug: <url-slug>
+---
+```
+
+3. **Add the `<!-- more -->` excerpt marker** after the introduction paragraph (first paragraph after the H1 heading). This controls where the preview cuts off on the blog index page.
+
+4. **Update `mkdocs/mkdocs.yml`** — add the new post to the `nav` section under `Blog`. If the article belongs to a series, add it under the existing series heading. If it starts a new series or is a standalone article, add it as a direct entry under Blog.
+
+5. **Verify the author key** exists in `mkdocs/docs/blog/.authors.yml`. If the author is not yet listed, ask the user for the required information (name, description) and add the entry.
+
+### Step 5: Append to the cumulative `enrichment-notes.md`
+
+`enrichment-notes.md` is the **cumulative** companion that brainstorm seeds, the writer and grill append to, and `enrich-article` consumes. The full contract lives in `.claude/article-pipeline.md`.
+
+**File path:** in the same session folder as `brief.md`, e.g. `.article-work/2026-06-06-gateway-pattern/enrichment-notes.md`. **Do not** place it next to the published article in `mkdocs/docs/blog/posts/`.
+
+**Expected state on entry:** `brainstorm-article` should have already created this file and written a `## From brainstorm-article ({date})` section. If the file is missing (the user came straight to write without going through brainstorm), create it now with the header and frontmatter from the brainstorm contract; otherwise read it.
+
+**Your job:** append a new section `## From write-article ({YYYY-MM-DD})` to the **end** of the file. **Never overwrite the brainstorm section.** Use the same subsection vocabulary as brainstorm, omitting subsections that have nothing for them:
+
+```markdown
+## From write-article ({YYYY-MM-DD})
+
+### Collapsible Deep Dives (high priority)
+<one subsection per planned ??? tip / ??? info box that surfaced during writing — placement, why it matters, 3-6 sentences of content. Or omit.>
+
+### Cross-Link Targets (in addition to those already generated by the standard rules)
+<bulleted list of doc paths and the article phrases that should link to them. Or omit.>
+
+### Admonitions (recommended)
+<one bullet per planned admonition: type, title, suggested placement, content. Or omit.>
+
+### Abbreviation Tooltips (article-specific, do not duplicate from glossary.md)
+<*[Term]: definition lines. Or omit.>
+
+### Content Annotations ({ .annotate } markers)
+<concrete anchor phrases and the annotation content. Or omit.>
+
+### External References (for context)
+<books, specs, blog posts, papers referenced in writing-time discussions. Or omit.>
+
+### Open Questions / Future-Article Seeds
+<topics that came up while writing but do not fit this article and would warrant a separate piece. Or omit.>
+
+### Code Reference Hints (for content annotations or admonitions)
+<specific file paths and line numbers the enricher might want to point at. Or omit.>
+
+### Style/Voice Notes for the Enricher
+<article-specific style points that emerged from writing. Or omit.>
+```
+
+**Sourcing the content:**
+
+- Capture anything that surfaced *during* writing — design discussions, naming debates, comparisons to other frameworks, code-level details that would have derailed the main argument.
+- If brainstorm already named something in its section, do not duplicate it. Only add what is new.
+- Be generous. The cost of an over-rich notes file is low; the cost of a thin one is enrichment-time guessing.
+
+**Maintenance rule:** When the user has follow-up questions about the article and the conversation produces new material that would enrich it (a sidebar idea, a naming insight, a missing cross-reference, a clarifying example), **append it to the write-article section immediately**, with a brief note about where it should land. Do not wait for the enrichment step to remember things.
+
+## Language and Tone
+
+- Write in **American English** exclusively. Use American spelling (e.g., "behavior" not "behaviour", "optimize" not "optimise", "color" not "colour").
+- Maintain a **confident, opinionated tone**. The writing should feel like it comes from someone who has strong views earned through experience. Do not hedge with "it could be argued" or "some people think" — state your position and back it with reasoning. Be approachable, but do not be afraid to be direct or even provocative when the point demands it. The reader should feel they are learning from someone who has opinions, not from a textbook.
+- **Address the reader directly** using "you" and "your". Make them feel like the article is written specifically for them.
+- Write in **first person singular** ("I") when sharing opinions, experiences, or recommendations.
+- When referring to **products or services by digital frontiers**, use first person **plural** ("we", "our") and always refer to the company as "digital frontiers" (lowercase "digital").
+- Never mix languages. If the article is in English, every term must be in English — no German, no untranslated domain terms, no foreign-language phrases unless they are established technical jargon.
+- Do not use 2-em dashes (—), use normales dashes instead (-)
+- Please use consistent definitions across all articles and documentations
+
+## Structure
+
+- Use **headings up to second level only** (`##`). Never use `###` or deeper heading levels.
+- Each section (under a heading) must contain **between 3 and 5 paragraphs**.
+- Each paragraph must contain **between 3 and 5 sentences**. No single-sentence or two-sentence paragraphs. No paragraphs with 6 or more sentences.
+- Code blocks and diagrams are **standalone elements** between paragraphs. They do not count toward the paragraph limit of a section, but they must always be framed by a preceding paragraph that sets context and a following paragraph that explains the takeaway.
+- Start with a compelling introduction that frames the problem or topic and draws the reader in.
+- End with a conclusion that summarizes key insights and gives the reader a clear takeaway or call to action.
+- **Vary how sections end.** Do not always close with a bold, punchy insight — that pattern becomes predictable after three sections. Instead, mix it up: sometimes end with a memorable one-liner, sometimes with a provocative question that pulls the reader into the next section, sometimes with a quiet transition that lets the previous point breathe. The goal is rhythm, not formula.
+
+## Article Series
+
+- When writing a series of related articles, maintain **consistent terminology and domain language** across all parts.
+- Reference previous articles with a brief recap so readers who start in the middle can follow along.
+- End each article (except the last) with a **teaser** for the next article that frames the upcoming problem.
+- Use the same fictional domain, actors, and example data throughout the entire series.
+
+## Formatting and Emphasis
+
+- **Bold sparingly — aim for roughly 10% of the text.** Bold loses its power when overused. Reserve it for the statements a reader should absorb even if they are skimming: core definitions, the single most important conclusion per section, and genuinely critical warnings. If everything is bold, nothing is.
+- **Bold all links** without exception. Every hyperlink must be wrapped in bold formatting, e.g., `**[link text](url)**`.
+- Use bold to emphasize key terms when they are first introduced, but do not bold them again on subsequent uses.
+- Do not use italic for emphasis. Reserve italic only for technical terms, book titles, or non-English words if absolutely necessary.
+
+## Writing Style
+
+- Prefer **active voice** over passive voice. Write "You configure the interceptor" rather than "The interceptor is configured".
+- Use **concrete examples** to illustrate abstract concepts. Show, don't just tell.
+- Keep sentences clear and direct. Avoid unnecessarily complex sentence structures, but do not oversimplify either — the audience consists of professionals.
+- **Vary sentence length deliberately.** Follow a long, complex sentence with a short, hard one. This creates rhythm. Monotonous sentence length — whether all long or all short — puts readers to sleep. A three-word sentence after a forty-word sentence hits like a punch. Use that.
+- Use **transitional phrases** between paragraphs and sections to maintain a natural reading flow.
+- Avoid filler words and phrases. Every sentence should convey meaningful information or advance the argument.
+
+## Technical Content
+
+- When including code examples, keep them **concise and focused** on the point being made. Do not include boilerplate or unrelated code.
+- Introduce code examples with context — explain what the reader is about to see and why it matters.
+- After a code example, explain the key aspects and connect them back to the broader argument.
+- Default to **framework-agnostic** explanations. Describe the pattern first, then show the implementation. The reader should understand the concept even if they use a different framework.
+- Use **Mermaid diagrams** to visualize workflows, state machines, sequences, or architectural concepts whenever a visual representation adds clarity that prose alone cannot achieve.
+
+## Fictional Examples and Domain Language
+
+- When illustrating concepts with fictional examples, **all domain terms must fit the fictional domain**. Never leak internal terminology from a source codebase into the article.
+- Before finalizing, review every class name, field name, and domain term in the article. Ask: would a reader unfamiliar with the source project understand this term in the context of the fictional domain?
+- Keep the fictional domain **simple and universally understood**. Every developer should intuitively grasp the domain without needing background knowledge.
+
+## OpenCQRS Terminology
+
+- **Never use the term "aggregate"** when referring to OpenCQRS concepts. OpenCQRS does not have aggregates. Use **"instance"** or **"state"** instead, depending on context. For example: "the system replays events to reconstruct the instance's state" — not "to reconstruct the aggregate."
+- When the article discusses general event sourcing or DDD theory (not OpenCQRS specifically), "aggregate" may appear if it is the established term in that context. But when connecting the concept back to OpenCQRS, always switch to "instance" or "state."
+
+## Things to Avoid
+
+- Do not use emojis.
+- Do not use bullet point lists in the article body. Integrate information into flowing paragraphs instead. Lists are only acceptable in a brief summary or takeaway section at the very end, if appropriate.
+- Do not use headings deeper than second level.
+- Do not write paragraphs shorter than 3 sentences or longer than 5 sentences.
+- Do not use British English spelling or conventions.
+
+---
+> Source: [open-cqrs/opencqrs](https://github.com/open-cqrs/opencqrs) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-24 -->
