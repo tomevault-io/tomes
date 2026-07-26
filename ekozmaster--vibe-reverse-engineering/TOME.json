@@ -1,0 +1,81 @@
+{
+  "name": "Vibe-Reverse-Engineering",
+  "owner": "Ekozmaster",
+  "repo": "Vibe-Reverse-Engineering",
+  "description": "A set LLM-Friendly tools for Cursor to Reverse Engineer binaries, specially games",
+  "type": "tome",
+  "source_format": "AGENTS.md",
+  "formats": [
+    {
+      "format": "claude_md",
+      "display": "CLAUDE.md",
+      "platform": "Claude Code"
+    },
+    {
+      "format": "agents_md",
+      "display": "AGENTS.md",
+      "platform": "Codex"
+    },
+    {
+      "format": "copilot_instructions",
+      "display": "copilot-instructions.md",
+      "platform": "GitHub Copilot"
+    },
+    {
+      "format": "cursor_mdc",
+      "display": ".cursor/rules/*.mdc",
+      "platform": "Cursor"
+    },
+    {
+      "format": "gemini_md",
+      "display": "GEMINI.md",
+      "platform": "Gemini CLI"
+    },
+    {
+      "format": "windsurf_rules",
+      "display": ".windsurf/rules/*.md",
+      "platform": "Windsurf"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Vibe-Reverse-Engineering",
+      "path": ".claude/skills/dx9-ffp-port/SKILL.md",
+      "github_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering/tree/main/.claude/skills/dx9-ffp-port/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Vibe-Reverse-Engineering",
+      "path": ".cursor/skills/dx9-ffp-port/SKILL.md",
+      "github_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering/tree/main/.cursor/skills/dx9-ffp-port/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Vibe-Reverse-Engineering",
+      "path": ".claude/skills/dynamic-analysis/SKILL.md",
+      "github_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering/tree/main/.claude/skills/dynamic-analysis/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Vibe-Reverse-Engineering",
+      "path": ".cursor/skills/dynamic-analysis/SKILL.md",
+      "github_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering/tree/main/.cursor/skills/dynamic-analysis/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Vibe-Reverse-Engineering",
+      "path": ".github/skills/dx9-ffp-port/SKILL.md",
+      "github_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering/tree/main/.github/skills/dx9-ffp-port/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Vibe-Reverse-Engineering",
+      "path": ".github/skills/dynamic-analysis/SKILL.md",
+      "github_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering/tree/main/.github/skills/dynamic-analysis/SKILL.md",
+      "description": ""
+    }
+  ],
+  "source_url": "https://github.com/Ekozmaster/Vibe-Reverse-Engineering",
+  "distributed_by": "TomeVault",
+  "distributed_at": "2026-07-26T11:34:25Z"
+}
