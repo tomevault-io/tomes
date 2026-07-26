@@ -5,11 +5,11 @@
 ## All Platforms Config
 
 The `TOME.json` file in this directory is the project config converted for All Platforms.
-Original source: `CLAUDE.md` in [3egirlsdream/Watermark.Win](https://github.com/3egirlsdream/Watermark.Win).
+Original source: `AGENTS.md` in [3egirlsdream/Watermark.Win](https://github.com/3egirlsdream/Watermark.Win).
 
 ## Also available for
 
-- **Codex** — `AGENTS.md`
+- **Claude Code** — `CLAUDE.md`
 - **GitHub Copilot** — `copilot-instructions.md`
 - **Cursor** — `project-config.mdc`
 - **Gemini CLI** — `GEMINI.md`
