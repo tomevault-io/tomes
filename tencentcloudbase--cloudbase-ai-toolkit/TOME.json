@@ -1,0 +1,63 @@
+{
+  "name": "CloudBase-AI-Toolkit",
+  "owner": "TencentCloudBase",
+  "repo": "CloudBase-AI-Toolkit",
+  "description": "Backend for AI coding agents on CloudBase \u2014 database, auth, functions via Plugin, Skills & MCP.",
+  "type": "tome",
+  "source_format": "CLAUDE.md",
+  "formats": [
+    {
+      "format": "claude_md",
+      "display": "CLAUDE.md",
+      "platform": "Claude Code"
+    },
+    {
+      "format": "agents_md",
+      "display": "AGENTS.md",
+      "platform": "Codex"
+    },
+    {
+      "format": "copilot_instructions",
+      "display": "copilot-instructions.md",
+      "platform": "GitHub Copilot"
+    },
+    {
+      "format": "cursor_mdc",
+      "display": ".cursor/rules/*.mdc",
+      "platform": "Cursor"
+    },
+    {
+      "format": "gemini_md",
+      "display": "GEMINI.md",
+      "platform": "Gemini CLI"
+    },
+    {
+      "format": "windsurf_rules",
+      "display": ".windsurf/rules/*.md",
+      "platform": "Windsurf"
+    }
+  ],
+  "skills": [
+    {
+      "name": "ai-model-web",
+      "path": "config/.claude/skills/ai-model-web",
+      "github_url": "https://github.com/TencentCloudBase/CloudBase-AI-Toolkit/tree/main/config/.claude/skills/ai-model-web",
+      "description": ""
+    },
+    {
+      "name": "web-development",
+      "path": "config/.claude/skills/web-development",
+      "github_url": "https://github.com/TencentCloudBase/CloudBase-AI-Toolkit/tree/main/config/.claude/skills/web-development",
+      "description": ""
+    },
+    {
+      "name": "cloudbase-sites-runtime",
+      "path": "plugin/cloudbase-sites/skills/cloudbase-sites-runtime",
+      "github_url": "https://github.com/TencentCloudBase/CloudBase-AI-Toolkit/tree/main/plugin/cloudbase-sites/skills/cloudbase-sites-runtime",
+      "description": ""
+    }
+  ],
+  "source_url": "https://github.com/TencentCloudBase/CloudBase-AI-Toolkit",
+  "distributed_by": "TomeVault",
+  "distributed_at": "2026-07-28T18:32:39Z"
+}
