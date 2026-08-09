@@ -1,0 +1,81 @@
+{
+  "name": "Khazix-Skills",
+  "owner": "KKKKhazix",
+  "repo": "Khazix-Skills",
+  "description": "",
+  "type": "tome",
+  "source_format": "CLAUDE.md",
+  "formats": [
+    {
+      "format": "claude_md",
+      "display": "CLAUDE.md",
+      "platform": "Claude Code"
+    },
+    {
+      "format": "agents_md",
+      "display": "AGENTS.md",
+      "platform": "Codex"
+    },
+    {
+      "format": "copilot_instructions",
+      "display": "copilot-instructions.md",
+      "platform": "GitHub Copilot"
+    },
+    {
+      "format": "cursor_mdc",
+      "display": ".cursor/rules/*.mdc",
+      "platform": "Cursor"
+    },
+    {
+      "format": "gemini_md",
+      "display": "GEMINI.md",
+      "platform": "Gemini CLI"
+    },
+    {
+      "format": "windsurf_rules",
+      "display": ".windsurf/rules/*.md",
+      "platform": "Windsurf"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Khazix-Skills",
+      "path": "aihot/SKILL.md",
+      "github_url": "https://github.com/KKKKhazix/Khazix-Skills/tree/main/aihot/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Khazix-Skills",
+      "path": "neat-freak/SKILL.md",
+      "github_url": "https://github.com/KKKKhazix/Khazix-Skills/tree/main/neat-freak/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Khazix-Skills",
+      "path": "hv-analysis/SKILL.md",
+      "github_url": "https://github.com/KKKKhazix/Khazix-Skills/tree/main/hv-analysis/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Khazix-Skills",
+      "path": "khazix-writer/SKILL.md",
+      "github_url": "https://github.com/KKKKhazix/Khazix-Skills/tree/main/khazix-writer/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Khazix-Skills",
+      "path": "storage-analyzer/SKILL.md",
+      "github_url": "https://github.com/KKKKhazix/Khazix-Skills/tree/main/storage-analyzer/SKILL.md",
+      "description": ""
+    },
+    {
+      "name": "Khazix-Skills",
+      "path": "leader/SKILL.md",
+      "github_url": "https://github.com/KKKKhazix/Khazix-Skills/tree/main/leader/SKILL.md",
+      "description": ""
+    }
+  ],
+  "source_url": "https://github.com/KKKKhazix/Khazix-Skills",
+  "distributed_by": "TomeVault",
+  "distributed_at": "2026-08-09T13:37:02Z"
+}
