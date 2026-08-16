@@ -1,0 +1,22 @@
+# bagel
+
+> See [AGENTS.md](./AGENTS.md) for setup, usage etiquette, and development
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/bagel/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# CLAUDE.md
+
+See [AGENTS.md](./AGENTS.md) for setup, usage etiquette, and development
+workflow. It is the single source of truth for agent instructions in this repo.
+
+---
+> Source: [Extelligence-ai/bagel](https://github.com/Extelligence-ai/bagel) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-08-16 -->
