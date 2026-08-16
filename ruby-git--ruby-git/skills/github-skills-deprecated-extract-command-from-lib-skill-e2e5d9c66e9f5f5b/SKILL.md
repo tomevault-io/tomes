@@ -1,0 +1,493 @@
+---
+name: extract-command-from-lib
+description: Migrates a direct #command call in Git::Lib to a Git::Commands::* class as part of the architectural redesign. Use when extracting a specific command during the Strangler Fig migration. Use when this capability is needed.
+metadata:
+  author: ruby-git
+---
+
+# Extract Command from Lib
+
+Replace a direct `#command` call in `Git::Lib` with a call to a `Git::Commands::*`
+class. The git subcommand is determined by the first (or first few) arguments to the
+`#command` method call.
+
+## Contents
+
+- [How to use this skill](#how-to-use-this-skill)
+- [Prerequisites](#prerequisites)
+- [Related skills](#related-skills)
+- [Input](#input)
+- [Workflow](#workflow)
+  - [Branch setup](#branch-setup)
+  - [Step 1 — Identify the `#command` call](#step-1-identify-the-command-call)
+  - [Step 2 — Plan the migration and get approval](#step-2-plan-the-migration-and-get-approval)
+  - [Step 3 — Ensure adequate legacy tests](#step-3-ensure-adequate-legacy-tests)
+  - [Step 4 — Ensure the `Git::Commands::*` class exists](#step-4-ensure-the-gitcommands-class-exists)
+  - [Step 5 — Update `Git::Lib` to delegate to the command class](#step-5-update-gitlib-to-delegate-to-the-command-class)
+- [Commit discipline](#commit-discipline)
+- [Create a pull request](#create-a-pull-request)
+- [Quality gates (run at every step)](#quality-gates-run-at-every-step)
+- [Common patterns](#common-patterns)
+  - [Simple delegation (stdout passthrough)](#simple-delegation-stdout-passthrough)
+  - [Delegation with post-processing](#delegation-with-post-processing)
+  - [Delegation with parsed return value](#delegation-with-parsed-return-value)
+  - [Delegation with opts-hash key normalization](#delegation-with-opts-hash-key-normalization)
+  - [Delegation with option filtering (preventing API expansion)](#delegation-with-option-filtering-preventing-api-expansion)
+- [What stays in `Git::Lib`](#what-stays-in-gitlib)
+- [What moves to `Git::Commands::*`](#what-moves-to-gitcommands)
+
+## How to use this skill
+
+Attach this file to your Copilot Chat context, then invoke it with a short message
+identifying the `Git::Lib` method or `#command` call to migrate. Examples:
+
+```text
+Using the Extract Command from Lib skill, migrate Git::Lib#worktree_add —
+it calls command('worktree', 'add', ...).
+```
+
+```text
+Extract Command from Lib: command('ls-tree', ...)
+```
+
+The invocation needs either the `Git::Lib` method name or the git subcommand string
+from the `#command` call (or both).
+
+## Prerequisites
+
+Before starting, you **MUST** load the following skill(s) in their entirety:
+
+- [YARD Documentation](../../skills/yard-documentation/SKILL.md) — authoritative
+  source for YARD formatting rules and writing standards;
+
+## Related skills
+
+Run or reference these skills during the workflow:
+
+- [Command Implementation](../../skills/command-implementation/SKILL.md) — generates and reviews `Git::Commands::*`
+  classes, unit tests, integration tests, and YARD docs (used in Step 4 if the
+  command class does not exist yet); also the canonical class-shape checklist,
+  phased rollout gates, and internal compatibility contracts
+- [Review Arguments DSL](../../skills/review-arguments-dsl/SKILL.md) — verifying DSL entries match git CLI
+- [Command Test Conventions](../../skills/command-test-conventions/SKILL.md) — unit/integration test conventions for command classes
+- [Command YARD Documentation](../../skills/command-yard-documentation/SKILL.md) — documentation completeness for command classes
+- [Review Cross-Command Consistency](../../skills/review-cross-command-consistency/SKILL.md) — sibling consistency within a command family
+- [Review Backward Compatibility](../../skills/review-backward-compatibility/SKILL.md) — preserving `Git::Lib` return-value contracts
+- [Extract Facade from Base/Lib](../extract-facade-from-base-lib/SKILL.md) — the
+  follow-on extraction that moves the public method from `Git::Base` /
+  `Git::Lib` into a `Git::Repository::*` facade method (Phase 4 deletes both
+  `Git::Base` and `Git::Lib`)
+
+## Input
+
+Required:
+
+1. A `Git::Lib` method that contains one or more `command(...)` calls to replace
+2. The git subcommand name (derived from the first arguments to `#command`)
+
+## Workflow
+
+### Branch setup
+
+All work must be done on a feature branch. **Never commit or push directly to
+`main`.**
+
+Before starting, create a new branch:
+
+```bash
+git checkout -b <feature-branch-name>
+```
+
+All commits in this workflow go on the feature branch. When work is complete,
+open a pull request — do not merge or push directly into `main`.
+
+### Step 1 — Identify the `#command` call
+
+1. Locate the `Git::Lib` method that calls `command(...)`.
+2. Note:
+   - the git subcommand (first argument(s) to `#command`)
+   - the options/arguments passed after the subcommand
+   - execution options (e.g., `timeout:`, `out:`, `err:`, `env:`)
+   - the return value and any post-processing (`.stdout`, parsing, regex matching)
+3. Document the method's current **public contract**: signature, return type, and
+   return-value format (String, Array, Hash, Boolean, etc.)
+4. Run linters and rubocop to confirm a clean baseline:
+
+   ```bash
+   bundle exec rubocop
+   ```
+
+   Fix any issues before continuing.
+
+### Step 2 — Plan the migration and get approval
+
+Before writing or changing any code, present a migration plan and **wait for
+explicit confirmation** from the user. Do not proceed until they approve.
+
+The plan must cover every `#command` call identified above. For each one, state:
+
+| `Git::Lib` method | `#command` call | Target `Git::Commands` class | Class exists? | Notes |
+| --- | --- | --- | --- | --- |
+| `some_method` | `command('sub', '--flag', arg)` | `Git::Commands::Sub` (new) or existing | ✅ / 🆕 | any mapping decisions |
+
+Also state:
+
+- Which (if any) new `Git::Commands::*` classes need to be created
+- How optional or empty arguments will be handled (e.g., nil vs `''` operands)
+- Any return-value post-processing that stays in `Git::Lib`
+
+Then ask:
+
+> Does this mapping look correct? Any changes before I start implementing?
+
+**Do not move to Step 3 until the user confirms the plan.**
+
+### Step 3 — Ensure adequate legacy tests
+
+Before making any changes, verify that `tests/units/` has adequate tests for the
+`Git::Lib` method being migrated.
+
+1. Search existing legacy tests for coverage of the method:
+
+   ```bash
+   grep -rn '<method_name>' tests/units/
+   ```
+
+2. If coverage is insufficient, add **minimal new tests** to the legacy test suite
+   that exercise the method's current behavior. These tests ensure the refactor does
+   not break backward compatibility.
+   - Do **not** change existing tests.
+   - Follow existing legacy test conventions (`Test::Unit::TestCase`,
+     `assert_command_line_eq`, `in_temp_dir`, etc.).
+   - Verify new tests pass:
+
+     ```bash
+     bundle exec bin/test <test-file-basename>
+     ```
+
+   - Run rubocop against the new test file:
+
+     ```bash
+     bundle exec rubocop tests/units/<test-file>
+     ```
+
+   - Fix any issues before continuing.
+3. Commit the new legacy tests:
+
+   ```bash
+   git add tests/units/<test-file>
+   git commit -m "refactor(test): add legacy tests for <method_name>"
+   ```
+
+### Step 4 — Ensure the `Git::Commands::*` class exists
+
+1. Search `lib/git/commands/` for an existing command class that matches the git
+   subcommand:
+
+   ```bash
+   find lib/git/commands -name '*.rb' | sort
+   ```
+
+   Also check the class contents to confirm the existing class covers the same
+   subcommand variation (e.g., `branch --show-current` vs. `branch --list`).
+
+2. **If the command class already exists**, skip to Step 5.
+
+3. **If the command class does not exist**, scaffold it using the
+  [Command Implementation](../../skills/command-implementation/SKILL.md) skill. This produces:
+
+   - `lib/git/commands/<command>.rb` (or `lib/git/commands/<family>/<action>.rb`)
+   - `spec/unit/git/commands/<command>_spec.rb`
+   - `spec/integration/git/commands/<command>_spec.rb`
+
+4. Verify the new command class:
+
+   ```bash
+   bundle exec rspec spec/unit/git/commands/<command>_spec.rb
+   bundle exec rspec spec/integration/git/commands/<command>_spec.rb
+   bundle exec rubocop lib/git/commands/<command>.rb
+   bundle exec rake yard
+   ```
+
+   Fix any issues before continuing.
+
+5. Commit the new command class and its tests:
+
+   ```bash
+   git add lib/git/commands/<command>*.rb spec/
+   git commit -m "refactor(command): add Git::Commands::<Command> class"
+   ```
+
+### Step 5 — Update `Git::Lib` to delegate to the command class
+
+1. Replace the `command(...)` call with a call to the `Git::Commands::*` class:
+
+   ```ruby
+   # Before
+   def some_method(args)
+     command('some-command', '--flag', args).stdout
+   end
+
+   # After
+   def some_method(args)
+     Git::Commands::SomeCommand.new(self).call(args, flag: true).stdout
+   end
+   ```
+
+2. Preserve the method's **exact return value contract** — apply any parsing or
+   transformation after `.stdout` / `.stderr` / `.status` to match the original
+   return type.
+
+3. **Prevent API expansion** — the command class may accept many more options than
+   the legacy `Git::Lib` method ever exposed. Only forward the options that were
+   part of the original `Git::Lib` method's public API. Use a `<COMMAND>_ALLOWED_OPTS`
+   constant to whitelist permitted option keys, call `assert_valid_opts` to raise
+   on unknown keys, then filter with `opts.slice` before forwarding:
+
+   ```ruby
+   PULL_ALLOWED_OPTS = %i[allow_unrelated_histories].freeze
+
+   def pull(remote = nil, branch = nil, opts = {})
+     assert_valid_opts(opts, PULL_ALLOWED_OPTS)
+     allowed_opts = opts.slice(*PULL_ALLOWED_OPTS)
+     Git::Commands::Pull.new(self).call(remote, branch, **allowed_opts).stdout
+   end
+   ```
+
+   `assert_valid_opts` raises `ArgumentError` for any unrecognised key, giving
+   callers a clear error instead of silently ignoring unknown options. This
+   ensures that callers cannot accidentally pass options that happen to match
+   command DSL option names but were never part of the public contract.
+
+4. Add the appropriate `require_relative` at the top of `lib/git/lib.rb` if not
+   already present.
+
+4. Verify:
+
+   ```bash
+   bundle exec bin/test <legacy-test-file-basename>
+   bundle exec rspec
+   bundle exec rubocop
+   bundle exec rake yard
+   ```
+
+   Fix any issues before continuing.
+
+5. Commit the `Git::Lib` change:
+
+   ```bash
+   git add lib/git/lib.rb
+   git commit -m "refactor(lib): delegate <method_name> to Git::Commands::<Command>"
+   ```
+
+## Commit discipline
+
+Keep work organized into **three logical commit categories** (each optional if no
+changes were needed for that step):
+
+1. `refactor(test): add legacy tests for <method_name>` — new tests in
+   `tests/units/`
+2. `refactor(command): add Git::Commands::<Command> class` — new command class,
+   unit specs, and integration specs
+3. `refactor(lib): delegate <method_name> to Git::Commands::<Command>` — `Git::Lib`
+   changes only
+
+During implementation, you may use multiple task-level commits. Before opening a
+PR, follow the repository finalize workflow (see
+[Development Workflow](../../skills/development-workflow/SKILL.md)) and squash commits as
+required.
+
+**Issue and PR references in commit bodies:** Do not use `#<number>` in the
+commit body — write `issue 1000` not `issue #1000`. A commitlint parser flaw
+treats any line containing `#<number>` as a footer token, breaking the
+body/footer split. To close an issue/PR, use `Closes`/`Fixes`/`Resolves #<number>`
+in the footer. To merely mention one for context, omit the `#` and no footer line
+is needed.
+
+If further changes are needed after task commits are created:
+
+- Amend the change to the **appropriate commit** (e.g., a command class fix goes
+  into the `refactor(command)` commit).
+- Rebase the later commits on top:
+
+  ```bash
+  git rebase -i <base-commit>
+  ```
+
+- After rebasing, verify all quality gates still pass:
+
+  ```bash
+  bundle exec rspec && bundle exec rake test && bundle exec rubocop && bundle exec rake yard
+  ```
+
+## Create a pull request
+
+Once all commits are clean and quality gates pass, create a PR for the branch.
+
+If changes are made after the PR is created:
+
+- Amend the change to the appropriate commit.
+- Rebase later commits on top.
+- Force-push the branch:
+
+  ```bash
+  git push --force-with-lease
+  ```
+
+## Quality gates (run at every step)
+
+```bash
+bundle exec rspec
+bundle exec rake test
+bundle exec rubocop
+bundle exec rake yard
+```
+
+All four must pass before committing at each step. If errors are found, fix them
+before continuing.
+
+## Common patterns
+
+### Simple delegation (stdout passthrough)
+
+```ruby
+# Before
+def symbolic_ref(branch_name)
+  command('symbolic-ref', 'HEAD', "refs/heads/#{branch_name}")
+end
+
+# After
+def symbolic_ref(branch_name)
+  Git::Commands::SymbolicRef.new(self).call(branch_name).stdout
+end
+```
+
+### Delegation with post-processing
+
+```ruby
+# Before
+def cat_file_type(object)
+  command('cat-file', '-t', object).stdout
+end
+
+# After
+def cat_file_type(object)
+  Git::Commands::CatFile::Type.new(self).call(object).stdout
+end
+```
+
+### Delegation with parsed return value
+
+```ruby
+# Before
+def worktree_list
+  worktrees = {}
+  command('worktree', 'list', '--porcelain').stdout.split("\n").each do |w|
+    # ... parsing ...
+  end
+  worktrees
+end
+
+# After
+def worktree_list
+  result = Git::Commands::Worktree::List.new(self).call
+  worktrees = {}
+  result.stdout.split("\n").each do |w|
+    # ... parsing stays in Git::Lib ...
+  end
+  worktrees
+end
+```
+
+### Delegation with opts-hash key normalization
+
+When the legacy method accepted a flat `opts` hash and uses a `KEY_NORMALIZATIONS`
+constant to rename option keys before forwarding them, the constant's keys must be
+the same type as the keys callers actually pass.
+
+**Ruby's `'key':` symbol-literal syntax creates a *symbol* key** — `{ 'update-head-ok': :x }`
+stores the key `:'update-head-ok'`, not the string `'update-head-ok'`. If legacy
+callers pass string keys, the lookup misses and the raw key is forwarded unchanged,
+causing a git "unsupported option" error at runtime.
+
+Always symbolize keys before the normalization lookup:
+
+```ruby
+# ❌ Bug — string key 'update-head-ok' misses the symbol key :'update-head-ok'
+opts = opts.transform_keys { |k| KEY_NORMALIZATIONS.fetch(k, k) }
+
+# ✅ Correct — symbolize first so both string and symbol callers match
+opts = opts.transform_keys do |k|
+  sym = k.is_a?(Symbol) ? k : k.to_sym
+  KEY_NORMALIZATIONS.fetch(sym, sym)
+end
+```
+
+**When to apply this pattern:** Whenever `transform_keys` is combined with a
+normalization constant whose keys use the `'hyphenated-name':` symbol-literal
+syntax. Scan the constant's definition to confirm its keys are symbols, then
+confirm whether existing callers pass strings or symbols. If callers are a mix —
+or if callers are `Git::Base` or `Git::Lib` methods that forward user-supplied
+hashes — add the symbolization guard.
+
+### Delegation with option filtering (preventing API expansion)
+
+A command class may expose many more options than the legacy `Git::Lib` method
+ever accepted. Without filtering, callers could accidentally pass options that
+happen to match command DSL names but were never part of the public contract.
+
+The facade is also where **policy options** are set as safe defaults — options
+that support non-interactive execution, control output format for parsing, or
+set other command-level defaults. The command class stays neutral; the facade
+makes the defaults explicit. Some defaults are **fixed** (not in `ALLOWED_OPTS` —
+`assert_valid_opts` rejects them if a caller supplies them); others are
+**overridable** (in `ALLOWED_OPTS`, placed before `**opts` so the caller's value
+wins on collision). Examples: `no_edit: true`, `verbose: true`,
+`no_progress: true`, `no_color: true`.
+See "Command-layer neutrality" in CONTRIBUTING.md.
+
+Declare an `<COMMAND>_ALLOWED_OPTS` constant listing only the options that were
+present in the original method. Call `assert_valid_opts` first to raise
+`ArgumentError` on unrecognised keys, then use `opts.slice` to filter before
+forwarding:
+
+```ruby
+# Only :allow_unrelated_histories was accepted by the original Git::Lib#pull
+PULL_ALLOWED_OPTS = %i[allow_unrelated_histories].freeze
+
+def pull(remote = nil, branch = nil, opts = {})
+  raise ArgumentError, 'You must specify a remote if a branch is specified' if remote.nil? && !branch.nil?
+
+  assert_valid_opts(opts, PULL_ALLOWED_OPTS)
+  allowed_opts = opts.slice(*PULL_ALLOWED_OPTS)
+  positional_args = [remote, branch].compact
+  # no_edit: true is the non-interactive default (see CONTRIBUTING.md)
+  Git::Commands::Pull.new(self).call(*positional_args, no_edit: true, **allowed_opts).stdout
+end
+```
+
+`assert_valid_opts` is a private helper already defined in `Git::Lib` — no extra
+require is needed. It raises `ArgumentError: Unknown options: <key>` when any
+unrecognised key is present, giving callers a clear error rather than silently
+dropping the option.
+
+Name the constant after the git subcommand (`PULL_ALLOWED_OPTS`, `FETCH_ALLOWED_OPTS`,
+etc.) and place it immediately before the method definition.
+
+## What stays in `Git::Lib`
+
+- Output parsing and transformation (until a parser class is created)
+- Return-value adaptation to preserve backward compatibility
+- Option validation and filtering to prevent API expansion (see `<COMMAND>_ALLOWED_OPTS` + `assert_valid_opts` pattern)
+- Deprecation shims (e.g., option renames)
+- Method signatures and public API surface
+
+## What moves to `Git::Commands::*`
+
+- Argument building and CLI flag generation
+- `#command` invocation
+- Exit-status handling via `allow_exit_status`
+
+---
+> Source: [ruby-git/ruby-git](https://github.com/ruby-git/ruby-git) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-26 -->
