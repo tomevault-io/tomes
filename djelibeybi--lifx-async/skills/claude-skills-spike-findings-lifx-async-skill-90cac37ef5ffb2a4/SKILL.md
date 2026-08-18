@@ -62,4 +62,4 @@ are preserved in `sources/`. Raw results JSONL remains in `.planning/spikes/*/`.
 
 ---
 > Source: [Djelibeybi/lifx-async](https://github.com/Djelibeybi/lifx-async) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:skill_md:2026-07-18 -->
+<!-- tomevault:4.0:skill_md:2026-08-18 -->
