@@ -1,0 +1,28 @@
+# tandem-browser
+
+> Source: [hydro13/tandem-browser](https://github.com/hydro13/tandem-browser). Graded, signed and kept current as the models change by [TomeVault](https://tomevault.io)
+
+## All Platforms Config
+
+The `TOME.json` file in this directory is the project config converted for All Platforms.
+Original source: `CLAUDE.md` in [hydro13/tandem-browser](https://github.com/hydro13/tandem-browser).
+
+## Also available for
+
+- **Codex** — `AGENTS.md`
+- **GitHub Copilot** — `copilot-instructions.md`
+- **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
+- **Windsurf** — `project-config.md`
+
+## Bundled Skills (1)
+
+- [tandem-browser](https://github.com/hydro13/tandem-browser/tree/main/skill/SKILL.md)
+
+From [hydro13/tandem-browser](https://github.com/hydro13/tandem-browser) — a repo with 576+ stars on GitHub.
+
+---
+
+Explore more instruction files on [TomeVault](https://tomevault.io), the platform that grades AI instruction files and catches silent drift across every major tool.
+
+<!-- genome:d-e-s -->
