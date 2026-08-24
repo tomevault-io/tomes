@@ -1,0 +1,36 @@
+---
+name: bigquery-ai-ml
+description: >- Use when this capability is needed.
+metadata:
+  author: google
+---
+
+# BigQuery AI & ML
+
+BigQuery integrates with Vertex AI to provide powerful machine learning and
+generative AI capabilities directly within SQL queries using built-in functions
+like `AI.FORECAST`, `AI.KEY_DRIVERS`, `AI.DETECT_ANOMALIES`, and `AI.GENERATE`.
+
+## Reference Directory
+
+-   [AI Forecast](references/ai_forecast.md): Leveraging pre-trained
+    TimesFM model for forecasting without custom training.
+
+-   [AI Detect Anomalies](references/ai_detect_anomalies.md): Identify
+    deviations in time series data using pre-trained TimesFM model.
+
+-   [AI Generate](references/ai_generate.md): General-purpose text and
+    content generation using Gemini models.
+
+-   [AI Key Drivers](references/ai_key_drivers.md): Automatically identify
+    dimensional segments most responsible for driving changes in a metric.
+
+## Related Skills
+
+- [BigQuery Basics Skill](../bigquery-basics):
+  SKILL.md file for core BigQuery concepts, resource management, CLI,
+  and client libraries.
+
+---
+> Source: [google/skills](https://github.com/google/skills) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-24 -->
