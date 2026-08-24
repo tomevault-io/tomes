@@ -1,0 +1,32 @@
+# portfolio_rs
+
+> Tome by [MarkusZoppelt](https://github.com/MarkusZoppelt/portfolio_rs), graded and kept true across every major AI platform by [TomeVault](https://tomevault.io)
+
+## All Platforms Config
+
+The `TOME.json` file in this directory is the project config converted for All Platforms.
+Original source: `AGENTS.md` in [MarkusZoppelt/portfolio_rs](https://github.com/MarkusZoppelt/portfolio_rs).
+
+## Also available for
+
+- **Claude Code** — `CLAUDE.md`
+- **GitHub Copilot** — `copilot-instructions.md`
+- **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
+- **Windsurf** — `project-config.md`
+
+## Bundled Skills (1)
+
+- [portfolio_rs](https://github.com/MarkusZoppelt/portfolio_rs/tree/main/templates/skills/portfolio-rs/SKILL.md)
+
+Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/MarkusZoppelt/portfolio_rs](https://github.com/MarkusZoppelt/portfolio_rs)
+
+---
+
+Install this config instantly:
+```
+npx tomevault install MarkusZoppelt/portfolio_rs
+```
+Source: [github.com/MarkusZoppelt/portfolio_rs](https://github.com/MarkusZoppelt/portfolio_rs).
+
+<!-- genome:t-i-p -->
