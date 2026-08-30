@@ -1,0 +1,78 @@
+---
+name: devtools
+description: > Use when this capability is needed.
+metadata:
+  author: TanStack
+---
+
+This skill builds on @tanstack/table-core#core and @tanstack/table-devtools#devtools.
+
+## Setup
+
+```tsx
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { useTable, tableFeatures } from '@tanstack/react-table'
+import {
+  tableDevtoolsPlugin,
+  useTanStackTableDevtools,
+} from '@tanstack/react-table-devtools'
+
+const features = tableFeatures({})
+const columns = [{ accessorKey: 'id' }]
+const data: Array<{ id: string }> = []
+
+export function App() {
+  const table = useTable({
+    key: 'users-table',
+    features,
+    columns,
+    data,
+  })
+  useTanStackTableDevtools(table)
+  return <TanStackDevtools plugins={[tableDevtoolsPlugin()]} />
+}
+```
+
+## Hooks and Components
+
+Use `useTanStackTableDevtools(table, { enabled })` immediately after creating the table. Mount one TanStackDevtools host with `tableDevtoolsPlugin()` near the application root.
+
+## Common Mistakes
+
+### HIGH Hook receives a keyless table
+
+Wrong: create the table without `key` and expect the hook to infer a name.
+
+Correct: set a unique `key` in table options before calling the hook.
+
+Core target registration skips keyless tables.
+
+Source: TanStack/table:docs/devtools.md
+
+### HIGH Hook called conditionally
+
+Wrong: call `useTanStackTableDevtools` only inside an `if` branch.
+
+Correct: call it every render and pass `{ enabled: condition }`.
+
+The hook owns React effect registration and cleanup.
+
+Source: TanStack/table:packages/react-table-devtools/src/useTanStackTableDevtools.ts
+
+### MEDIUM Default import expected in production
+
+Wrong: expect the normal hook/plugin/panel to inspect production tables.
+
+Correct: keep normal guidance development-only; use the `/production` entrypoint only when explicitly required.
+
+The default index selects no-op implementations outside development.
+
+Source: TanStack/table:packages/react-table-devtools/src/index.ts
+
+## API Discovery
+
+Inspect `node_modules/@tanstack/react-table-devtools/dist/index.d.ts` and `useTanStackTableDevtools.d.ts` for the installed lifecycle API.
+
+---
+> Source: [TanStack/table](https://github.com/TanStack/table) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-07-25 -->
