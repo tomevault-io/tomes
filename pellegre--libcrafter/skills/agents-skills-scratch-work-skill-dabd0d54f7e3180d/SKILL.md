@@ -1,0 +1,69 @@
+---
+name: scratch-work
+description: Use ignored .scratch workspaces for experiments, disposable prototypes, network probes, hardware exploration, generated code, and any task where the user asks for work that should not be committed until promoted. Use when this capability is needed.
+metadata:
+  author: pellegre
+---
+
+# Scratch Work
+
+Use this skill when work should be explored locally without immediately adding
+prototype code, logs, captures, generated files, or one-off scripts to tracked
+repo paths.
+
+## Workflow
+
+1. Ensure `.scratch/` is ignored in the repository before creating scratch
+   files. Add the ignore rule if it is missing.
+2. Create one workspace per experiment:
+   `.scratch/<short-topic-slug>/`.
+3. Add a `README.md` in the scratch workspace with:
+   - goal and date
+   - host or execution assumptions
+   - exact commands run
+   - observed outputs worth preserving
+   - cleanup notes
+   - candidates for later promotion into `docs/`, `tools/`, or tests
+4. Keep ad hoc code under `scripts/`, `src/`, `guest/`, or similarly explicit
+   subdirectories inside that workspace.
+5. Keep artifacts under `artifacts/`, `state/`, `pcaps/`, or `logs/` inside the
+   scratch workspace.
+6. Do not commit scratch files directly. Promote only hardened pieces by moving
+   them into tracked repo locations and adding tests or docs appropriate for the
+   promoted behavior.
+
+## Network Experiments
+
+For USB dongle, wire-level packet, or LAN probing work:
+
+- Keep host mutation in documented setup steps. Do not hide root-requiring
+  changes inside casual scratch scripts.
+- Use only an authorized execution environment for raw packet work.
+- Record interface names, USB IDs, driver assumptions, and
+  observed MAC/IP addresses in the workspace README.
+- Put captures and logs in scratch artifacts. Redact secrets before promoting
+  any output.
+- Keep machine selection and hardware lifecycle in operator-supplied tooling
+  outside this repository.
+
+## Script Rules
+
+- Make scratch scripts small, direct, and parameterized with environment
+  variables or flags.
+- Print commands and paths clearly enough that the user can rerun them.
+- Avoid embedding credentials, Wi-Fi passphrases, service tokens, or private
+  network secrets in files.
+- Add timeouts to sniffing, scanning, packet generation, or remote commands.
+- Treat scratch results as evidence, not final implementation. Summarize what
+  worked and what should be promoted.
+
+## Promotion
+
+When a scratch experiment stabilizes, move the durable pieces out of `.scratch/`
+and update the repo normally. Typical destinations are `tools/` for reusable
+scripts, `docs/` for workflow documentation, `tests/` for fixtures or checks,
+and `.agents/skills/` for reusable agent procedure.
+
+---
+> Source: [pellegre/libcrafter](https://github.com/pellegre/libcrafter) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-06 -->
