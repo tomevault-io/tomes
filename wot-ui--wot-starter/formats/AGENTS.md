@@ -49,4 +49,4 @@ openspec --version
 
 ---
 > Source: [wot-ui/wot-starter](https://github.com/wot-ui/wot-starter) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-09-08 -->
+<!-- tomevault:4.0:agents_md:2026-09-09 -->
