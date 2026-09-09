@@ -1,0 +1,41 @@
+---
+name: zui-helper
+description: 在 ZUI 主仓库的 lib/* 中设计、实现或修复函数、类、store 和其他 helper；实施前确认计划或复用已有批准。 Use when this capability is needed.
+metadata:
+  author: easysoft
+---
+
+# ZUI 辅助工具开发
+
+## 准备与分析
+
+按 [共享工作流](../zui-standards/references/workflow.md) 定位目标并复用已有上下文，阅读 [helper 规范](../zui-standards/references/helper.md) 中与本次变更有关的部分。涉及包角色、文档或调试页时再读对应规范。
+
+从目标及必要调用方判断纯函数/常量/类型、状态类、store/单例、浏览器 DOM 模块或库内私有 helper 的归属，核实本次涉及的副作用、错误和清理约定。不要擅自把私有 helper 提升为共享包。
+
+## 确认门禁
+
+尚无适用批准时，在修改前按共享工作流给出拟实施计划；以下仅展开本次相关决策：
+
+- 类型判断、放置目标及相似实现；
+- 目标、非目标和验收场景；
+- 公开 API、类型、错误语义、导出路径和必要 JSDoc；
+- 数据流、状态所有权、持久化/序列化以及副作用；
+- 浏览器监听、计时器、observer、SSR/global 防护和清理策略（若适用）；
+- 文件集、依赖、入口和 `contributes` 影响；
+- 文档/调试需求、验证方式和假设。
+
+尚无适用批准时，等待用户明确确认后再实施。批准复用、增量范围与等待期间的推进遵循共享工作流，始终服从当前协作模式。
+
+## 实施
+
+1. 确认后重新检查工作区状态，仅实现批准范围。
+2. 默认保持纯函数无副作用、确定性和完整类型；状态型工具明确所有权、重入、并发、失败和销毁行为。
+3. 对公开 API 添加有价值的 JSDoc，并从局部 `index.ts` 与库入口显式导出；不要依赖未承诺的深层路径。
+4. 仅在范围内组合 `$zui-doc` 或 `$zui-dev`，不要为文档或演示修改不相关运行时代码。
+5. 按共享工作流验证本次改动、修复范围内问题并复跑受影响检查；按涉及的行为选择 helper 验收项目。
+6. 汇报 API、文件、验证结果和风险，不自动提交。
+
+---
+> Source: [easysoft/zui](https://github.com/easysoft/zui) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-07 -->
