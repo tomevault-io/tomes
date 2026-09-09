@@ -1,6 +1,6 @@
 # translate-python
 
-> Guidance for Codex and other AI coding agents working in this repository.
+> Guidance for Claude Code and other AI coding agents working in this repository.
 
 ## Usage
 
@@ -12,9 +12,9 @@ Read and follow the instructions in .claude/skills/translate-python/SKILL.md
 
 Or copy the instructions below directly into your CLAUDE.md:
 
-# AGENTS.md
+# CLAUDE.md
 
-Guidance for Codex and other AI coding agents working in this repository.
+Guidance for Claude Code and other AI coding agents working in this repository.
 
 Translate is a Python command-line translation tool with support for multiple providers (MyMemory, Microsoft, DeepL, LibreTranslate, Yandex).
 
@@ -92,4 +92,4 @@ translate-python/
 
 ---
 > Source: [terryyin/translate-python](https://github.com/terryyin/translate-python) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-09-08 -->
+<!-- tomevault:4.0:claude_md:2026-09-09 -->
