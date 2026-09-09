@@ -1,0 +1,29 @@
+---
+name: zui-dev
+description: 维护 ZUI 主仓库 lib/* 的开发调试页、README 示例及 dev.ts 生命周期。需求明确时直接实施。 Use when this capability is needed.
+metadata:
+  author: easysoft
+---
+
+# ZUI 开发调试页
+
+## 工作流
+
+1. 按 [共享工作流](../zui-standards/references/workflow.md) 定位目标、检查已有改动并复用上下文；按其澄清规则消除影响本次交付的歧义，需求明确时直接实施。
+2. 按需阅读 [dev-page 规范](../zui-standards/references/dev-page.md) 中与本次变更有关的部分。
+3. 阅读本次涉及的页面内容、dev.ts 及相关 API 或样式；需要设计新场景或判断生命周期时再检查对应实现和必要参考。
+4. 在 `README.md` 中使用 info string 为 `html:example:<utility classes>` 的代码围栏构建实例 DOM；通过 `@/` 引用库内资源。
+5. 在 `dev.ts` 中导入目标入口和演示依赖。DOM 每次重建后都要执行的初始化放进 `onPageUpdate`；真正的一次性全局设置才放进 `onPageLoad`。
+6. 避免重复全局监听、冲突 ID、不可清理的计时器和遗留实例。不要修改正式文档或运行时 API，除非请求或共享批准范围明确包含它们。
+7. 按共享工作流验证本次改动并完成范围内修复；涉及渲染、交互或 HMR 时复用或启动 `pnpm dev` 验证对应场景，服务按归属和用途管理。
+8. 汇报调试场景、生命周期处理、验证结果和未覆盖项，不自动提交。
+
+## 组合边界
+
+- 独立调用且目标明确时不设置额外确认门禁。
+- 作为子流程时只处理共享范围内的本领域工作；上下文、批准和增量范围统一遵循共享工作流。
+- 用户只要求评审时保持只读。
+
+---
+> Source: [easysoft/zui](https://github.com/easysoft/zui) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-07 -->
