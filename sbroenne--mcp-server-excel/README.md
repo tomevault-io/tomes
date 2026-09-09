@@ -1,28 +1,48 @@
 # AI instruction files for mcp-server-excel
 
-> Sourced from [sbroenne/mcp-server-excel](https://github.com/sbroenne/mcp-server-excel) and converted for every major platform by [TomeVault](https://tomevault.io)
+> Sourced from [sbroenne/mcp-server-excel](https://github.com/sbroenne/mcp-server-excel), graded against the public Tome Standard and kept consistent across every major platform by [TomeVault](https://tomevault.io)
 
 Excel MCP Server & CLI - 23 tools, 214 operations for AI-powered Excel automation via COM API
 
 ## All Platforms Config
 
 The `TOME.json` file in this directory is the project config converted for All Platforms.
-Original source: `copilot-instructions.md` in [sbroenne/mcp-server-excel](https://github.com/sbroenne/mcp-server-excel).
+Original source: `AGENTS.md` in [sbroenne/mcp-server-excel](https://github.com/sbroenne/mcp-server-excel).
 
 ## Also available for
 
 - **Claude Code** — `CLAUDE.md`
-- **Codex** — `AGENTS.md`
+- **GitHub Copilot** — `copilot-instructions.md`
 - **Cursor** — `project-config.mdc`
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (2)
+## Bundled Skills (22)
 
 - [excel-mcp](https://github.com/sbroenne/mcp-server-excel/tree/main/skills/excel-mcp)
 - [excel-cli](https://github.com/sbroenne/mcp-server-excel/tree/main/skills/excel-cli)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skill.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/skills/excel-mcp/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/skills/excel-cli/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/templates/skill.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/project-conventions/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/dependency-validation/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/mcp-cli-parity-triage/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/publish-hardening-docs/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/plugin-surface-wording/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/node24-action-upgrades/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/precommit-release-gates/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/error-transport-context/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/plugin-overlay-bundling/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/mcp-schema-enum-regression/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/workflow-run-tag-resolution/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/dependabot-tooling-downgrade/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/cross-repo-release-preflight/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/templates/skills/project-conventions/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/plugin-build-smoke-regression/SKILL.md)
+- [mcp-server-excel](https://github.com/sbroenne/mcp-server-excel/tree/main/.squad/skills/retire-legacy-distribution-surface/SKILL.md)
 
-From [sbroenne/mcp-server-excel](https://github.com/sbroenne/mcp-server-excel) — a repo with 147+ stars on GitHub.
+From [sbroenne/mcp-server-excel](https://github.com/sbroenne/mcp-server-excel) — a repo with 673+ stars on GitHub.
 
 ---
 
