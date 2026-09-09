@@ -68,4 +68,4 @@ Or copy the instructions below directly into your CLAUDE.md:
 
 ---
 > Source: [hebohang/HEngine](https://github.com/hebohang/HEngine) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-09-08 -->
+<!-- tomevault:4.0:claude_md:2026-09-09 -->
