@@ -1,0 +1,133 @@
+---
+name: dig-ui
+description: 用于 Dig 网页与产品界面的设计系统 skill。Use when the user mentions dig-ui, dig-ui-skill, Dig UI, catalog/wise, catalog/dig, CSS token, layout recipe, block library, dashboard, runtime, marketing, docs, or frontend UI review. Read global-rules.md first, then local rules and local extensions when present. Use when this capability is needed.
+metadata:
+  author: originaleric
+---
+
+# dig-ui
+
+Dig UI 是 AI 可执行的产品界面设计系统。它通过 `dig-read + workflow + layout + catalog + block + token + global/local rules + render ops` 帮助 agent 生成、审查和维护稳定的产品 UI。
+
+## 读取优先级
+
+1. 用户当前 prompt
+2. `references/local/palettes/` 或 `~/.config/dig-ui-skill/palettes/`（当用户指定本地/custom palette 时）
+3. `references/local/styles/` 或 `~/.config/dig-ui-skill/styles/`（当用户指定本地/custom style 时）
+4. `references/global-rules.local.md`（若存在）
+5. `references/local/`（若存在，用于项目级 layout / block 扩展）
+6. 当前安装语言的 `references/global-rules.md`
+7. 当前安装语言的 `references/dig-read.md`、`references/anti-tells.md`、`references/preflight.md`、`references/workflows/`
+8. 当前安装语言的 `references/layouts/`、`references/catalogs/`、`references/blocks/`
+9. `references/shared/` 中的 manifest、token、primitive
+
+若用户明确说「不使用 global / skip global / no global rules」，本次任务跳过 global rules 和 local global rules，但仍可使用 layout、catalog、block、primitive。
+
+## 工作流
+
+### 1. 输出 Dig Read
+
+对页面生成或 UI review 任务，先读取 `references/dig-read.md`，再用一句话确认：
+
+```text
+<task type> page for <target user / job>,
+using <layout> layout + <catalog> catalog.
+```
+
+然后给出四个 dials：
+
+- `INFORMATION_DENSITY`
+- `BRAND_EXPRESSIVENESS`
+- `INTERACTION_ENERGY`
+- `OPERATIONAL_CRITICALITY`
+
+如果任务明显属于 review、redesign、execution 或 image-reference 场景，同时读取 `references/workflows/` 中的对应 workflow。
+
+### 2. 选择 layout
+
+先读 `references/layouts/README.md`，再读取最匹配的 layout 文件。layout 负责信息结构、slots、响应式顺序和 QA notes，不负责品牌色。
+
+若存在 `references/local/manifest.yaml` 或 `references/local/layouts/`，优先判断是否有项目级 layout 更适合。local layout 应使用 `extends`，避免静默复制官方 layout。
+
+### 3. 选择 catalog
+
+写 CSS 前必须先选一个 catalog。用户明确指定时用户优先；未指定时按 layout 的 `default_catalog` 和 `recommended_catalogs` 推断。
+
+常用 catalog：
+
+- `dig`：Dig 默认产品语言
+- `mono`：克制、灰阶、高密调试
+- `editorial`：叙事、发布、品牌表达
+- `wise`：移动优先、消费级 fintech
+- `apple`：高端产品发布、系统原生感
+- `paletteXX`：以整体网站配色为入口的 color palette catalog；当用户指定 mood、配色组合或整体色彩方向而非品牌时使用
+- `style-catalog`：以完整视觉语法为入口；当用户指定非品牌风格、截图风格、材质/形态/插画/组件气质时使用，例如 `cozy-arcade`、`quant-signal-console`
+- `custompalette`：用户通过 Palette Lab 导入到 `~/.config/dig-ui-skill/palettes/`，并可同步到 `references/local/palettes/` 的本地 palette；只属于用户资产，不写入内置 catalog
+- `customstyle`：用户通过 Style Lab 导入到 `~/.config/dig-ui-skill/styles/`，并可同步到 `references/local/styles/` 的本地 style；只属于用户资产，不写入内置 catalog
+
+用户明确指定本地 style 资产或复用已导出的风格时使用 `customstyle`。同一页面或同一组组件不要混用多个 base catalog。
+
+当决定使用内置 style catalog 时，读取 `references/catalogs/styles/README.md` 后再选择具体 style。它按任务、avoid 边界与 render archetype 路由，避免仅因颜色或标题气质相似而误选 style。
+
+### 4. 选择 blocks
+
+涉及常见组件或业务模块时，读取 `references/blocks/README.md` 和相关 block 文件。优先使用 block 协议，不临时发明重复结构。
+
+常见 blocks：
+
+- primitive：button、input、select、form-row、toast、modal、tooltip、tabs
+- product：table-toolbar、runtime-log-stream、run-status-header、step-timeline、settings-row、empty-state、notification-item、search-result-row
+
+若存在 `references/local/blocks/`，先判断项目级 block 是否更适合。
+
+### 5. 应用 token / primitive / global rules
+
+实现样式时先定义 token、font、type scale、spacing、radius、shadow、background/grid 行为。组件样式引用 `--dig-*` token 或项目主题变量，不写死 dark/light hex。
+
+### 6. 过滤 anti-tells
+
+交付前读取 `references/anti-tells.md`，过滤 AI 常见坏味道，尤其是：
+
+- 通用紫蓝 AI SaaS 渐变
+- 所有内容都塞 card
+- runtime / execution 页面 landing 化
+- 同一业务列表混用 table / card / feed
+- 用 glow 替代真实状态层级
+
+### 7. Preflight 和 Render Ops
+
+交付前读取 `references/preflight.md`。如果修改了 catalog 或 render 相关资产，还应运行或建议运行：
+
+```bash
+dig-ui-skill render all
+dig-ui-skill validate renders
+```
+
+render 只用于 catalog 视觉维护预览，不是第二套规范；layout 和 block 以 Markdown 协议为准。若 render 与 markdown 冲突，以 markdown / manifest 为准。
+
+## 个人 Local Rules
+
+当用户明确要求“记住”、“沉淀”或“加入我的 Dig 本地规则”时，当前 Host Agent 必须读取 `references/local-rules-builder.md`，将偏好归类、去重并写入用户配置中心：
+
+```text
+~/.config/dig-ui-skill/global-rules.local.md
+```
+
+- 这是个人规则的唯一真源；不要编辑共享 `references/global-rules.md`，也不要编辑项目仓库中的 ignored local 文件。
+- 使用 `local add --no-sync` 写入后再同步：用户未指定范围时执行 `dig-ui-skill local sync --all --from-config`，仅同步已安装的受支持 Host Agent；指定范围时只同步该目标并显式使用 `--from-config`。
+- 规则写入完成后，报告章节、写入内容和各目标的同步结果。
+- 仅当用户明确要求持久化时写入；讨论、建议或不明确的偏好不得自动沉淀。
+- Host Agent 是通用角色，不假定当前工具为 Codex、Cursor、Claude Code 或任何特定产品。
+
+## Runtime 命名边界
+
+`runtime` 历史上既像 page type 又像视觉皮肤。新规则中优先使用：
+
+- `task_type: execution` 表示运行、调试、观测类任务
+- `catalog: runtime` 仅在未来作为视觉皮肤落地时使用
+
+保留旧的 `page_type: runtime` 只是为了兼容既有 layout 与历史资产。
+
+---
+> Source: [originaleric/dig-ui-skill](https://github.com/originaleric/dig-ui-skill) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-13 -->
