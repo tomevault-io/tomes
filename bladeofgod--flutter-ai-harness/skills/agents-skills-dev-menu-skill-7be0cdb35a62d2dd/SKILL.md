@@ -1,0 +1,17 @@
+---
+name: dev-menu
+description: 适用：新增或修改仅 Debug 可见的开发菜单入口，用于导航、Mock、缓存、网络、账号或 Feature Flag。不适用：生产设置，或散落在业务 UI 中的隐藏调试控件。触发词：DevMenu、调试菜单、开发者工具、Mock 状态、调试快捷入口、Feature Flag。 Use when this capability is needed.
+metadata:
+  author: bladeofgod
+---
+
+# dev-menu
+
+这是 Claude Skill 的 Codex 原生发现入口。执行前必须完整读取并遵守
+[`Skill 事实源`](../../../.claude/skills/dev-menu/SKILL.md)。
+
+不要在本文件复制或修改工作流正文。
+
+---
+> Source: [bladeofgod/flutter-ai-harness](https://github.com/bladeofgod/flutter-ai-harness) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-13 -->
