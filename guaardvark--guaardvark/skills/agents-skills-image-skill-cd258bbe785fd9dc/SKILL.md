@@ -1,0 +1,76 @@
+---
+name: image
+description: >- Use when this capability is needed.
+metadata:
+  author: guaardvark
+---
+
+# Images with Guaardvark
+
+Read `setup` first if the backend or the `comfyui` plugin state is unknown.
+
+## One image: MCP `generate_image`
+
+- `prompt` is scene, pose, lighting, setting. Plain prose. Do not paste JSON or tag soup; the
+  default model (Z-Image Turbo) reads prompts as language, and SD-era tag lists hurt it.
+- `model` default `auto` picks the best downloaded model. Only override when the user names one:
+  `zimage-turbo`, `krea2-turbo`, `krea2-raw`, `flux-dev`, `sd-xl`, `sdxl-turbo`,
+  `realistic-vision`, `epic-realism`.
+- `width` / `height`: 512, 768 or 1024. `style`: realistic, artistic, anime, photographic, digital-art.
+- **Consistent character**: pass `subject_ids=[<cast id>]` as its own array. Never put the
+  trigger word alone in the prompt and expect the LoRA to load. Find ids with
+  `GET /api/cast-library` (see the cast skill).
+- On-image text: quote the exact words in double quotes inside the prompt.
+- The tool returns the image URL (`/api/outputs/generated_images/<file>.png`, relative to the
+  backend), the model that ran, steps, seed and whether a Cast LoRA was applied. Show the URL
+  and the prompt you used. Measured: 768x768 on Z-Image Turbo in ~20 s on a free 16 GB card.
+- **Over MCP the call queues by default** (`wait_for_result` defaults to false there) and
+  returns `Image queued as batch ImageBatch_...` at once. Poll
+  `get_generation_status(batch_id=...)` every few seconds until `completed`; it returns the
+  file URL. Pass `wait_for_result: true` to block for the render instead (allowed up to 30
+  minutes). A call that exceeds the server's timeout answers with an error that says the
+  render is still running; it is not lost.
+- A failed call carries the backend's reason (plugin off, out of memory, bad model). Read it
+  and act on it; `inspect_gpu` and `GET /api/plugins/status` are the two checks that resolve most.
+
+## Edit an existing image: MCP `edit_image`
+
+- `instruction` is the change ("put a cowboy hat on him", "make the shirt red"). The image the
+  user just attached is used automatically; otherwise pass `image` as a path or URL.
+- `model` `auto` uses FLUX.1 Kontext when installed, else img2img on the current model.
+- For a brand-new picture use `generate_image`, not this.
+
+## Many images: REST batch
+
+```bash
+B=${GUAARDVARK_URL:-http://localhost:5000}
+curl -s -X POST $B/api/batch-image/generate/prompts -H 'Content-Type: application/json' -d '{
+  "prompts": ["prompt one", "prompt two"],
+  "model": "auto",
+  "subject_ids": []
+}'
+```
+- `prompts` may be strings or `{"prompt": "..."}` objects. There is a per-batch maximum; if the
+  server answers 400 "Too many prompts", split the list.
+- Optional `adapters` (user LoRAs from the models skill) and `subject_ids` (Cast Library).
+- The response is `data.batch_id` (`ImageBatch_<date>_<n>`). Poll
+  `GET $B/api/batch-image/status/<batch_id>?include_results=true`: `status` goes
+  running → completed, with `completed_images` / `total_images`, `output_dir`, and one
+  `results[]` entry per prompt (`success`, `image_path`, `thumbnail_path`, `generation_time`,
+  `metadata.model_used`). A contact sheet: `GET $B/api/batch-image/preview/<batch_id>`; one file:
+  `GET $B/api/batch-image/image/<batch_id>/<image_name>` (the basename of `image_path`).
+  Cancel with `POST $B/api/batch-image/cancel/<batch_id>`. Measured: one 1024x1024 prompt
+  completed in ~30 s.
+- Helpers: `POST /api/batch-image/enhance-prompt`, `/analyze-prompt`, `/expand-concept` (JSON
+  body with the prompt) when the user wants prompt help before spending GPU time.
+
+## Rules
+
+- Say which model actually ran (the response names it). Do not promise a model that is not installed.
+- Generation time depends on the GPU; a first image after Ollama held the card can take longer
+  because the orchestrator swaps models. That is normal.
+- Never upload the user's images anywhere. Everything here is local.
+
+---
+> Source: [guaardvark/guaardvark](https://github.com/guaardvark/guaardvark) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-13 -->
