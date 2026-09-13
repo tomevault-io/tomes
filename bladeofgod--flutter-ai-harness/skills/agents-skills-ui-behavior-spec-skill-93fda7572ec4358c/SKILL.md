@@ -1,0 +1,17 @@
+---
+name: ui-behavior-spec
+description: 适用：根据已批准任务、产品规则、原型或 Figma 输入生成、审计或执行 Version 1 UI 行为 Spec。不适用：替代产品决策、实现 UI、操作系统原生界面或探索未定义流程。触发词：UI Spec、行为契约、plan-spec、spec-writer、spec-auditor、app-operator、Marionette 验收。 Use when this capability is needed.
+metadata:
+  author: bladeofgod
+---
+
+# ui-behavior-spec
+
+这是 Claude Skill 的 Codex 原生发现入口。执行前必须完整读取并遵守
+[`Skill 事实源`](../../../.claude/skills/ui-behavior-spec/SKILL.md)。
+
+不要在本文件复制或修改工作流正文。
+
+---
+> Source: [bladeofgod/flutter-ai-harness](https://github.com/bladeofgod/flutter-ai-harness) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-13 -->
