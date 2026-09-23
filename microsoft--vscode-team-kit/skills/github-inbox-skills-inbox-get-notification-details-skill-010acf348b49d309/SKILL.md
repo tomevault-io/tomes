@@ -1,0 +1,39 @@
+---
+name: inbox-get-notification-details
+description: Get details of a specific GitHub notification thread Use when this capability is needed.
+metadata:
+  author: microsoft
+---
+
+# Get Notification Details
+
+Use `gh api` to fetch details of a specific notification thread or issue/PR comments.
+
+## Notification thread details
+
+```
+gh api /notifications/threads/{thread_id}
+```
+
+## Issue comments (latest)
+
+```
+gh api repos/{owner}/{repo}/issues/{number}/comments --jq '.[-1] | {user: .user.login, body: .body}'
+```
+
+## PR comments (latest)
+
+```
+gh api repos/{owner}/{repo}/pulls/{number}/comments --jq '.[-1] | {user: .user.login, body: .body}'
+```
+
+Replace `{thread_id}`, `{owner}`, `{repo}`, `{number}` with actual values.
+
+## Rules
+
+- Run each `gh api` command as a **separate** terminal invocation — NEVER chain with `&&`
+- Use `--jq` for filtering — it is built into `gh`
+
+---
+> Source: [microsoft/vscode-team-kit](https://github.com/microsoft/vscode-team-kit) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-16 -->
