@@ -1,0 +1,35 @@
+---
+name: fabric-guide
+description: Recommends the right user-invoked Pi Fabric workflow without running it. Use when you want help choosing among workflow, council, fusion, RLM, Schema, Jev judgments and loops, ambient actors, or swarm. Use when this capability is needed.
+metadata:
+  author: monotykamary
+---
+
+# Fabric Guide
+
+Recommend the smallest sufficient path; do not invoke it. Core coding needs no advanced skill: answer `No advanced skill — use the core fabric_exec path.`
+
+| Need | Recommend |
+|---|---|
+| Finite discover → fan-out → verify work | `/skill:fabric-workflow` |
+| Same-model independent roles and synthesis | `/skill:fabric-council` |
+| Different models compared by a judge, or read-only references executed by one actor | `/skill:fabric-fusion` |
+| Work too large for one context window | `/skill:fabric-rlm` |
+| Evidence-gated or transactional local-file mutation | `/skill:fabric-schema` |
+| Typed semantic judgments or a code-owned observe → judge → act loop | `/skill:fabric-jev` |
+| Jev watches coding work per turn or at settlement with deterministic policy | `/skill:fabric-foreman` |
+| Persistent material peer advice | `/skill:fabric-advisor` |
+| Persistent progress toward one measurable goal | `/skill:fabric-supervisor` |
+| Strict feature-spec compliance, audited until verified | `/skill:fabric-spec` |
+| One command that infers advisor versus supervisor | `/skill:fabric-ambient` |
+| Durable actor team with mailboxes and CAS tasks | `/skill:fabric-swarm` |
+
+Prefer the smallest sufficient mechanism. Distinguish workflow/council/fusion by execution shape, RLM by context size, Jev by code-owned loops and event-driven Main-turn advisors with typed judgments instead of per-tick reasoning turns, Foreman by lifecycle-driven coding supervision with a fixed judgment/policy loop, ambient roles by persistent reasoning, and swarm by durable multi-actor coordination. Jev runs are session-owned, not restart-durable.
+
+## Completion criterion
+
+Complete with one of three outputs: (1) `No advanced skill` plus one-sentence reasoning for core work; (2) one advanced recommendation, one-sentence reasoning, and an exact `/skill:...` command that preserves the user’s task as arguments; or (3) one discriminating question when two choices are genuinely tied. Never load or execute a recommended skill yourself.
+
+---
+> Source: [monotykamary/pi-fabric](https://github.com/monotykamary/pi-fabric) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-20 -->
