@@ -1,0 +1,110 @@
+---
+name: compensation-calculator
+description: Calculate worker-side monetary claim ranges for China labor disputes, including N, N+1, 2N, unpaid wages, unsigned-contract double wage, and unused annual leave estimates. Use when case facts include employment dates, wage, termination path, or the user asks how much compensation to request. Use when this capability is needed.
+metadata:
+  author: 90le
+---
+
+# Compensation Calculator
+
+## Overview
+
+Estimate monetary claims with a deterministic script where possible. Do not rely on free-form arithmetic for core amounts.
+
+## Required Facts
+
+Before calculating, collect:
+
+- Work start date.
+- End date or expected termination date.
+- Average monthly wage for the last 12 months or actual shorter period.
+- City or region.
+- Local average monthly wage if wage-cap analysis is needed.
+- Termination path: mutual, non-fault without notice, economic layoff, unlawful, unknown.
+- Previous month's wage if claiming substitute notice wage under a non-fault dismissal path.
+- Unpaid wages, unused annual leave days, unsigned-contract months, overtime amount, if claimed.
+
+If wage or dates are missing, output missing inputs instead of estimating.
+
+## Script Use
+
+Use `scripts/calculate_compensation.py` for deterministic baseline calculations:
+
+```bash
+python3 scripts/calculate_compensation.py --input case.json
+```
+
+To derive the wage base from up to 12 monthly payroll records without saving them, use a UTF-8 CSV with exactly `month,gross_wage` columns:
+
+```bash
+python3 scripts/calculate_compensation.py --input case.json --payroll-csv payroll.csv
+```
+
+The result includes the source SHA-256, normalized monthly rows, missing-month list, total, average, and calculation formula. The CSV average replaces any `average_monthly_wage` supplied in the JSON; verify missing months and the legally applicable wage-base period before relying on it.
+
+For a standard-hours overtime estimate, set `work_schedule_type` to `standard` and provide an explicit `overtime_monthly_wage_base` in the JSON. Then import a UTF-8 CSV with exactly `work_date,started_at,ended_at,break_minutes,day_type,compensatory_leave_minutes`:
+
+```bash
+python3 scripts/calculate_compensation.py --input case.json --attendance-csv attendance.csv
+```
+
+`day_type` is `workday`, `rest_day`, or `statutory_holiday`. Timestamps use local `YYYY-MM-DDTHH:MM`. The script rejects overlaps, aggregates split shifts by work date, preserves the source SHA-256, and emits each daily formula and amount. It supports only standard hours; comprehensive or flexible schedules require separate approval documents and local analysis. Attendance rows and day labels remain worker-provided facts that must be checked against original records and employer-arrangement evidence.
+
+To write a new self-contained HTML review report, add an unused output path:
+
+```bash
+python3 scripts/calculate_compensation.py --input case.json --attendance-csv attendance.csv --report-html report.html
+```
+
+Add `--source-as-of YYYY-MM-DD` when a reproducible source-health date is required. The result and report include a numbered evidence directory linking source digests and missing verification items to the wage or overtime claim. The report contains aggregate/daily calculations and official source cards with jurisdiction, effective/expiry dates, retrieval/review dates, and freshness health. Expired or review-due cards produce a visible degraded warning. Source paths, raw payroll rows, raw clock timestamps, names, IDs, chats, and attachments are excluded. Existing files are never overwritten; review the remaining dates and amounts before sharing.
+
+For quick testing:
+
+```bash
+python3 scripts/calculate_compensation.py --self-test
+```
+
+For regression testing all MVP cases:
+
+```bash
+python3 scripts/run_golden_cases.py
+```
+
+For invalid-input and boundary regression testing:
+
+```bash
+python3 scripts/run_edge_cases.py
+```
+
+## Output Format
+
+Return:
+
+- `calculation_inputs`: facts used and missing facts.
+- `service_period`: dates, service months, and N months.
+- `base_amounts`: N, N+1, 2N, wage cap status.
+- `additional_claims`: unpaid wages, unused annual leave estimate, unsigned-contract double wage, overtime if provided.
+- `claim_paths`: conservative, negotiation, and high-risk paths.
+- `formula_notes`: concise formula explanation.
+- `source_notes`: article numbers and source cards to verify.
+- `evidence_directory`: digest-backed source entries plus missing arrangement, schedule, and wage-base evidence.
+- `report_export`: absolute HTML path, SHA-256, byte count, redaction profile, source assessment date/status, and degraded source IDs when explicitly requested.
+- `uncertainties`: local wage cap, limitation period, evidence gaps, procedural defenses.
+
+## Calculation Boundaries
+
+- Treat the script as a baseline estimator, not a final legal opinion.
+- Use average monthly wage, not a single high month, unless the user only has incomplete wage data.
+- Apply the high-wage cap only when local average monthly wage is provided.
+- Use `previous_month_wage` for substitute notice wage when available; if missing, explain that the script falls back to average monthly wage.
+- Label annual leave and overtime as estimates unless the user has attendance and payroll evidence.
+- Require an explicit overtime wage base and standard-hours classification; never infer special-hours treatment from timestamps alone.
+- Do not calculate social insurance losses without local rules and payment records.
+
+## Resources
+
+Read `references/calculation-rules.md` before explaining formulas or legal bases.
+
+---
+> Source: [90le/worker-rights-cn](https://github.com/90le/worker-rights-cn) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-14 -->
