@@ -1,6 +1,6 @@
 # go-wind-admin
 
-> 本文件为 Claude Code 提供项目级开发规范和约定。所有代码生成和修改必须遵循以下规则。
+> 本文件是 monorepo 总入口：定位布局、指路各端规范、声明全仓铁律。**深入开发前必读对应端的 AGENTS.md**。
 
 ## Usage
 
@@ -12,140 +12,85 @@ Read and follow the instructions in .claude/skills/go-wind-admin/SKILL.md
 
 Or copy the instructions below directly into your CLAUDE.md:
 
-# CLAUDE.md — GoWind Admin 项目指令
+# AGENTS.md — go-wind-admin Monorepo 开发指南（AI Agent 入口）
 
-本文件为 Claude Code 提供项目级开发规范和约定。所有代码生成和修改必须遵循以下规则。
+本文件是 monorepo 总入口：定位布局、指路各端规范、声明全仓铁律。**深入开发前必读对应端的 AGENTS.md**。
 
-## 项目概述
-
-**go-wind-vue3-element-admin** — 基于 Vue 3 + Vite + TypeScript + Element Plus 的后台管理模板（Vue3 版 vue-element-admin）。
-
-### 技术栈
-
-Vue 3.5 / TypeScript 5.9 / Vite 8 / Element Plus 2.x / vxe-table 4.x / Pinia 3 / @tanstack/vue-query 5 / vue-router 5 / vue-i18n 11 / UnoCSS + SCSS / vee-validate + zod / axios（封装 gRPC-Web 风格 API）
-
-### 核心目录结构
+## 仓库布局
 
 ```
-src/
-├── api/
-│   ├── generated/          # gRPC 自动生成代码（禁止手动修改）
-│   ├── client.ts           # ApiClient 单例（transport 适配层）
-│   └── composables/        # Composable 层：Vue Query hooks + 枚举工具函数（通过 apiClient 调用）
-├── components/Pro/         # Pro 组件库（配置化 CRUD 页面）
-├── core/
-│   ├── transport/rest/     # 请求客户端、PaginationQuery、拦截器
-│   ├── i18n/               # 国际化核心
-│   ├── router/             # 路由工具函数
-│   └── access/             # 权限控制
-├── pages/app/              # 业务页面（按模块分目录）
-├── locales/                # 翻译资源（zh-CN / en-US）
-├── router/routes/modules/  # 动态路由模块
-├── layouts/                # 布局组件
-└── stores/                 # Pinia stores
+backend/                    Go + Kratos + Ent（DI 手写装配 wiring_*.go，已弃用 Wire；HTTP :7788，SSE 网关 :7789）
+frontend/admin/
+├── react/                  React 19 + antd 6 + ProComponents + TanStack Query + zustand
+├── vue-element/            Vue 3 + Element Plus + vxe-table + TanStack vue-query + Pinia
+└── vue-vben/               Vben Admin 5.x monorepo（apps/admin + packages/*）+ Ant Design Vue
+docs/                       文档体系（总入口 docs/README.md：教程层 docs/tutorial/ + 参考层专题文档）
 ```
 
----
+## 三端门禁（必须保持全绿）
 
-## 编码规范
+| 端 | 命令（在各自目录下） | dev 端口 |
+|---|---|---|
+| react | `npm run typecheck` | 5888 |
+| vue-element | `npx vue-tsc --noEmit`（或 `npm run type-check`） | 5777 |
+| vue-vben | `pnpm run check:type` | 5666 |
 
-### TypeScript
-- 接口命名**不使用 I 前缀**（`User` 而非 `IUser`）
-- 路由类型使用 `RouteRecordRaw`（非 `AppRoute`）
-- 路由数组 map+sort 后需类型断言为 `RouteRecordRaw[]`
-- 不使用 `isFunction` 做类型窄化，用 `typeof fn === "function"`
-- `defineExpose` 暴露的属性直接访问，无需 `.value`
+2026-09-07 起三端 typecheck 全部 0 错误。**门禁出现任何新报错，一律当作自己引入的 bug 修复**，不存在"可忽略的既有错误"。改完代码先跑门禁再声称完成。
 
-### 国际化（强制）
-- 所有用户可见文本必须通过 `$t()` / `t()` 国际化，**禁止硬编码中文**
-- `$t()` 用于模板和 `computed`（响应式场景）
-- `t()` 用于 composable 顶层（非响应式场景）
-- 翻译 key 命名：`pages.<module>.<field>` / `enum.<module>.<field>.<VALUE>` / `routes.<module>.<page>` / `common.<category>.<key>`
+## 全仓铁律
 
-### API 两层架构
+1. **不吞错**：任何 catch 至少二选一——`console.error/warn` 带出**原始错误对象**，或重新抛出。用户可见的通知/Message ≠ 日志（只有翻译文案）。合法裸 catch 仅限纯本地 best-effort 兜底且注释写明原因。历史教训：认证链路静默吞错曾让 bug 排查耗时数日。
+2. **vue-vben 工具链版本已钉死**（catalog 精确版本 + packageManager 匹配本机 pnpm）：禁止改回 `^` 范围、禁止顺手升级 vue/typescript/vue-tsc/pnpm。原因与升级流程见 `frontend/admin/vue-vben/AGENTS.md`「工具链与已知坑」。
+3. **搜索条件一律 contains 而非 EQ**、ID 类字段不进模糊搜索；CRUD 请求体必须包 `{ data: {...} }`，但**仅限 CRUD**——`body: "*"` 的自定义 RPC（如 `internal-message/send`）收的是扁平请求体，多包一层 `data` 会被 protojson 当未知字段丢掉，接口照样 200、字段全为空。细节见 `.zcode/skills/add-crud-module/SKILL.md`。
 
-严格遵循分层：`generated/` + `apiClient` → `composables/`
+## 开发策略：react 先行，其余移植
 
-#### ApiClient 单例 (`src/api/client.ts`)
-- 全局唯一实例，通过 `ClientTransport` 适配 axios 请求
-- 懒加载属性访问器按需创建各服务 Client（如 `apiClient.userService`、`apiClient.authenticationService`）
-- protobuf 重新生成后 `ApiClient` 类自动包含新服务属性
+新功能/新模块以 **react 端为行为基准先实现**，验证通过后再移植到 vue-element / vue-vben。移植是"有参照的翻译"，远比三端并行首创便宜；vue-vben 框架变体语料薄，直接首创容易产出框架级错误（详见其 AGENTS.md）。
 
-#### Composable 层 (`src/api/composables/`)
-- 从 `generated/` **只导入类型**（`type` import），运行时调用通过 `apiClient`
-- 每个 composable 文件导出：`use*` Hook + `fetch*` 非 Hook 函数 + 枚举工具
-- queryKey 格式：`["操作名", 参数]`，全局唯一
-- 列表查询使用 `apiClient.xxxService.List(query.toRawParams())`
-- **创建 mutation 的参数必须用 `{ data: {...} }` 包裹**（gRPC 约定）
-- **更新 mutation 必须使用 `makeUpdateMask` 生成字段掩码**
-- 枚举列表用 `computed(() => [...])` + i18n `t()` 标签
-- 在 `src/api/composables/index.ts` 中添加 `export *`
+**CRUD 模块**：使用 `/add-crud-module` skill（后端 + 前端端到端流程）。
 
-### 组件规范
-- `ElDrawer` 必须设置 `:append-to-body="true"`
-- `ElDialog` 的 `appendTo` 属性是字符串选择器（非布尔值）
-- `ElTreeSelect` 的 `value` 不接受 `undefined`，用 `null` 代替
-- 暗黑模式下文本颜色使用 `var(--el-text-color-*)` CSS 变量，避免硬编码
+**代码生成器**：配套工具 [go-wind-toolkit/gowind-uiapp](https://github.com/tx7do/go-wind-toolkit/tree/main/gowind-uiapp)（桌面 GUI + CLI，从数据库表/SQL 生成前后端代码，含简单表单）。CLI（`gowind-cli`）非交互、JSON 输出，适合 Agent 调用。工具产物仍须按本仓铁律与约定验收补齐（`{ data: {...} }` 包裹、contains 搜索、已部署实例的新端点走管理页「接口同步」登记进 Api 表、`make ts` 生成三端 TS 等）。
 
-### 样式规范
-- CSS 变量使用 `--gowind-*` 前缀，避免与 Element Plus `--el-*` 冲突
-- 主题色变量存储为 HSL 数值（非 hex 字符串）
-- 更新 CSS 变量使用 `style.setProperty()`
+> 系统默认数据（admin 用户、角色、菜单、权限、语言等）由服务启动时在 Go 侧自动播种（`pkg/constants/default_data.go` + 各 service 的 count==0 守卫；Api 表仅在空表时于启动期自动同步，**已部署实例新增端点须在管理页「接口同步」手动触发全量重建**，否则租户闸门 fail-closed 403；「接口同步」重建读的是**打进二进制的** `cmd/server/assets/openapi.yaml`，所以新 proto 必须先 `make openapi` 再重启进程，否则同步"成功"而新端点依旧不在表里。新菜单同理：`count==0` 守卫意味着老库要靠各端「菜单同步」(MERGE) 才会多出这一行），**不要**找 SQL 种子脚本，`backend/sql/` 下只剩演示数据。
 
-### 路由
-- 动态路由放在 `src/router/routes/modules/app/<module>.ts`
-- 顶层路由使用 `Layout` 组件包裹
-- `meta.title` 使用 i18n key
-- `meta.icon` 使用 `lucide:` 前缀
-- `meta.authority` 控制权限
-- 文件导出 `default` 路由数组
+## 后端任务：gow 优先，make 兜底
 
----
+后端的运行与代码生成统一走 [gow CLI](https://github.com/tx7do/go-wind-toolkit/tree/main/gowind)（安装：`go install github.com/tx7do/go-wind-toolkit/gowind/cmd/gow@latest`），在 `backend/` 下执行。**接手后不要上来就用 Makefile 的 make 命令**：Windows 无原生 make、嵌套 Makefile 需要跨目录 cd，而 gow 自动发现 `app/*/service`，行为一致：
 
-## 新建 CRUD 模块清单
+| 任务 | gow 命令 |
+|---|---|
+| 运行服务 | `gow run admin` |
+| Ent 生成 | `gow ent`（全部服务）/ `gow ent admin` |
+| Proto / API Go 代码 | `gow api` |
+| 从数据库表生成 CRUD | `gow generate`（DSN 驱动；`--proto-only` 仅出 proto） |
 
-创建新业务模块时，按以下顺序生成文件：
+项目已弃用 Wire（DI 为手写 `wiring_*.go`），不要运行 `gow wire`，也不要在新代码里引入 wire 依赖。
 
-1. **`src/api/composables/<module>.ts`** — Vue Query hooks + 枚举工具（通过 apiClient 调用）
-2. **`src/api/composables/index.ts`** — 添加 `export *`
-3. **`src/locales/zh-CN/pages/<module>.json`** — 中文翻译
-4. **`src/locales/en-US/pages/<module>.json`** — 英文翻译
-5. **`src/locales/zh-CN/enum.json`** — 追加枚举翻译
-6. **`src/locales/zh-CN/routes.json`** — 追加路由标题
-7. **`src/router/routes/modules/app/<module>.ts`** — 路由配置
-8. **`src/pages/app/<module>/<module>/index.vue`** — 列表页（ProPage 配置）
-9. **`src/pages/app/<module>/<module>/<module>-drawer.vue`** — 弹窗组件（useProModal 模式）
+gow 未覆盖的任务（三端 TS 生成 `make ts`、OpenAPI `make openapi`、`make test/lint` 等）才退回 Makefile（`backend/` 根目录执行）。
 
----
+## 本地验证要点
 
-## 常见陷阱
+- 后端起在 `:7788`（`gow run admin`；启动方式见 `docs/windows-startup-guide.md` / `docs/backend_deploy.md`）；前端 dev 端口见上表，代理已配置好 API 转发。
+- 登录账号：全新环境播种为 `admin / Abcd@1234`（`pkg/constants/default_data.go` 的 `DefaultUserPassword`）；本机 `gwa` 库实测（2026-09-20）即为此值，历史备注的 `admin / admin` 已失效（登录返回 `INVALID_PASSWORD`）。图形验证码的答案可在 Redis 中按 `gowind:captcha:<captchaId>` 直接读取，便于自动化验证。
+- vue-element 在 dev 下若见 router-view 塌空/白屏：先重启 dev server 再下结论（vite 依赖优化竞态已做遏制与自愈，见其 AGENTS.md「dev 白屏处置」）。
+- `go test ./...` 偶发 `fork/exec %TEMP%\go-build...\x.test.exe: Access is denied.`（Windows 上对刚链接好的测试二进制执行被拦，疑似安全策略/杀软实时扫描）：属环境问题、**不是代码失败**。复验办法是绕开 Temp 执行——`go test -c -o <工作区内路径>/x.test.exe ./pkg/x` 后直接跑该 exe；判成"测试挂了"之前先这样确认一次。
 
-| 陷阱 | 正确做法 |
-|------|----------|
-| gRPC 创建接口直接传对象 | 必须用 `{ data: {...} }` 包裹 |
-| `isFunction` 做类型窄化 | 使用 `typeof fn === "function"` |
-| PowerShell 中用 `&&` 连接命令 | 使用分号 `;` |
-| `ElLink` underline 传 boolean | 已废弃 boolean，使用字符串 |
-| vue-i18n `$te` 传 ns 选项对象 | `$te` 不支持 ns 选项，用完整 key |
-| `ElTreeSelect` value 传 undefined | 使用 `null` 代替 |
+## 文档索引
 
----
-
-## 构建命令
-
-```bash
-pnpm dev              # 启动开发服务器
-pnpm build            # 类型检查 + 生产构建
-pnpm build-only       # 仅构建（不检查类型）
-pnpm type-check       # TypeScript 类型检查
-pnpm lint             # ESLint + Prettier + Stylelint
-pnpm commit           # Git 提交（cz-git 交互式）
-```
-
-- Node 版本：`^20.19.0 || >=22.12.0`
-- 包管理器：仅 pnpm（preinstall 强制检查）
-- Git 提交：Conventional Commits 规范
+- **文档总入口（两层索引：教程层 + 参考层）**：`docs/README.md`；渐进教程系列（面向采用者的 9 章学习路径）在 `docs/tutorial/`
+- 各端规范：`frontend/admin/{react,vue-element,vue-vben}/AGENTS.md`
+- 后端：`docs/backend_project_struct.md`、`docs/backend_deploy.md`、`docs/audit-log-producer-design.md`
+- 前端权限模型：`docs/frontend_authority.md`
+- 查询/分页规则：`docs/list_query_rule.md`
+- 脚本系统：`docs/script_system.md`（Lua/JS 脚本级插件：钩子点/定时任务/HTTP 出站/安全模型；改钩子点或模块先读它）
+- 认证与令牌链路：`docs/authentication.md`（登录全流程/令牌与刷新轮换/MFA/限流策略/会话吊销/已知问题；改登录、令牌、刷新、MFA、限流或登录策略前先读它）
+- 多租户隔离：`docs/tenant_isolation.md`（上下文链路/HTTP 闸门/数据层读写隔离/套餐联动/覆盖边界与排障；改隔离层、Api 表、套餐门禁或给新表接租户前先读它）
+- 套餐与计费管控：`docs/plan_billing.md`（三档到期策略全链路/模块白名单/配额与用量计量/租户数据清理；改套餐、配额、到期处置或排租户 403 前先读它）
+- 任务调度系统：`docs/task_system.md`（配置与启动链/任务数据模型/调度生命周期/系统级常驻任务/脚本任务桥/多租户语义与排障；加任务类型、排"任务没跑"或接新调度需求前先读它）
+- SSE 推送架构：`docs/sse_architecture.md`（服务端配置与生命周期/流鉴权与 streamID 语义/事件生产/三端消费/部署与排障；改推送链路、加事件类型或排"收不到通知"前先读它）
+- 数据权限范围：`docs/data_scope_design.md`（角色级行数据范围：语义/聚合/接入步骤/运维边界；新表接入数据范围或改聚合规则先读它）
+- 设计语言规范：`docs/design-language.md`（三端视觉唯一权威值表，改颜色/圆角/布局尺寸先改这里再同步三端）
 
 ---
 > Source: [tx7do/go-wind-admin](https://github.com/tx7do/go-wind-admin) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-06-29 -->
+<!-- tomevault:4.0:claude_md:2026-09-23 -->
