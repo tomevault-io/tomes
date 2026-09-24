@@ -1,0 +1,30 @@
+---
+name: delegate-work
+description: Use when delegating bounded coding work to a subagent.
+metadata:
+  author: breko861-hash
+---
+
+# Delegate Work
+
+Use this skill only when implementation should be handed to a worker.
+
+If Astra is the active parent:
+1. Pick the cheapest worker likely to finish the bounded task reliably:
+   - Spark for tiny deterministic edits when available.
+   - Luna High for normal implementation.
+   - Sol Medium for harder bounded debugging, investigation or implementation.
+2. Give the worker one clear outcome and only the context it needs.
+3. Define what completion looks like and what verification is actually useful.
+4. If the worker fails, check task clarity before escalating. Do not loop blindly.
+
+If Sol is the active parent:
+- use Spark or Luna when delegation clearly saves context, time or cost;
+- otherwise handle the bounded work directly;
+- do not spawn `sol-escalation` merely to recreate the active Sol parent.
+
+For the detailed work-package template, read `references/work-package.md` only when you need to prepare the package.
+
+---
+> Source: [breko861-hash/sol-luna-codex-orchestrator](https://github.com/breko861-hash/sol-luna-codex-orchestrator) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-21 -->
