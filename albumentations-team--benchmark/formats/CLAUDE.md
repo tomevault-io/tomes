@@ -1,0 +1,30 @@
+# benchmark
+
+> Before planning, changing, running, resuming, aggregating, plotting, or interpreting a benchmark, read both:
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/benchmark/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# Benchmark execution
+
+Before planning, changing, running, resuming, aggregating, plotting, or interpreting a benchmark, read both:
+
+- [`.codex/skills/augmentation-benchmark-contract/SKILL.md`](.codex/skills/augmentation-benchmark-contract/SKILL.md)
+- [`docs/benchmark_execution_contract.md`](docs/benchmark_execution_contract.md)
+
+Every successful new production cell must measure end-to-end throughput and peak process GPU memory in the same pass. A separate memory run is forbidden unless the user explicitly adds a different research question.
+
+The active work is RGB `dataloader_disk`. Each production `run_id` freezes its
+recipes, hardware, dataset, package lock, code archive, and timing boundary.
+Any such change requires a new run; never mutate or mix its existing results.
+
+---
+> Source: [albumentations-team/benchmark](https://github.com/albumentations-team/benchmark) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-09-24 -->
