@@ -1,0 +1,32 @@
+---
+name: native-enhance-pptx
+description: > Use when this capability is needed.
+metadata:
+  author: byungjunjang
+---
+
+# Native PPTX Enhance
+
+Use this standalone direct-PPTX route only after
+[`../ppt-master/workflows/routing.md`](../ppt-master/workflows/routing.md)
+selects native enhancement.
+
+## Runtime Procedure
+
+1. Read
+   [`../ppt-master/workflows/native-enhance-pptx.md`](../ppt-master/workflows/native-enhance-pptx.md)
+   in full.
+2. Execute that workflow step by step, including its enhancement-plan
+   confirmation, any separate voice/settings confirmation, apply, and read-back
+   gates.
+3. Keep slide count, order, visible wording, and layout stable unless the user
+   changes the request and routing selects a different route.
+
+Shared scripts do not imply main-pipeline inheritance. Do not load or execute
+the main SVG `ppt-master` skill, Strategist/Executor references,
+`finalize_svg.py`, `svg_to_pptx.py`, or `verify_deck.py` for this route unless
+the native-enhancement workflow explicitly hands off to one of them.
+
+---
+> Source: [byungjunjang/slide-master](https://github.com/byungjunjang/slide-master) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-19 -->
