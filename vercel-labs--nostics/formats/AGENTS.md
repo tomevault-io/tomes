@@ -1,0 +1,7 @@
+# Calculator project
+
+Learning project for TypeScript. A few buttons backed by a JS library. No frontend framework.
+
+---
+> Source: [vercel-labs/nostics](https://github.com/vercel-labs/nostics) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:agents_md:2026-09-24 -->
