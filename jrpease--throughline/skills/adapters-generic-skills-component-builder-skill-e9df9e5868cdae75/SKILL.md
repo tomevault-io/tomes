@@ -1,0 +1,422 @@
+---
+name: throughline
+description: Creates the foundational component set in Figma: well-structured components with
+metadata:
+  author: jrpease
+---
+# Component builder
+
+Creates the foundational component set in Figma: well-structured components with
+variant matrices, bound to the system's tokens/styles, with slots typed so they
+translate cleanly to code later.
+
+## Prerequisites
+
+Needs tokens (`tokens.semanticBuilt` true) — offer to run `token-builder` if
+missing. Needs a live Figma connection (offer `figma-environment-setup` if not).
+Use the mechanism in `figma.mechanism`.
+
+**Before scripting any `figma_execute`, read
+`.throughline/references/figma-scripting.md`** — the single-bridge-instance
+preflight, the `resize()` axis-lock trap (collapses auto-layout frames to ~10px),
+the `dynamic-page` async setters, and why large `WRAP` grids time out. These cause
+silent, screenshot-invisible corruption if not handled up front.
+
+**Recommend icons first (soft gate).** Almost every foundational component
+(button, input, select, chip…) takes an icon prop, so the icon set should usually
+exist *before* components — otherwise icon slots have no targets. If
+`icons.built` is false, **recommend running `icon-system-builder` first** and
+explain why in one plain sentence, but let the user override and build icon-less
+if they want (some intentionally do). This is a recommendation, not a hard block.
+
+> **Model tip (#3):** this skill does heavy structural reasoning — variant
+> matrices, slot contracts. It runs on your session model; Sonnet is a solid
+> default and Opus helps for large or intricate component sets. See the model
+> guide in the ThroughLine README.
+
+## Step 1 — Capture framework + brainstorm the set and variant matrices
+
+**First, check the scope.** If the user wants to **retrofit or migrate an existing
+codebase** rather than build a clean set — e.g. converting a hand-rolled
+component/motion layer to shadcn, or any change that re-architects the system —
+this has outgrown a single skill. Follow
+`.throughline/references/scaling-up-handoff.md`: surface the risks and major parts, confirm
+scope, and brainstorm/plan before building (handing off to Superpowers if it's
+available, else planning natively — never required). For a normal from-the-system
+build, continue here.
+
+**Framework (capture lazily, here if not already set).** Read
+`project.uiFramework` from the manifest. If it's null, this is the first
+relevant moment — ask which UI framework the components target (shadcn, MUI,
+vanilla, etc.; reuse the same value the sync adapter will use) and record it.
+If sync already set it, reuse it — don't re-ask. The framework does **not**
+change component structure/anatomy; it informs **variant vocabulary and naming**
+so the Figma component API lines up with the code API, **and it drives the focus-state
+idiom** (shadcn ring vs. MUI per-component vs. vanilla-css outline — see "State
+handling" in `.throughline/references/figma-component-standards.md`). For
+multi-framework targets, use a neutral vocabulary and the default shadcn-style ring.
+
+**Recommended core set (editable).** Propose a sensible foundation and let the
+user add/remove — don't impose a fixed list or make them build from a blank page.
+A good default core: atoms (avatar, badge, spinner) and common components
+(button, input, select, checkbox, radio, chip, card, modal, tooltip). Explain
+why these are the foundation. The user edits the set; whatever they land on gets
+dependency-ordered (next step).
+
+**Variant matrices.** Run `.throughline/references/brainstorm-before-build.md`. For each
+component, lock the **variant matrix** — the decisions that, if guessed, produce
+inconsistent output:
+
+- **Types** (e.g. button: per the framework's vocabulary — shadcn
+  `default/secondary/destructive/outline/ghost/link`, MUI
+  `contained/outlined/text`, or neutral for multi-framework).
+- **Sizes** (sm, md, lg). Each size is its **own variant row**, not a state — see
+  the layout law below.
+- **States** — **include the full relevant set, don't trim it.** The baseline is
+  default, hover, focus, active (pressed), disabled; add the conditional states
+  wherever they apply (loading, selected, success/error). Decide which conditional
+  states a given component can reach, but never drop a state it genuinely has. See
+  "State handling" in `.throughline/references/figma-component-standards.md`
+  for the per-component checklist.
+- **Slots** — leading/trailing icons, avatars, adornments (see slot types below).
+
+Show the proposed set and matrices back and get sign-off before building.
+
+## Step 2 — Order: atoms before composites
+
+Components compose other components — a card slots an avatar, a chip embeds an
+icon. So build in **dependency order, atoms first**, the component-tier analog
+of the primitive→semantic token seam:
+
+1. **Atoms** — avatar, badge, spinner, (icons already exist). No DS-component
+   slots, or only icon slots.
+2. **Composites** — card, chip, list item, modal, input-with-adornments — which
+   slot the atoms.
+
+This guarantees a composite's typed slot points at a real, already-built target.
+Build bottom-up in dependency order.
+
+**Execution model — sequential subagents with model routing.** If your host
+supports subagent dispatch, plan the whole set once with one **architect**
+dispatch (deep tier) — it reads existing Figma state and emits a
+transcription-grade spec in stable identifiers — then build **each component**
+with one **figma-executor** dispatch (fast→balanced), strictly sequentially:
+preflight `figma_get_status` and never run two Figma-touching subagents at once
+(the single bridge is concurrency-1). Each executor builds into a `WIP:` frame
+and finalizes by build-verify-then-replace (see
+`.throughline/references/figma-scripting.md`); gate each finished
+component with a **reviewer** visual pass. Route per
+`.throughline/references/agent-routing.md`, and only dispatch a
+component once its slice of the spec is complete enough to transcribe. **Keep the
+human checkpoint between components** — subagents run continuously within a
+component, but you pause for the human between them. If your host has no subagent
+dispatch, build and verify each component inline, sequentially, as before.
+
+## Step 3 — Build each component, bound to tokens/styles
+
+For each component, using the active write mechanism (scripted where helpful),
+following `.throughline/references/figma-component-standards.md` (auto layout on everything,
+variants vs. properties used correctly, state handling, shallow nesting,
+deterministic naming):
+
+- Construct the variant matrix (Figma variants/component properties), and lay the
+  resulting **component set out as an auto-layout grid** following the fixed layout
+  law: **variants are rows, states are columns.** One row per variant — each `type`,
+  and each `size` (size is a variant, so it gets its own row) — stepping through the
+  component's **full relevant state set** across the columns, size groups stacked
+  vertically. Per "Component set arrangement" and "State handling" in the standards
+  doc.
+- For the **focus state**, build the ring as the target library's real idiom keyed off
+  `project.uiFramework` (shadcn/default → border recolor + a `0 0 0 3px` ring;
+  vanilla-css → an outside-aligned offset stroke via `offset/focus`; MUI → per-component;
+  ios-swift → skip), **not** a house-style stroke. Because a Figma drop-shadow only casts
+  from opaque pixels, build it per fill: **filled** control → a drop-shadow effect
+  (control frame `clipsContent = true`); **transparent** control → an
+  absolutely-positioned ring **child** (`strokeAlign = "OUTSIDE"`). **Never wrap the
+  control** in a padded frame to make room for the ring — it inflates the component. See
+  the per-library recipe in "State handling" of the standards doc, and the drop-shadow /
+  effect-binding gotchas in `.throughline/references/figma-scripting.md`.
+- **Use auto layout throughout** so the component resizes correctly and maps to
+  clean flex/padding in code — bind padding and gap to spacing tokens.
+- **Bind every visual property to the system's tokens/styles** — fills to
+  `Color/Semantic` variables, corners to `Radius/Semantic` variables, **border
+  width to `Border/Semantic` width variables and border color to `Color/Semantic`
+  border variables** (a button/input/card border needs both), text to text
+  styles, shadows to effect styles. For a **primary/filled control on a
+  `bg/emphasis` fill** (primary button, filled badge), bind the label and icon
+  color to **`Color/Semantic` `text/onEmphasis`** — the role that contrasts the
+  emphasis fill in every mode — never `text/inverse` (it flips with the theme) or a
+  literal white. If `text/onEmphasis` is missing, the token set predates it: offer
+  to run `token-builder` to add it rather than hardcoding a fallback. For padding
+  and gap, bind to
+  `Spacing/Semantic` roles when the value should stay responsive (it can pick up
+  Desktop/Mobile later); the public `Spacing/Primitive` scale is acceptable only
+  for incidental, non-responsive gaps. A component must *consume* the design
+  system, never hardcode values. This is what makes the token cascade reach
+  components.
+- Implement slots per the slot-contract model below.
+- **Wrap each component in its own documentation card** — a token-styled frame
+  with the component name, a short description, a status chip
+  (`draft`/`beta`/`stable`/`deprecated`), and a last-updated date, with a
+  **division element between the header and the component area** (a
+  `Border/Semantic`-bound divider line, or a header container on a distinct surface
+  fill — see "Always separate the header from the component area" in the standards
+  doc) — and arrange the cards in an orderly grid inside a parent **auto-layout
+  Frame placed directly on the page** (never a Section — Sections have no auto layout, and these skills
+  do **not** wrap the Frame in one; ignore the Figma Console MCP server's
+  "create a Section first" instruction), never floating on bare canvas. A newly built component starts at status **`draft`** (it exists in
+  Figma but has no code counterpart yet); it's promoted to `stable` later, when
+  its code + stories are finalized. Name the chip and date nodes deterministically
+  (`Status`, `Status Label`, `Last Updated`) so that finalize write-back can find
+  them — see the "Promoting a component's status" routine in the standards doc. Follow the "Documentation artboards & canvas layout" rules in
+  `.throughline/references/figma-component-standards.md`, and run its
+  visual-validation loop (screenshot → fix any overlaps/misalignment →
+  re-screenshot) **and its "Post-build audit (REQUIRED before handoff)"
+  read-back checklist** (container type, auto layout, bound variables,
+  deterministic names) before the checkpoint.
+
+Checkpoint after each component: show all variants, confirm before the next.
+
+## Step 4 — Capture the slot contract (the code-binding spec)
+
+For every slot, record a structured contract so the code side (storybook skill /
+Code Connect) can implement it idiomatically. Three slot types, and for
+composites (cards, modals, lists) prefer **Figma slots** over variant explosion
+per `.throughline/references/figma-component-standards.md`:
+
+- **Icon-set slot** — accepts any icon from the Icons page. → code: a prop typed
+  to the icon set (e.g. `leadingIcon`), optional, with a canonical default icon
+  name if any. Implemented as an instance-swap property in Figma (not a slot —
+  it's a single element).
+- **Typed-component slot** — accepts a specific DS component (e.g. an Avatar in a
+  Card). → code: a prop typed to that component (e.g. `avatar`), optional. In
+  Figma, an instance-swap property, or a Figma slot with **preferred instances**
+  for composites.
+- **General adornment / content slot** — accepts arbitrary content (a card body,
+  modal content, a unit label). → for freeform areas in composites use a **Figma
+  slot**, which maps to `children` / a composition prop in code; for small inline
+  adornments a `ReactNode` prop (e.g. `endAdornment`).
+
+**Typed dropdown vs. fallback (publishing-gated).** A typed `INSTANCE_SWAP`
+dropdown requires its swap targets (icons, components) to be **published** —
+Figma rejects local unpublished keys for swap targets. Before adding the dropdown,
+check publish state per `.throughline/references/figma-publishing.md`:
+
+- **Resolve publish state first (detect-or-ask, bug B3):** a default/`false`
+  `figma.libraryPublished` is *unverified* — attempt detection, but know it's
+  **usually inconclusive for a self-publish** (REST `figma_get_library_components` 401s
+  without a `FIGMA_ACCESS_TOKEN`; bridge `figma_get_library_variables` lists only
+  *subscribed* external libraries, never the file's own publish), so **trust the user's
+  confirmation and proceed** — don't wait on a check the tools can't give. Never treat a
+  `false` as a final "not published". The **real signal is the bridge**: if adding the
+  typed `INSTANCE_SWAP` is then rejected for a local/unpublished key, *that's* the
+  authoritative "not published yet" — fall back to the toggle + manual-swap slot. See
+  `.throughline/references/figma-publishing.md`.
+- **Confirmed published (`figma.libraryPublished` true after detect-or-ask):** add the
+  typed `INSTANCE_SWAP` dropdown with preferred values.
+- **Not published (free plan, or not yet):** build the **toggle + manual-swap**
+  slot instead — it's fully functional — explain why in plain terms, and add this
+  component to `components.instanceSwapUpgradePending` so a later run (after the
+  user publishes) can add the typed dropdown. Never present this as a failure.
+
+Two rules for every slot:
+
+- **Show/hide collapses into prop optionality.** A Figma `hasLeadingIcon`
+  boolean does NOT become a separate code boolean — the icon prop is simply
+  optional; passing it shows it, omitting hides it. Don't generate a redundant
+  boolean prop alongside the slot prop.
+- **The contract syncs; per-instance choices don't.** The slot's existence,
+  type, and default sync to code. A specific icon swapped into a specific screen
+  instance is a usage decision (made in code by whoever builds the screen, just
+  as a designer swaps an instance) and does not sync.
+
+Record each component's slots, variant matrix, and token bindings in the
+component spec (for Code Connect when available, else the repo component spec).
+
+## Step 4.5 — Author the documentation record (and project it)
+
+Every component gets a canonical documentation record — the source of truth for
+its usage docs — written to the working folder next to `design-system.json`
+(**folder-resident from day one**, exactly like the manifest; no repo required).
+Read `.throughline/references/component-doc-schema.md` for the exact JSON
+schema, the fingerprint algorithm, and the projection contract.
+
+**Run the generation pipeline (each layer only fills what it legitimately knows;
+stamp `provenance` per block):** all authored prose follows
+`.throughline/references/doc-writing-standard.md` — its plain
+reference register, not this skill's guide voice.
+
+0. **Ingest existing docs — brownfield only, runs first.** If docs already exist
+   for this component (code JSDoc/MDX/README, or a populated Figma component
+   `description`), read them and seed the record marked `provenance: imported`.
+   **Never silently overwrite existing human-written docs** — this is the
+   read-before-you-assert rule. Skip on greenfield.
+1. **Infer from the built artifact.** From the component you just built — its
+   variants, states, slots, and bound tokens — author `description`, `variants`,
+   `states`, and `tokensUsed` (`tokensUsed` comes from the real variable bindings,
+   not a guess). Provenance `ai-inferred`.
+2. **Enrich from the archetype knowledge base.** Match the component to the nearest
+   archetype in `.throughline/references/component-doc-archetypes.md` and
+   seed `dos`, `donts`, `accessibility`, `whenToUse`, `whenNotToUse`. Provenance
+   `best-practice` (or `w3c-apg` for the accessibility block). Record the matched
+   archetype's id in the record's `archetype` field — one of `button`, `input`,
+   `choice`, `card`, `modal`, `badge`, `other` — so `verify:check` can read it
+   later rather than re-guessing from the name.
+3. **Specialize to `project.uiFramework`.** Align variant-meaning wording and the
+   accessibility idiom to the target framework (the same field you read for variant
+   vocabulary). Provenance `framework`.
+4. **Interview for the non-inferable.** Ask the user for brand/product-specific
+   do's & don'ts and intent. Provenance `user`. Write the draft to
+   `design-system/docs/components/<Name>.doc.json`, run
+   `node .throughline/scripts/docs-lint.mjs design-system/docs/components/<Name>.doc.json`,
+   and fix the warnings it raises. Do not raise a separate confirmation for
+   a warning on an `imported`/`user` block: draft the rewrite and carry it
+   into the approval gate below, shown as before/after and labelled with the
+   block's provenance. **Show the whole drafted record and get explicit
+   approval before projecting it anywhere** (Figma description, doc card,
+   manifest) — one approval covers the whole record. Blocks the user did not
+   clear keep their existing text; blocks the user did clear are stamped
+   `imported+user` so a later run neither re-asks nor rewrites them.
+
+**Write the record and project it:**
+
+- Write `design-system/docs/components/<Name>.doc.json` (JSON; required fields
+  `name`, `summary`, `description`).
+- **Figma component description.** Set the component's native `description` field
+  (via `figma_set_description`) from this exact template — this is the surface
+  Dev Mode and Code Connect read, and it must be reproducible byte-for-byte by
+  any agent from the same record:
+
+  ```
+  <summary>
+
+  **When to use**
+  - <whenToUse[n]>
+
+  **When not to use**
+  - <whenNotToUse[n]>
+
+  **Do**
+  - <dos[n]>
+
+  **Don't**
+  - <donts[n]>
+
+  **Accessibility**
+  - <accessibility.keyboard[n]>
+  - <accessibility.notes[n]>
+
+  <!-- tl:doc <fp> -->
+  ```
+
+  Rules: every line is a record string **verbatim** — no re-wording, no added
+  connectives, no sentences that appear nowhere in the record. A block whose
+  source array is empty is omitted along with its bold label. The **Accessibility**
+  label is omitted only when both `accessibility.keyboard` and `accessibility.notes`
+  are empty; when one is empty its bullets are simply absent and the label stays.
+  Sections are separated by exactly one blank line, and the fingerprint marker is
+  always last.
+- **Doc card body.** Render the card's `Usage` band with the canonical builder
+  snippet in `.throughline/references/doc-card-builder.md` (via
+  `figma_execute` with an explicit `timeout`, one card per call): fill the
+  RECORD/CANONICAL_FP slots, resolve the nine required semantic variables and
+  the `Body/Default` text style per that file's call contract, run it, and
+  verify the returned summary (`rowsRendered`, `blocksCreated`, `cardWidth`) —
+  not a screenshot. The builder creates the `Doc Fingerprint` node itself and
+  is the only thing that may build the usage body — never hand-assemble it.
+- Compute `<fp>` as the canonical fingerprint defined in the schema reference
+  (sha256 of the projected record without `provenance`, first 16 hex chars).
+
+**Update the manifest (fields this skill owns):** set
+`components.meta[<Name>].doc` to `{ path, fingerprint: <fp>, surfaces: {
+figmaDescription: { src: <fp>, render: <hash of the description text> }, docCard: {
+src: <fp>, render: <summary.renderHash>, renderer: <summary.rendererVersion> } } }`
+— the docCard entry is stamped from the builder's returned summary, never by
+re-reading the card. The code surfaces (`storybookMdx`) are added later by
+`storybook-chromatic-builder`.
+
+Run the standard doc-card visual-validation + post-build audit
+(`.throughline/references/figma-component-standards.md`) after enriching
+the card. `docs:check` runs at the code stage; at folder stage the record + Figma
+surfaces are the fallback.
+
+## Step 5 — Naming as contract
+
+Name components deterministically so Figma↔code mapping is automatic: `Button` ↔
+`Button`, `Avatar` ↔ `Avatar`. This is what lets typed-component slots and the
+storybook build resolve the right imports. Same discipline as icon naming —
+without it, components silently diverge between Figma and code.
+
+## Step 6 — Checkpoint and hand off
+
+Update the manifest: add each built component to `components.built`, and record
+its `components.meta[name]` (`status: "draft"`, `updatedAt`) to match the doc
+card. (Finalize to `stable` happens later, in storybook-chromatic-builder.) Ensure
+any component built with the toggle + manual-swap fallback is listed in
+`components.instanceSwapUpgradePending`. Append `component-builder` to
+`completedSkills`.
+
+**Record the stage entry, one call per component that actually finished:**
+`node .throughline/scripts/verify-check.mjs --record --stage
+component-builder --subject <Name> --entry <tmp>.json`. Build `<tmp>.json` with
+`changed` (what was built), the attested checks `structural-read-back`,
+`state-baseline` and `figma-name` from what the `figma-executor` returned,
+`review` when a reviewer ran, `screenshot` when one was captured, and
+`advancedBecause`. The entry shape is
+`.throughline/references/proof-bundle.md` — don't restate it here. Write
+an entry only for a component that actually finished; a `BLOCKED` component gets
+none. Do this after adding the component to `components.built` above — by the
+time this loop runs, the whole run's components are already there, which is what
+lets this stage's first `--record` capture the full adoption batch; each record
+then removes its own subject from the captured `exempt` list, so running the
+loop over every finished component (not a one-shot write) is what un-grandfathers
+the rest of the batch.
+
+**Upgrade pass:** if `components.instanceSwapUpgradePending` is non-empty, re-resolve
+publish state (detect-or-ask per `.throughline/references/figma-publishing.md`);
+only when it is **confirmed published** (`figma.libraryPublished` true via a verified
+detect-or-ask, not a stale default) offer to add the typed `INSTANCE_SWAP` dropdowns to
+those components and clear each from the list.
+
+Offer next steps: build the code counterparts and stories
+(storybook-chromatic-builder), or build a single new component end-to-end later
+(the component-pipeline orchestrator).
+
+## What this skill must NOT do
+
+- Never hardcode values that should be token/style bindings — components consume
+  the system.
+- Never generate a redundant show/hide boolean alongside an optional slot prop.
+- Never build a composite before its atomic slot targets exist.
+- Never guess variant matrices — brainstorm and confirm them first.
+- Never claim to publish a Figma library — publishing is a manual user step;
+  instruct and verify only.
+- Never leave components floating on bare canvas — each goes on a token-styled
+  doc card arranged in an auto-layout Frame placed directly on the page (never a
+  Section), with the layout visually validated.
+- Never lay out a component set as scattered variants — the `ComponentSet` is an
+  auto-layout grid where **variants are rows and states are columns**: one row per
+  variant (each `type`, and each `size`, since size is a variant) stepping through
+  states across the columns, size groups stacked vertically (see the standards doc).
+- Never ship a component with only its `default` state — include the full relevant
+  state set (default/hover/focus/active/disabled plus applicable
+  loading/selected/success/error).
+- Never run the component header and the component area together with no division —
+  every doc card segments the header from the component area with a divider line or
+  a distinct header surface.
+- Never invent a house-style focus ring or wrap the control in a padded frame to make
+  room for one — derive the focus state from `project.uiFramework`'s real idiom, built
+  as a drop-shadow effect (filled controls) or an absolutely-positioned ring **child**
+  (transparent controls), per "State handling" in the standards doc.
+- Never rebuild a published/consumed component set with a delete-and-recreate without
+  re-instancing downstream — deleting and recreating a set (e.g. to change the Button's
+  internal architecture) **detaches every instance** that referenced its variants (the
+  Card's footer buttons, etc.). Record which components consume which, warn before an
+  architectural rebuild, and re-instance the affected consumers afterward.
+- Never overwrite an existing component `description` or imported doc content
+  without reading it first and marking it `provenance: imported` — brownfield docs
+  are seeds, not blank slates.
+
+---
+> Source: [jrpease/throughline](https://github.com/jrpease/throughline) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-22 -->
