@@ -1,0 +1,36 @@
+---
+name: postman-zh-deep-audit
+description: 维护本仓库的 Postman 中文汉化。用于从当前官方 i18n 补译、按用户截图定点修复，以及修改运行时翻译或 app.asar 注入并完成验证；不用于普通 Postman API 调试或其他仓库的翻译任务。 Use when this capability is needed.
+metadata:
+  author: Aerozb
+---
+
+# Postman 汉化维护
+
+先读仓库根目录 [AGENTS.md](../../../AGENTS.md)。唯一词典是 `payload/zh-localize.js`；命令和菜单收尾以 [脚本说明](../../../scripts/README.md) 为准。
+
+## 选择工作范围
+
+- 截图反馈：定位对应界面，必要时定点读取真实 DOM 文本、属性和码位，先测已有 `translate()`，再按 AGENTS 的词典分类修复。不要凭截图猜原串或顺带遍历所有界面。
+- 批量补译、版本升级：从当前官方 i18n 重新取材，见 [i18n 说明](../../../docs/官方i18n清单与生成规则.md)。它提供原文，不直接替换官方语言包。
+- 半译、隐形字符、源码补查：看 [维护指南](../../../docs/维护指南.md)。仅当官方资源与反馈未覆盖时检查本地 asar / 缓存 bundle，不恢复固定扫描渠道。
+- 自动更新或版本检查：先读 [更新守卫](../../../docs/更新守卫.md)，分清两个独立开关。
+- 跨站 iframe：先读 [跨站子帧汉化](../../../docs/跨站子帧汉化.md)，区分 CDP 可读取与生产注入生效。
+
+## 执行边界
+
+固定操作通过根目录 `postman-zh.bat` 调用。需要 CDP 时复用公共客户端，连接前重新读取端口。报告和临时文件写同级 `_generated`；JSON 使用 `scripts/lib/诊断输出.js` 的 `writeDiagnosticReport`，摘要按最终结果计数。截图按需使用 `writeDiagnosticScreenshot`，PNG 像素未脱敏。
+
+定点诊断跳过原生文件选择器和 `data-postman-zh-audit-skip="true"`。保留用户数据、代码、HTTP 字段和技术名称；避免发送、保存、删除用户数据或退出账号，结束前清理自有节点、弹窗和菜单。
+
+自动巡检、缓存扫词、页面探测和漏翻收集已退役；历史漏翻数据保持原样。DOM 监听、延迟重试和跨帧注入是实际汉化路径，应继续保留。
+
+## 验证
+
+源码重构先运行 `test`；涉及注入或翻译行为时再 `install`、`verify`，重走对应界面。纯只读代码审查不要求安装或操纵页面；临时诊断的部分结果不作完整通过结论。
+
+批量词条或翻译重构按维护指南比较真实 `translate()` 输出。发布按 [升级与发布](../../../docs/升级与发布.md) 执行，检查差异并排除临时产物与用户数据。
+
+---
+> Source: [Aerozb/Postman-cn](https://github.com/Aerozb/Postman-cn) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-22 -->
