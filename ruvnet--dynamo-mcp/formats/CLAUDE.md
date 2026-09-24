@@ -1,0 +1,26 @@
+# dynamo-mcp
+
+> Maintain and validate the federated MCP repository
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/dynamo-mcp/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# dynamo-mcp-agent
+
+Maintain and validate the federated MCP repository
+
+## Behavioral rules
+
+- Use the harness's MCP tools (`mcp__dynamo-mcp-agent__*`) for orchestration.
+- Defer destructive operations to the user.
+
+---
+> Source: [ruvnet/dynamo-mcp](https://github.com/ruvnet/dynamo-mcp) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-09-24 -->
