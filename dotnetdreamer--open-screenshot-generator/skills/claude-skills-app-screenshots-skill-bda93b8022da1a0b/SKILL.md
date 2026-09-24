@@ -1,0 +1,90 @@
+---
+name: app-screenshots
+description: Drive Open Screenshot Generator headlessly (puppeteer-core + Edge) to take UI screenshots, add palette elements, upload device screenshots, export artboard PNGs, and regenerate the 3D device thumbnails. Use when asked to visually verify UI changes, capture the palette or canvas, test PNG exports, check rendering quality, or refresh public/elements/device-3d thumbs. Use when this capability is needed.
+metadata:
+  author: dotnetdreamer
+---
+
+# App Screenshots & Browser Verification
+
+Drives the real app in headless Edge to verify changes end-to-end: screenshots, element adds, screenshot uploads, PNG exports, and pixel-level quality checks.
+
+## Prerequisites
+
+- Dev server on **http://localhost:9002** — usually already running (`npm run dev`; `EADDRINUSE` means reuse it, Next.js hot-reloads your edits).
+- A Chromium browser. `lib.js` finds it per platform (Edge first, then Chrome/Chromium/Brave; `C:/Program Files...` on Windows, `/Applications/...` on macOS, `/usr/bin/...` on Linux) and every script imports `EDGE` from there. Set `APP_BROWSER` to override. Headless Edge via puppeteer uses the **real GPU** (verified: ANGLE D3D11), so WebGL renders match what the user sees. No swiftshader flags needed.
+- ffmpeg/ffprobe at `C:/ffmpeg-2026-02-04-git-627da1111c-essentials_build/bin/`.
+- One-time: `cd .claude/skills/app-screenshots/scripts && npm install` (installs puppeteer-core).
+
+## Golden rules (each one cost real debugging time — do not skip)
+
+1. **Never use `page.screenshot({ clip })`.** Clipped captures briefly resize the emulated viewport, which trips the responsive sidebar breakpoint and **remounts the palette, wiping tab/drill-in state**. Always take full-page screenshots and crop afterwards with ffmpeg.
+2. **Radix tabs ignore synthetic `.click()`** — switch tabs with a real mouse click at the trigger's bounding-box center (`page.mouse.click`). Plain buttons/tiles are fine with DOM `.click()` via `page.evaluate` (also bypasses overlays).
+3. **`waitForFunction` needs `polling: 500`** — the default rAF polling starves on static headless pages. Prefer string-expression predicates (`"document.querySelectorAll(...).length > 3"`) over function+args.
+4. **After clicking "Start Blank", wait for `?projectId=` in the URL** before interacting — project creation settles asynchronously.
+5. **File uploads:** start `page.waitForFileChooser()` *before* clicking the app's "Upload Screenshot" button, then `chooser.accept([path])`.
+6. **Exports:** set `Browser.setDownloadBehavior` (CDP) to a download dir, click the export button, poll the dir until the expected number of `.png` files appears, then wait ~3s for writes to finish.
+
+## App selectors
+
+- Start screen: the blank-canvas card is a button whose text contains `Start blank` (lowercase b — it reads "Start blank" inside the "Start with a blank canvas" card). The template gallery is still the first thing on
+  screen; an **AI agent banner** sits above the tabs. `lib.js` `openAgentScreen(page)` steps into that
+  agent screen (back out via `button[aria-label="Back"]`), and `clickByTextContains` clicks a button by
+  a text fragment.
+- Tabs: `[role="tab"]` containing `Elements` / `Devices` / `Images` / `Previews`. **Previews** holds whole App
+  Preview boards (see `src/lib/previewScenes.ts`); its tiles read `Add the <Scene Name> preview board
+  (scene:<id>)` and each one adds an ARTBOARD, not an element, so count `[data-artboard-dom-id]` rather than
+  `[data-element-id]` to detect the add. To review the scenes themselves, do NOT drive the canvas: headless
+  Edge returns torn frames after scrolling the board row. Bundle `StaticArtboard` + `previewScenes.ts` with
+  esbuild (same recipe as `regen-3d-thumbs.js`), serve the harness from `public/` so the posters resolve, and
+  screenshot the mount node per scene. There is NO Layers tab anymore:
+  Properties (top) and Layers (bottom) live in one right dock with a draggable divider
+  (`[role="separator"]`) between them. Collapse the dock via `button[aria-label="Collapse right panel"]`;
+  collapsed it becomes a slim vertical rail — expand via `button[aria-label="Expand right panel"]` or the
+  rotated `Open Properties` / `Open Layers` buttons (by `title`). Dock state persists in localStorage
+  (`abs-right-dock-open`, `abs-right-dock-layers-height`), so reset those keys if a test needs the default layout.
+- Palette categories: `button[title="Browse <Category>"]` (e.g. `Browse 3D iPhone 17 Pro Max`, `Browse Colored iPhone`, `Browse Basic`); close with the `Back` button.
+- Tiles: `button[aria-label="Add <label> (<libraryId>)"]` — they carry **no `title`** (a Radix hover card shows the label + library id instead), so match on the accessible name. `lib.js clickByTitle` handles both: pass `Add Transparent device` and it matches the `(devicecolor:iphone-transparent)` suffix for you. `button[aria-label^="Add "]` selects every tile in the open group.
+- Elements tab search: `input[aria-label="Search elements by name or id"]` filters the whole Elements tab (Basic, App Preview and the vector library) by name, library id, group or keyword; `button[aria-label="Clear search"]` restores the category overview. Results replace the category grid, so type into it *instead of* opening a category.
+- Toolbar by `title` attr: `New Artboard` (new artboard becomes active), `Zoom In`, `Zoom Out`.
+- **Import and Export are dropdown menus**, `button[title="Open a project"]` and `button[title="Export"]`. Their items are `[role="menuitem"]`: `From a project file` / `From your account`, and `Project file` plus the render item, whose label depends on the project: `Artboards as images` for screenshot projects, `App preview video` for App Preview ones (match on either, or on the `.mp4` suffix). Radix opens them on pointerdown, so a DOM `.click()` does nothing: use `lib.js clickMenuItem(page, 'Export', 'Artboards as images')`, which mouse-clicks the trigger and then the item in the portal.
+- Canvas elements: `[data-element-id]` (count them to detect adds).
+- **Export dialog:** the Export menu's `Artboards as images` opens the "Export Screenshots" dialog (it no longer downloads directly). Checkboxes by id: `#export-as-is` (checked by default), `#gen-ios`, `#gen-ipad-pro-13`, `#gen-ipad-11` (App Store sizes to generate; disabled when the current canvas already covers that format). Confirm with the dialog button whose text is `Export`. `lib.js exportArtboards` handles all of this and takes an optional `extraFormats` array of those ids.
+- **App Preview video projects get a DIFFERENT dialog** ("Export App Preview Video", radio ids `#apv-styled` / `#apv-raw`, buttons `Export Styled Video` / `Export Store-Ready Recording`, plus `Export PNG stills instead` for the still path). Any project holding a recording mockup (`video-device`), a video/gesture element or an animation routes here — there are no App Store screenshot-size options. `lib.js exportArtboards` detects which dialog opened and takes the PNG path in both, so preview generation still works for the `pv-*` templates.
+- Exported files are named `<NN>_<Artboard_Name>[_<Device_Format>].png` with spaces → underscores; `NN` is the zero-padded canvas order and the device-format suffix (iPhone/Android/iPad_13-inch/iPad_11-inch/7-inch_tablet/10-inch_tablet) appears when the artboard's mockups resolve to one format (e.g. `01_Blank_Artboard.png`, `01_Blank_Artboard_iPhone.png`). Generated App Store formats download extra files per artboard (e.g. `01_Blank_Artboard_iPad_13-inch.png` at exactly 2064×2752).
+
+## Scripts (in `scripts/`)
+
+- `lib.js` — reusable helpers implementing all rules above: `launch`, `startBlankProject`, `clickTab`, `clickByText`, `clickByTitle`, `addTileAndCount`, `uploadScreenshotToSelected`, `exportArtboards`, `shot` (full-page only).
+- `example-flow.js` — complete worked example: blank project → Devices tab → open a 3D category → add a tile → upload a screenshot → export → download. Run: `node example-flow.js`.
+- `verify-detach.js` — end-to-end check of the **detachable right dock** on the web path: detach opens a popup, the popup renders the editor's panels from a pushed snapshot, and selecting a layer, typing into the properties form, deleting a layer and jumping a history state all land back in the editor. Needs the dev server. `node .claude/skills/app-screenshots/scripts/verify-detach.js`
+- `verify-detach-desktop.js` — the same feature on the **desktop** path, which is the one that matters for a second monitor. Needs the app running with WebView2's inspector open: `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9333 npm run tauri:dev`, then `node .claude/skills/app-screenshots/scripts/verify-detach-desktop.js`. Drives the Tauri webview over CDP and checks a real panel window opens, the Tauri event bus reaches it, it is placed inside a display work area, it remembers its geometry, reopening does not resize it, and reattaching closes it. **Never run `npm run build` while a dev server is up**: the production build writes into the same `.next` and the dev server serves 500s until it is cleared.
+- `regen-3d-thumbs.js` — regenerates the 156 thumbnails (iPhone / Android / Apple Watch / MacBook / iMac × pose × side × finish; each device renders exactly the poses in its sizes map — 'front' is watch+mac only, and the Macs render a curated subset with a landscape wallpaper) in `public/elements/device-3d/` by bundling the real `Device3DRenderer` with esbuild and screenshotting each pose/side/finish with a transparent background. Optional args filter by device key (`... regen-3d-thumbs.js macbook imac`). Run it whenever poses, finishes, or materials change in `Device3DRenderer.tsx`. Run from the repo root: `node .claude/skills/app-screenshots/scripts/regen-3d-thumbs.js`.
+- `gen-app-skeletons.js` — regenerates the neutral **skeleton-screen library** in `public/data/projects/app-screens/` used to fill empty phone mockups in the App Screenshots templates (the full-height counterpart to `fg-screens/`, in the inboxly-screen-inbox.png visual language: soft grey blocks, one soft accent). Outputs 6 archetypes × {light,dark,eco} — `app-<list|feed|grid|player|dashboard|chat>-<light|dark|eco>.png` — at 846×1710 @ DPR2 (== the iphone-15 screen aspect, so `objectFit:cover` never crops). `light`/`dark` use an indigo accent; `eco` is the light greys with a soft green accent (for green/nature templates like verda-eco). Themes live in the `THEMES` map — add one there and it renders automatically. Edit the archetype builders / palettes, then rerun from repo root: `node .claude/skills/app-screenshots/scripts/gen-app-skeletons.js` (all) · `... eco` (one theme) · `... grid player` (archetypes) · `... grid-eco` (one key).
+- `wire-app-skeletons.js` — assigns those skeletons to the App Screenshots templates. Holds the per-app `{theme, cycle}` MAP and surgically inserts `screenshotSrc` + natural dims after each device's `deviceType` line (every device already carries `screenshotObjectFit:"cover"` + a full `screenshotRect`), cycling archetypes so adjacent phones differ. Formatting-preserving and idempotent (skips templates already wired or holding real screenshots). `node wire-app-skeletons.js` (all mapped) · `... <slug ...>` (subset) · `... --report` (dry run). Feature-graphic (`fg-*`), connectly-chat, listly-tasks, inboxly-mail and darzi-studio are intentionally not in the MAP.
+- `gen-mac-skeletons.js` — regenerates the **macOS skeleton-screen library** in `public/data/projects/mac-screens/` used to fill the MacBook/iMac mockups in the Mac templates (desktop counterpart to `gen-app-skeletons.js`). 6 archetypes (mail, dashboard, kanban, editor, music, chat) × 5 themes (light, dark, amber, lime, blue) at 1280×800 @ DPR2 = 2560×1600 — the exact 16:10 Mac screen aspect. Same CLI filtering as the watch script: `node gen-mac-skeletons.js lime` / `... kanban` / `... mail-amber`.
+- `gen-previews.js` — generates the **card-thumbnail previews** for the App Screenshots gallery (the counterpart to the `fg-*` previews the feature-graphic tab already had). Per template: Pass A opens it and exports its artboards (clean, chrome-free), Pass B composes a wide **3:1 phone-carousel strip** on the template's own background and rewrites `previewImage` to `/data/projects/previews/<slug>.png`. Matches the App Screenshots category (`previewAspect '3 / 1'`, `previewFit 'contain'`; the gallery treats any non-`placehold.co` previewImage as a real strip and renders it `object-contain`). Needs the dev server up. `node gen-previews.js` (all 41) · `... <slug ...>` (subset) · `... --compose-only` (reuse cached exports in `%TEMP%/artboard-previews-src/`). Caps the strip at 6 screens.
+- `compose-preview.js` — the strip compositor used by `gen-previews.js`: lays exported artboard PNGs as rounded, shadowed cards centered on a background at 1500×500 @ DPR2. `renderOnPage(page, dir, bgCss, out, max)` reuses one browser; CLI `node compose-preview.js <artboardDir> <bgCss> <outFile> [maxScreens]` for one-offs.
+
+**After any script that changes template JSONs or `previewImage` values** (wire-app-skeletons, gen-previews, or hand edits), regenerate the AI agent's hosted catalog: `npm run gen:ai-catalog` (also runs inside `npm run build`). It rewrites `public/data/ai/catalog.txt`, whose verification token is a content hash — a stale file makes the agent's URL mode silently fall back to inline prompts once deployed. Details: docs/AI-AGENT.md.
+
+## Verifying image quality
+
+- Crop 1:1 regions with ffmpeg and view them: `ffmpeg -i export.png -vf "crop=W:H:X:Y" out.png`.
+- Zoom for pixel inspection: add `,scale=iw*3:ih*3:flags=neighbor`.
+- Measure (e.g. prove a shadow/halo is gone — background must be pure 255):
+  `ffmpeg -i export.png -vf "crop=10:10:X:Y,format=gray,signalstats,metadata=print:file=-" -frames:v 1 -f null -` then read `YMIN`/`YAVG`.
+- Test screen for pixelation checks (gradient + 2px grid shows blur/aliasing immediately):
+  `ffmpeg -f lavfi -i "gradients=s=1080x2400:c0=0x4F46E5:c1=0x06B6D4:x0=0:y0=0:x1=1080:y1=2400" -vf "drawgrid=w=120:h=120:t=2:color=white@0.55" -frames:v 1 screen-test.png`
+
+## Workflow
+
+1. Make code changes; the running dev server hot-reloads them.
+2. Write a small driver on top of `lib.js` (or extend `example-flow.js`) for the flow under test.
+3. Screenshot full pages, crop with ffmpeg, Read the crops to visually confirm.
+4. For exports, always open the downloaded PNGs and check 1:1 crops — don't trust the on-screen look alone (exports take a different rendering path).
+5. Put temp output in the session scratchpad; stage anything the user should review in `C:/Users/ik/Downloads/artboard-3d-verification/`.
+
+---
+> Source: [dotnetdreamer/open-screenshot-generator](https://github.com/dotnetdreamer/open-screenshot-generator) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-21 -->
