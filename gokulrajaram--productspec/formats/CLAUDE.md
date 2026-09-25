@@ -1,6 +1,6 @@
 # productspec
 
-> Product Specs are the product contract for consequential software work.
+> Product Specs are intent harnesses for consequential software work.
 
 ## Usage
 
@@ -14,7 +14,7 @@ Or copy the instructions below directly into your CLAUDE.md:
 
 # ProductSpec
 
-Product Specs are the product contract for consequential software work.
+Product Specs are intent harnesses for consequential software work.
 
 Before planning, coding, testing, or changing scope, load `skills/productspec/SKILL.md` and read the relevant `.product-spec.md` file.
 
@@ -31,4 +31,4 @@ When implementing from a Product Spec:
 
 ---
 > Source: [gokulrajaram/ProductSpec](https://github.com/gokulrajaram/ProductSpec) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-09-23 -->
+<!-- tomevault:4.0:claude_md:2026-09-25 -->
