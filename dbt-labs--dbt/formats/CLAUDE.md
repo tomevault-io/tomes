@@ -55,4 +55,4 @@ Paths in this file and in `.agents/` are relative to the directory containing th
 
 ---
 > Source: [dbt-labs/dbt](https://github.com/dbt-labs/dbt) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-09-23 -->
+<!-- tomevault:4.0:claude_md:2026-09-24 -->
