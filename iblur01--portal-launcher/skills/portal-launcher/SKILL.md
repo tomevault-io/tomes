@@ -1,0 +1,129 @@
+---
+name: portal-launcher-release
+description: Automates the complete release workflow for the portal-launcher repo (iblur01/portal-launcher). Use when the user wants to "deploy", "release", publish a version ("publier une version"), prepare a 0.0.X ("préparer une 0.0.X"), merge into main ("merge dans main"), or make a release build ("faire un build release"). The target branch is main. This skill analyzes the branch commits, determines the version, updates CHANGELOG.md, bumps versionCode/versionName in build.gradle.kts, creates a PR, merges it, builds a signed APK, creates a GitHub release and deletes the branch.
+metadata:
+  author: iblur01
+---
+
+# Portal Launcher — Release Workflow
+
+This skill fully automates the release process for the `iblur01/portal-launcher` repo.
+
+## Prerequisites
+
+Run this skill from the root of the `portal-launcher` repository. The signing keystore is in `~/.portal-launcher-signing/portal-launcher-release.jks` and the credentials are in `app/local.properties` (gitignored).
+
+## Workflow
+
+The user may provide:
+- `$ARGUMENTS`: may contain a version number (e.g. `0.0.5-beta`) or be empty (version auto-detected by incrementing the current versionCode on main).
+
+### Step 1 — Determine the source branch
+
+If the user mentions a branch name, use it. Otherwise, use the current branch (`git branch --show-current`). **Never create a release from main directly** — the source branch must be a feature branch.
+
+### Step 2 — Determine the version
+
+If the user provided an explicit version, use it.
+Otherwise, read the current `versionCode` in `main:app/build.gradle.kts`, increment it, and derive the corresponding `versionName` (e.g. versionCode 4 → version 0.0.4-beta).
+
+### Step 3 — Analyze the changes
+
+Run `git diff main...HEAD --stat` and `git log main...HEAD --oneline` to get the list of modified files and the commits.
+
+Use the `explore` agent with `thoroughness: "very thorough"` to analyze ALL modified files in depth. The agent must return a structured summary in English listing:
+- **Added**: new features, files, components, APIs
+- **Changed**: behavior changes, UI refactors
+- **Removed**: removed code/functionality
+- **Performance**: notable optimizations
+- **i18n**: new strings added
+- **Tests**: new tests
+
+### Step 4 — Update CHANGELOG.md
+
+Add an entry at the top of the file with the format:
+
+```markdown
+## X.Y.Z-beta
+
+### Added
+- ...
+
+### Changed
+- ...
+
+### Removed
+- ...
+
+### Performance
+- ...
+```
+
+### Step 5 — Bump version
+
+In `app/build.gradle.kts`, update `versionCode` and `versionName`.
+
+### Step 6 — Commit, push, PR, merge
+
+```bash
+git add CHANGELOG.md app/build.gradle.kts
+git commit -m "chore: bump version to X.Y.Z-beta and update changelog"
+git push
+```
+
+Create the PR with `gh pr create --base main --head {branch} --title "..." --body "..."`.
+Merge with **squash**: `gh pr merge {number} --squash --delete-branch --subject "..."`. All commits between the last commit of `main` and the branch HEAD must be squashed into a single commit on `main`.
+
+### Step 7 — Tag and release
+
+```bash
+git checkout main && git pull
+git tag -a "vX.Y.Z-beta" -m "release: vX.Y.Z-beta — {summary}"
+git push origin "vX.Y.Z-beta"
+```
+
+### Step 8 — Build signed APK
+
+```bash
+ANDROID_HOME="$ANDROID_HOME" JAVA_HOME="$JAVA_HOME" ./gradlew clean assembleRelease
+```
+
+Verify the signature with `apksigner`:
+```bash
+"$ANDROID_HOME"/build-tools/35.0.0/apksigner verify --verbose app/build/outputs/apk/release/app-release.apk
+```
+
+### Step 9 — Create the GitHub release with the APK
+
+```bash
+cp app/build/outputs/apk/release/app-release.apk /tmp/portal-launcher-vX.Y.Z-beta.apk
+gh release create "vX.Y.Z-beta" \
+  --title "vX.Y.Z-beta" \
+  --notes "{CHANGELOG condensed into markdown}" \
+  /tmp/portal-launcher-vX.Y.Z-beta.apk
+```
+
+The GitHub release title must be **only the version tag** (`vX.Y.Z`, including a prerelease suffix
+only when the tag itself has one). Never add a product name, summary, dash, colon, or any other text.
+Before creating the release, verify that the value passed to `--title` is byte-for-byte identical to
+the tag passed as the first argument to `gh release create`.
+
+### Step 10 — Cleanup
+
+```bash
+git branch -d {branch}  # local branch already deleted by gh merge --delete-branch
+git remote prune origin
+```
+
+## Notes
+
+- **Release notes are always in English** — CHANGELOG entries, PR title/body, tag messages, and GitHub release notes/summaries must be written in English, without exception.
+- **GitHub release titles contain only the tag** — for example `v1.2.3`, never `v1.2.3 — New features`.
+- The keystore is the same for all releases (no rotation).
+- The APK uses the v2 signature only (no v1 JAR signing). This is sufficient for minSdk 28.
+- The local branch is deleted by `gh pr merge --delete-branch`; you only need to prune the remote tracking ref.
+- If `gh` is not authenticated, ask the user to run `gh auth login` first.
+
+---
+> Source: [iblur01/portal-launcher](https://github.com/iblur01/portal-launcher) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-15 -->
