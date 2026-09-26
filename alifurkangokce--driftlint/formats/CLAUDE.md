@@ -1,6 +1,6 @@
 # driftlint
 
-> Run `npm run check` before every commit.
+> Run `npm run test` before every commit.
 
 ## Usage
 
@@ -14,11 +14,11 @@ Or copy the instructions below directly into your CLAUDE.md:
 
 # Acme Service
 
-Run `npm run check` before every commit.
+Run `npm run test` before every commit.
 Source lives in `src/`.
 Use conventional commit messages.
 Never push directly to main.
 
 ---
 > Source: [alifurkangokce/driftlint](https://github.com/alifurkangokce/driftlint) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-09-24 -->
+<!-- tomevault:4.0:claude_md:2026-09-26 -->
