@@ -1,0 +1,32 @@
+---
+name: using-string
+description: > Use when this capability is needed.
+metadata:
+  author: string-os
+---
+
+# Using String
+
+You have the installed String MCP tool named `string`; some hosts display it with a server prefix.
+
+Call it with `{ topic, cmd }`, for example `{ "topic": "main", "cmd": "/info" }`.
+
+Use topics like `main`, `app:<name>`, `app:<name>:<config>`, `bash:<name>`, or hubs `app`, `tool`, `bash`, `event`, `system`.
+
+`cmd` must start with `/`; use `/help`, `/info`, and `/act --help` to discover what to do.
+
+Use `/open` to read files, URLs, or apps; installed apps can run `/act.<name>` directly from `app:<name>` if you already know the action.
+
+Use `/edit` to inspect raw files, `/write` to create or overwrite, `/append` to add content, and `/replace` for exact text, block, or line-range edits.
+
+Use `/install` to add apps; `/set $VAR = "..."` for app credentials.
+
+Use topic `event` with `/events`, `/events.read <id>`, and `/events.ack <id>` to handle local webhook messages.
+
+Claude Code may also receive those webhook messages through the String channel, but ack still happens with `/events.ack <id>`.
+
+Read the payload inside `<𝒞=string:TOPIC>...</𝒞>` and follow `Recovery:` or `next:` hints.
+
+---
+> Source: [string-os/string](https://github.com/string-os/string) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-18 -->
