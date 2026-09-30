@@ -1,0 +1,73 @@
+---
+name: jev-lint-repo
+description: Use when changing jev-lint ITSELF — editing src/, shipped rule suites under rules/<language>/<id>/, or recorded runs in docs/data/. Complements the user-facing `jev-lint` skill with the maintainer loop: fixtures, labels, calibration, CI, replay. Not for using jev-lint on another project.
+metadata:
+  author: mizchi
+---
+
+# Maintaining jev-lint
+
+The user-facing skill (`skills/jev-lint/`, symlinked into `.claude/skills/`)
+is the contract; this file is what is different when the repository is
+jev-lint's own. Read `docs/internal.md` before editing `src/`.
+The symlink is checked by `npm run ci`; run `just skills-sync` if it is missing.
+
+## The loop
+
+```bash
+npm test                                   # no key, no network
+npm run ci                                 # typecheck, test, build, eval --replay
+node --experimental-strip-types src/cli.ts eval rules/<language>/<id> --repeat 3   # one suite, then --accept
+node --experimental-strip-types src/cli.ts check --dry-run    # self-lint plan, via .jev-lint.yaml
+node --experimental-strip-types src/cli.ts review --base main --retry 3
+```
+
+`.jev-lint.yaml` here points at source, tests, docs, and `package.json`,
+and excludes `test/fixtures/`, which holds planted defects for the cookbook.
+
+## Rules and their evals
+
+- A rule is `rules/<language>/<id>/rule.yml` with `fixtures/`, `expect.yml`
+  (labelled defects and cleans), and an accepted `baseline.json` beside it.
+  `last.json` is untracked. `jev-lint eval rules/<language>/<id> --repeat 3`
+  runs it; `--accept` promotes the
+  run; `npm run ci` ends in `jev-lint eval --replay`, which fails on a case
+  that was right when accepted and is wrong now, or on a rule whose question
+  changed since its baseline. The case files carry NO `// DEFECT` /
+  `// CLEAN` markers: those sat inside the file the model was shown, and the
+  fits they produced were better than the rules (six fell when they came
+  out). Editing a case file means shifting the labels below the edit; the
+  test suite fails on a label no subject sits on.
+- Each suite labels only its own rule. `tools/arms.ts` and
+  `tools/grouping.ts` run every rule over every suite's cases
+  (`evalCorpus`), where another rule's answer on a suite's file is clean by
+  default -- a defect for rule A in rule B's cases is B's false positive
+  until labelled.
+- A fixture file named for the rule it exercises carries
+  `// jev-lint-ignore-file module-name-describes-contents` on line 1, above
+  its imports, so the module rule does not judge a name that was never a
+  claim about the exports.
+- A new shipped rule needs its own fixtures with hard cleans, `gaps`,
+  repeated `eval`, a report with a verdict, and a pass over unseen code
+  before it enters `rules/<language>/<id>/` with an accepted baseline.
+- Any change to a shipped rule's `ask`, `criteria`, `note`, matcher,
+  `subject` or `state` is a new question: `jev-lint eval --replay` refuses
+  the old baseline until you run `jev-lint eval rules/<language>/<id> --repeat 3`,
+  read the result, and `--accept` it. Commit the baseline with the rule.
+- `tools/arms.ts` measures every arm per rule over every suite's cases
+  (five arms, two passes, about twenty cents). Re-run it after changing a matcher or splitting a rule; the
+  shipped `state:` choices are measurements, not preferences.
+- Figures quoted in `README.md`, `docs/reference.md` and `docs/deepdive.md`
+  are measured. Change the measurement and the figure together, or neither.
+
+## Plugin
+
+The repository root is a Claude Code plugin (`.claude-plugin/plugin.json`,
+`skills/`, `commands/`). Every YAML block in
+`skills/jev-lint/references/cookbook.md` must load and match
+`test/fixtures/cookbook/`; `npm test` asserts it. A new recipe needs its code
+shape added to the fixture.
+
+---
+> Source: [mizchi/jev-lint](https://github.com/mizchi/jev-lint) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-29 -->
