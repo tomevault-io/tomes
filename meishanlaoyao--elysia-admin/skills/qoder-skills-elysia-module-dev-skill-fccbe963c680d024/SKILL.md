@@ -1,0 +1,128 @@
+---
+name: elysia-module-dev
+description: >- Use when this capability is needed.
+metadata:
+  author: meishanlaoyao
+---
+
+# Elysia Admin Module Development
+
+Follow this checklist; read `.ai/` docs for details. **NEVER skip steps.**
+
+## When to Use
+
+- New `server/src/modules/{group}-{name}/`
+- New `admin/src/views/{group}/{name}/`
+- Menu, button permissions, or data dict required
+- Database schema design or verification
+
+**Triggers:** `CRUD module`, `business-*`, `menu permission`, `handoff sql`, `schema design`, `admin page`
+
+**User phrases (中文):** `按 module dev workflow`, `走完整 SOP`, `含菜单权限和 handoff SQL`, `全栈模块`, `先用脚手架`, `脚手架已生成`
+
+**Large / multi-module first:** If the request names **multiple business feature modules** or a full project, follow `.ai/AI_PHASED_TASKS.md` and write a task pack under this IDE’s `feature-tasks/{slug}/` **before** running this Skill for any single module.
+
+## 10-Step Checklist
+
+### 1. MCP
+
+- **MUST** use **Postgres MCP** read-only for tables, dict, menu IDs (`.ai/AI_MCP_SETUP.md`) — **first** for runtime data
+- **NEVER** read or modify `server/database/sql/pg.sql` (stale backup only; use MCP or schema files)
+- If unavailable: declare fallback; use SQL subqueries or placeholders
+
+### 2. Schema
+
+- **MUST** check `server/database/schema/` first
+- Main table: `...BaseSchema`; sort field name **MUST** be `sort`
+- Pure junction table: two FKs only; hard delete
+- **Soft delete & unique:** new unique constraints → partial unique index `WHERE del_flag = false` (not column `.unique()`); existing `.unique()` changes require developer approval + handoff SQL only
+- **MUST** ask developer before changing drizzle schema
+- After schema edits: `db:push` per `.ai/AI_SCHEMA_GUIDE.md` — check `.ai/dev-preferences.local.md`; ask once, then remember
+- See `.ai/AI_SCHEMA_GUIDE.md`
+
+### 3. Module scaffold (standard CRUD — when schema exists & module is new)
+
+- Read `.ai/AI_MODULE_SCAFFOLD.md`
+- From `server/`: `bun run create:module {slug} --tag "..."` then `bun run create:page {group} {name} --tag "..."`
+- Run in Agent mode when appropriate, or instruct user
+- **If scaffold ran:** skip hand-writing CRUD boilerplate — go to steps 5–8 for incremental work
+- **If skipped:** continue with step 4 as full backend generation
+
+### 4. Plan (no code yet — if scaffold not used)
+
+- Goal, module name, tables, CRUD, permissions, task/frontend need (≤5 lines)
+
+### 5. Backend
+
+- **Scaffold already ran:** edit `handle.ts` / extend `dto.ts` only; do **not** regenerate `route.ts` from templates
+- **No scaffold:** `dto.ts` / `handle.ts` / `route.ts` / `task.ts` (optional); `.ai/AI_CODE_EXAMPLES_BACKEND.md` (section only); reference `system-api/` only
+- **`dto.ts` error (required):** every validated field must include `error` with a readable Chinese user-facing message (`error`, not `errorMessage`); scaffold `CreateDto` auto-generates via `fieldLabels`
+- **Response DTO completeness:** join/assembled fields MUST be declared in dto `response` or they are stripped; sync dto when changing handle return shape
+- **`handle.ts` JSDoc:** every exported function needs purpose + `@param` / `@returns`; non-trivial flows list numbered steps
+- **Soft delete & uniqueness:** list/detail filter `delFlag`; uniqueness checks MUST account for soft-deleted rows with Chinese tips
+- **Entity dropdowns:** dedicated cached `GET /options` (`WithCache` + `Del` on write) — **NEVER** paginated `/list`
+- `meta.permission`: `group:name:action`
+
+### 6. Dict
+
+- **NEVER** hardcode business enums in backend or frontend
+- MCP query `system_dict_type` / `system_dict_data`
+- Missing items → handoff SQL
+
+### 7. Frontend (if needed)
+
+- **Scaffold already ran:** polish generated vue files; dict + layout per `.ai/AI_PAGE_QUALITY.md` / `.ai/AI_UI_LAYOUT.md`
+- **No scaffold:** reference `admin/src/views/system/user/` only
+- Permission strings **MUST** match backend
+- **Form validation both sides:** frontend `rules` + backend `dto.ts` with Chinese `error` for the same fields
+- **Options:** dict enums → `useDictStore`; entity dropdowns → `/options` API — **NEVER** `/list`
+- **MUST** read `.ai/AI_PAGE_QUALITY.md` and `.ai/AI_UI_LAYOUT.md` before finishing
+
+### 8. Handoff SQL
+
+- Single file: `server/database/sql/{module-name}-init.sql`
+- Order: dict → menu/buttons → role permissions → seed data
+- Menu INSERT **MUST** query live DB first (Postgres MCP)
+- **Deliver file only** — developer runs manually; **NEVER** scripts/MCP execute/ad-hoc code to apply SQL
+- See `.ai/AI_HANDOFF_SQL.md`
+
+### 9. Git Read-Only
+
+- Allowed: `status` / `diff` / `log`
+- **NEVER** `add` / `commit` / `push` / `stash` unless user explicitly asks
+
+### 10. Optimization (on demand only)
+
+- Default: no indexes/cache
+- Only when clear performance need; state reason
+- **NEVER** auto-add Redis for boilerplate CRUD
+- **Exception:** entity `/options` endpoints **MUST** use `WithCache` (e.g. `CacheEnum.BASE_OPTIONS + 'xxx'`) and invalidate on write
+
+## Delivery Format — MUST output in this order
+
+1. **Plan** (≤5 lines)
+2. **Files** changed / created
+3. **Schema note** (existing / proposed — ask before DDL)
+4. **Code** (by file)
+5. **Handoff SQL path:** `server/database/sql/{module}-init.sql`
+6. **MCP summary** OR `"Postgres MCP unavailable"` fallback
+7. **Quality checklist** (permissions ×3, dict, layout, git untouched)
+
+## Doc Index
+
+| Doc | Purpose |
+|-----|---------|
+| `.ai/AI_MODULE_WORKFLOW.md` | Full SOP |
+| `.ai/AI_MODULE_SCAFFOLD.md` | `create:module` + `create:page` CLI |
+| `.ai/AI_CODE_EXAMPLES_BACKEND.md` | Backend code templates |
+| `.ai/AI_CODE_EXAMPLES_FRONTEND.md` | Frontend code templates |
+| `.ai/AI_PAGE_QUALITY.md` | List/search/dialog quality |
+| `.ai/AI_SCHEMA_GUIDE.md` | Table design |
+| `.ai/AI_HANDOFF_SQL.md` | SQL templates |
+| `.ai/AI_UI_LAYOUT.md` | Form span layout |
+| `.ai/AI_MCP_SETUP.md` | MCP setup |
+| `.ai/AI_CONTEXT_CAPSULE.md` | One-page quick ref |
+
+---
+> Source: [meishanlaoyao/elysia-admin](https://github.com/meishanlaoyao/elysia-admin) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-29 -->
