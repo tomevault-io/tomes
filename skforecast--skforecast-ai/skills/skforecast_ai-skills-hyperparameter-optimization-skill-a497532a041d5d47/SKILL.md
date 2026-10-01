@@ -1,0 +1,287 @@
+---
+name: hyperparameter-optimization
+description: > Use when this capability is needed.
+metadata:
+  author: skforecast
+---
+
+# Hyperparameter Optimization
+
+## When to Use
+
+Use hyperparameter search after establishing a baseline forecaster to improve prediction accuracy. Skforecast supports three strategies:
+
+| Strategy | When to Use | Speed |
+|----------|-------------|-------|
+| **Bayesian Search** | **Recommended default.** Smart exploration via Optuna | Fastest to converge |
+| **Random Search** | Large parameter space, limited compute budget | Medium |
+| **Grid Search** | Small parameter space, exhaustive exploration | Slowest |
+
+### Related skills
+
+- **Prerequisite**: `autocorrelation-and-lag-selection` (narrow the `lags` search space to a statistically informed candidate set)
+- **Related**: `baseline-forecasting` (tune `ForecasterEquivalentDate` baselines with `grid_search_equivalent_date`)
+- **Related**: `foundation-forecasting` (tune zero-shot `ForecasterFoundation` inference parameters with `bayesian_search_foundation`)
+- **Related**: `feature-selection` (optional trim of the feature set afterwards; re-tune if the reduction is large)
+- **Next**: `prediction-intervals` (add uncertainty quantification once the configuration is fixed)
+
+## Stop Conditions
+
+Scan before writing code. Each row lists a rule, the symptom when it is broken, and the recovery. Full pitfall catalog: the `troubleshooting-common-errors` skill.
+
+| Rule | Symptom | Recovery |
+|------|---------|----------|
+| The search refits the forecaster in place with the best params when `return_best=True` (the default) | With `return_best=False`, the forecaster keeps its pre-search params | Rely on the default, or refit with the best params from the results table |
+| Use the `*_multiseries` / `*_stats` search variant matching the forecaster type | Search function raises on the wrong forecaster type | Call e.g. `bayesian_search_forecaster_multiseries` / `grid_search_stats` / `grid_search_equivalent_date` |
+| `ForecasterFoundation` is tuned only with `bayesian_search_foundation` and `TimeSeriesFold` | `TypeError` from the generic search functions, or from passing `OneStepAheadFold` | Call `bayesian_search_foundation` with a `TimeSeriesFold` |
+| Include `lags` in the Bayesian `search_space()` | Suboptimal search; the highest-impact parameter stays fixed | Add `trial.suggest_categorical('lags', [...])` to the search space |
+
+## Bayesian Search (Recommended)
+
+Always prefer Bayesian search as the default strategy. It uses Optuna to intelligently explore the search space.
+
+```python
+from skforecast.recursive import ForecasterRecursive
+from skforecast.model_selection import bayesian_search_forecaster, TimeSeriesFold
+from lightgbm import LGBMRegressor
+
+forecaster = ForecasterRecursive(
+    estimator=LGBMRegressor(random_state=123),
+    lags=24,
+)
+
+cv = TimeSeriesFold(
+    steps=12,
+    initial_train_size=len(data) - 100,
+    refit=False,
+)
+
+# Define search space as a function — lags CAN be included here
+def search_space(trial):
+    return {
+        'lags': trial.suggest_categorical('lags', [12, 24, [1, 2, 3, 23, 24]]),
+        'n_estimators': trial.suggest_int('n_estimators', 50, 500),
+        'max_depth': trial.suggest_int('max_depth', 3, 15),
+        'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
+        'reg_alpha': trial.suggest_float('reg_alpha', 1e-8, 10.0, log=True),
+    }
+
+# n_trials=20 is the default. Increase for better results (50-200 recommended).
+results, study = bayesian_search_forecaster(
+    forecaster=forecaster,
+    y=data['target'],
+    exog=exog,
+    cv=cv,
+    search_space=search_space,
+    metric='mean_absolute_error',
+    n_trials=20,
+    random_state=123,
+    return_best=True,        # Automatically updates forecaster with best params
+    n_jobs='auto',
+    show_progress=True,
+    output_file='search_results.csv',  # Save results incrementally
+)
+# results is a DataFrame sorted by metric (best first)
+# study is the full Optuna Study; access the best trial with study.best_trial
+```
+
+## Grid Search
+
+```python
+from skforecast.model_selection import grid_search_forecaster
+
+# Different lag configurations to try
+lags_grid = [3, 10, 24, [1, 2, 3, 23, 24]]
+
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [5, 10, 15],
+    'learning_rate': [0.01, 0.1],
+}
+
+results = grid_search_forecaster(
+    forecaster=forecaster,
+    y=data['target'],
+    exog=exog,
+    cv=cv,
+    lags_grid=lags_grid,
+    param_grid=param_grid,
+    metric='mean_absolute_error',
+    return_best=True,
+    n_jobs='auto',
+    show_progress=True,
+)
+```
+
+## Random Search
+
+```python
+from skforecast.model_selection import random_search_forecaster
+
+# Note: uses param_distributions (not param_grid) and n_iter
+param_distributions = {
+    'n_estimators': [50, 100, 200, 500],
+    'max_depth': [3, 5, 10, 15],
+    'learning_rate': [0.01, 0.05, 0.1, 0.3],
+}
+
+results = random_search_forecaster(
+    forecaster=forecaster,
+    y=data['target'],
+    exog=exog,
+    cv=cv,
+    lags_grid=lags_grid,
+    param_distributions=param_distributions,
+    n_iter=10,               # Number of random parameter combinations to try
+    random_state=123,
+    metric='mean_absolute_error',
+    return_best=True,
+    n_jobs='auto',
+    show_progress=True,
+)
+```
+
+## Multi-Series Search
+
+```python
+from skforecast.recursive import ForecasterRecursiveMultiSeries
+from skforecast.model_selection import bayesian_search_forecaster_multiseries
+
+forecaster = ForecasterRecursiveMultiSeries(
+    estimator=LGBMRegressor(random_state=123),
+    lags=24,
+    encoding='ordinal',
+)
+
+cv = TimeSeriesFold(
+    steps=12,
+    initial_train_size=len(series) - 100,
+    refit=False,
+)
+
+results, study = bayesian_search_forecaster_multiseries(
+    forecaster=forecaster,
+    series=series,
+    exog=exog,
+    cv=cv,
+    search_space=search_space,
+    metric='mean_absolute_error',
+    aggregate_metric=['weighted_average', 'average', 'pooling'],  # Default
+    levels=None,             # None = evaluate all series; or list of series names
+    n_trials=20,
+    return_best=True,
+    n_jobs='auto',
+    show_progress=True,
+)
+# Access the best trial with study.best_trial
+```
+
+## Statistical Models Search
+
+```python
+from skforecast.recursive import ForecasterStats
+from skforecast.stats import Arima
+from skforecast.model_selection import grid_search_stats
+
+forecaster = ForecasterStats(estimator=Arima(order=(1, 1, 1)))
+
+param_grid = {
+    'order': [(1, 0, 0), (1, 1, 0), (1, 1, 1), (2, 1, 1)],
+    'seasonal_order': [(0, 0, 0), (1, 1, 1)],
+    'm': [12],
+}
+
+results = grid_search_stats(
+    forecaster=forecaster,
+    y=data['target'],
+    cv=cv,
+    param_grid=param_grid,
+    metric='mean_absolute_error',
+    return_best=True,
+)
+```
+
+## Foundation Model Search
+
+`ForecasterFoundation` is zero-shot: no weights are trained, so only the
+**inference-time** configuration is tuned. The highest-impact parameter is
+`context_length` (how many past observations are fed to the model). Use
+`bayesian_search_foundation`, which evaluates each trial with
+`backtesting_foundation`.
+
+```python
+from skforecast.foundation import FoundationModel, ForecasterFoundation
+from skforecast.model_selection import bayesian_search_foundation, TimeSeriesFold
+
+forecaster = ForecasterFoundation(
+    estimator=FoundationModel(model_id='autogluon/chronos-2-small', device_map='auto')
+)
+
+# TimeSeriesFold only — OneStepAheadFold raises TypeError
+cv = TimeSeriesFold(steps=24, initial_train_size=len(series) - 200, refit=False)
+
+def search_space(trial):
+    return {
+        'context_length': trial.suggest_categorical('context_length', [512, 1024, 2048, 4096]),
+        'cross_learning': trial.suggest_categorical('cross_learning', [True, False]),
+    }
+
+results, study = bayesian_search_foundation(
+    forecaster=forecaster,
+    series=series,
+    cv=cv,
+    search_space=search_space,
+    metric='mean_absolute_error',
+    n_trials=30,
+    return_best=True,
+)
+```
+
+Differences from `bayesian_search_forecaster`: no `lags` in `search_space`, no
+`n_jobs`, `TimeSeriesFold` only, and every `search_space` key must be a valid
+adapter parameter. Search `context_length` and the adapter's quality-relevant
+parameters; device/dtype and other runtime settings are accepted but cannot
+improve accuracy, and several parameters force an expensive model reload per
+trial. Per-adapter tunables and reload matrix: the `foundation-forecasting`
+skill (`references/adapter-parameters.md`).
+
+## Fast Tuning with OneStepAheadFold
+
+```python
+from skforecast.model_selection import OneStepAheadFold
+
+# Much faster than TimeSeriesFold — no recursive predictions needed
+cv_fast = OneStepAheadFold(
+    initial_train_size=len(data) - 100,
+)
+
+results, study = bayesian_search_forecaster(
+    forecaster=forecaster,
+    y=data['target'],
+    cv=cv_fast,
+    search_space=search_space,
+    metric='mean_absolute_error',
+    n_trials=100,
+    return_best=True,
+)
+# Access the best trial with study.best_trial
+```
+
+## Common Mistakes
+
+1. **Not setting `return_best=True`**: The forecaster is not updated with the best parameters unless this is True.
+2. **Too few trials in Bayesian search**: Start with at least 20-50 trials for meaningful exploration.
+3. **Using TimeSeriesFold for initial tuning**: Use `OneStepAheadFold` first for fast screening, then validate the top candidates with `TimeSeriesFold`.
+4. **Forgetting to include lags in search space**: For Bayesian search, lags can be included in `search_space()` — this is often the most impactful parameter.
+5. **Putting `lags` in a foundation `search_space`**: `bayesian_search_foundation` has no lag concept; any key that is not an adapter parameter raises `ValueError`.
+
+## References
+
+See [references/search-parameters.md](references/search-parameters.md) for
+the complete parameter comparison across all 9 search functions, function
+routing by forecaster type, and `lags_grid` / `search_space` / `param_grid`
+usage details.
+
+---
+> Source: [skforecast/skforecast-ai](https://github.com/skforecast/skforecast-ai) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-27 -->
