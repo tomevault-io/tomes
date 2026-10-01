@@ -1,0 +1,33 @@
+# nuqs
+
+> Tome by [47ng](https://github.com/47ng/nuqs), graded and kept true across every major AI platform by [TomeVault](https://tomevault.io)
+
+## All Platforms Config
+
+The `TOME.json` file in this directory is the project config converted for All Platforms.
+Original source: `CLAUDE.md` in [47ng/nuqs](https://github.com/47ng/nuqs).
+
+## Also available for
+
+- **Codex** — `AGENTS.md`
+- **GitHub Copilot** — `copilot-instructions.md`
+- **Cursor** — `project-config.mdc`
+- **Gemini CLI** — `GEMINI.md`
+- **Windsurf** — `project-config.md`
+
+## Bundled Skills (2)
+
+- [nuqs](https://github.com/47ng/nuqs/tree/main/.agents/skills/bundle-size-bake-off/SKILL.md)
+- [nuqs](https://github.com/47ng/nuqs/tree/main/.claude/skills/bundle-size-bake-off/SKILL.md)
+
+From [47ng/nuqs](https://github.com/47ng/nuqs) — a repo with 10865+ stars on GitHub.
+
+---
+
+Install this config instantly:
+```
+npx tomevault install 47ng/nuqs
+```
+Source: [github.com/47ng/nuqs](https://github.com/47ng/nuqs).
+
+<!-- genome:t-i-s -->
