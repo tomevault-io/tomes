@@ -1,0 +1,29 @@
+# fineenvs
+
+> See `AGENTS.md` for full project context and conventions.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/fineenvs/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# Claude Code Instructions
+
+See `AGENTS.md` for full project context and conventions.
+
+## Key rules
+
+- When creating D3 chart embeds, read `.ai/skills/create-html-embed/directives.md` first
+- Use CSS variables for theming (`--text-color`, `--surface-bg`, `--border-color`)
+- Colors from `window.ColorPalettes`, never hardcoded
+- Embeds go in `app/src/content/embeds/`, data in `app/src/content/assets/data/`
+- Follow Conventional Commits for commit messages
+
+---
+> Source: [adithya-s-k/FineEnvs](https://github.com/adithya-s-k/FineEnvs) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-10-01 -->
