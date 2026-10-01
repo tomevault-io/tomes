@@ -125,4 +125,4 @@ Prefer package filters over repo-wide runs, e.g. `pnpm --filter web typecheck`, 
 
 ---
 > Source: [reactive-resume/reactive-resume](https://github.com/reactive-resume/reactive-resume) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:agents_md:2026-09-30 -->
+<!-- tomevault:4.0:agents_md:2026-10-01 -->
