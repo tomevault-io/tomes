@@ -1,0 +1,511 @@
+---
+name: add-new-component
+description: End-to-end guide for adding a new component to the Apsara design system. Use when creating a new React component including source, styles, tests, documentation, and playground examples. Triggers on tasks involving adding, scaffolding, or creating new components in the component library. Use when this capability is needed.
+metadata:
+  author: raystack
+---
+
+# Add New Component to Apsara
+
+Step-by-step ultrathink instructions for adding a new component to the Apsara design system. Each component requires changes across two packages: `packages/raystack/` (source, styles, tests) and `apps/www/` (docs, demos, playground).
+
+## Files to Create/Modify
+
+```
+packages/raystack/
+├── index.tsx                                      # Add export (alphabetical)
+└── components/<name>/
+    ├── index.tsx                                   # Re-export only
+    ├── <name>.tsx                                  # Component + Object.assign
+    ├── <name>.module.css                           # Styles
+    └── __tests__/<name>.test.tsx                   # Tests
+
+apps/www/src/content/docs/components/<name>/
+├── index.mdx                                       # Docs page
+├── demo.ts                                         # Code demos + playground
+└── props.ts                                        # Prop interfaces
+```
+
+## Step 1: Create the Component Source
+
+Create `packages/raystack/components/<name>/`.
+
+For simple components, define everything in a single file. For complex components with multiple sub-components, split into separate files:
+
+```
+# Simple
+<name>.tsx               # All sub-components + Object.assign
+
+# Complex
+<name>.tsx               # Object.assign composition (imports sub-components)
+<name>-root.tsx          # Root wrapper
+<name>-trigger.tsx       # Trigger sub-component
+<name>-content.tsx       # Content sub-component
+```
+
+### Component File Template
+
+```tsx
+'use client';
+
+import { ComponentName as ComponentPrimitive } from '@base-ui/react';
+import { cx } from 'class-variance-authority';
+import styles from './<name>.module.css';
+
+const ComponentRoot = ({
+  className,
+  ...props
+}: ComponentPrimitive.Root.Props) => (
+  <ComponentPrimitive.Root
+    className={cx(styles.root, className)}
+    {...props}
+  />
+);
+
+ComponentRoot.displayName = 'Component';
+```
+
+Key rules:
+- `'use client'` directive on all interactive component files
+- Use React 19 ref-as-prop — plain function components, not `forwardRef`/`ElementRef`; `ref` flows through `...props` or is destructured when it must target a non-default element
+- `displayName` set for React DevTools (e.g., `'Component.Trigger'`)
+- `cx()` from `class-variance-authority` to merge CSS module class with user's `className`
+- Spread `...props` last so consumers can override defaults
+- **`data-slot` on every rendered element** — a stable, kebab-case, component-prefixed identifier (`data-slot='component-trigger'`, `data-slot='component-panel-label'`). Subparts extend the prefix; a repeated part reuses one name. Slot names are public API covered by semver — renaming one is a breaking change. Put the attribute before the `...props` spread so consumers can override. Skip `Popover.Content`/`Menu.Content` call sites (extra props land on the positioner, not the popup).
+
+### Object.assign Composition
+
+Multi-file:
+
+```tsx
+// <name>.tsx
+import { ComponentRoot } from './<name>-root';
+import { ComponentTrigger } from './<name>-trigger';
+import { ComponentContent } from './<name>-content';
+
+export const Component = Object.assign(ComponentRoot, {
+  Trigger: ComponentTrigger,
+  Content: ComponentContent
+});
+```
+
+Single-file:
+
+```tsx
+// <name>.tsx
+const ComponentRoot = (props) => (...);
+const ComponentTrigger = (props) => (...);
+const ComponentPanel = (props) => (...);
+
+export const Component = Object.assign(ComponentRoot, {
+  Trigger: ComponentTrigger,
+  Panel: ComponentPanel
+});
+```
+
+### Base UI Primitive Wrapping (when applicable)
+
+When the component wraps a Base UI primitive from `@base-ui/react`, follow these additional conventions:
+
+**Naming:** The Base UI `Popup` (or `Panel`) sub-component is always exported as `Content` in Apsara. The `Content` wrapper internally composes `Portal`, `Positioner`, and `Popup` (or `Panel`) so consumers only deal with a single sub-component.
+
+**Content Props Interface:** Merge Positioner props with Popup/Panel props so positioning config (`side`, `align`, `sideOffset`, etc.) is passed directly on `<Component.Content>`. Separate them internally via rest spread:
+
+```tsx
+export interface ComponentContentProps
+  extends Omit<
+      ComponentPrimitive.Positioner.Props,
+      'render' | 'className' | 'style'
+    >,
+    ComponentPrimitive.Popup.Props {
+  /** @default false */
+  showArrow?: boolean;
+}
+```
+
+**Content Component Template:**
+
+```tsx
+const ComponentContent = ({
+  className,
+  children,
+  showArrow = false,
+  style,
+  render,
+  ref,
+  ...positionerProps
+}: ComponentContentProps) => (
+  <ComponentPrimitive.Portal>
+    <ComponentPrimitive.Positioner
+      sideOffset={showArrow ? 10 : 4}
+      collisionPadding={3}
+      className={styles.positioner}
+      {...positionerProps}
+    >
+      <ComponentPrimitive.Popup
+        ref={ref}
+        className={cx(styles.popup, className)}
+        style={style}
+        render={render}
+      >
+        {children}
+        {showArrow && (
+          <ComponentPrimitive.Arrow className={styles.arrow}>
+            {/* arrow SVG */}
+          </ComponentPrimitive.Arrow>
+        )}
+      </ComponentPrimitive.Popup>
+    </ComponentPrimitive.Positioner>
+  </ComponentPrimitive.Portal>
+);
+ComponentContent.displayName = 'Component.Content';
+```
+
+Key rules:
+- `ref` forwards to the `Popup`/`Panel` element (the visible content container)
+- `className` and `style` apply to `Popup`/`Panel`, NOT the Positioner
+- Positioner gets its own CSS class from the module (e.g., `styles.positioner`)
+- If the Base UI primitive uses `Panel` instead of `Popup`, substitute accordingly but still export as `Content`
+- Arrow is optional, controlled by `showArrow` prop (default `false`). When `showArrow` is true, increase `sideOffset` to account for arrow size
+
+**Existing examples:**
+- `Popover.Content` wraps `Portal > Positioner > Popup` — see `components/popover/popover.tsx`
+- `Tooltip.Content` wraps `Portal > Positioner > Popup` with arrow support — see `components/tooltip/tooltip-content.tsx`
+- `PreviewCard.Content` wraps `Portal > Positioner > Popup` with arrow support — see `components/preview-card/preview-card.tsx`
+
+## Step 2: Create the Index File
+
+Simple re-export:
+
+```tsx
+// packages/raystack/components/<name>/index.tsx
+export { Component } from './<name>';
+```
+
+## Step 3: Add CSS Module Styles
+
+Create `<name>.module.css`.
+
+- Kebab-case class names (e.g., `.accordion-trigger`, `.panel`)
+- Use `--rs-*` CSS variables for all design tokens (no hardcoded colors/spacing)
+- Use Base UI data attributes for state-based styling
+
+```css
+.trigger {
+  cursor: pointer;
+  outline: none;
+  background: var(--rs-color-background-base-primary);
+  font-size: var(--rs-font-size-regular);
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  background-color: var(--rs-color-background-base-primary-hover);
+}
+
+.trigger:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Base UI data attribute for state */
+.trigger[data-panel-open] .icon {
+  transform: rotate(180deg);
+}
+
+/* Animated panel with Base UI CSS variables */
+.panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height 150ms ease-out;
+}
+
+.panel[data-starting-style],
+.panel[data-ending-style] {
+  height: 0;
+}
+```
+
+Common `--rs-*` tokens:
+- **Colors:** `--rs-color-foreground-base-primary`, `--rs-color-background-base-primary`, `--rs-color-border-base-primary`
+- **Spacing:** `--rs-space-2` through `--rs-space-5`
+- **Typography:** `--rs-font-size-small`, `--rs-font-size-regular`, `--rs-line-height-regular`
+- **Effects:** `--rs-radius-2`, `--rs-shadow-lifted`, `--rs-shadow-inset`
+
+## Step 4: Register the Export
+
+Add to `packages/raystack/index.tsx` in **alphabetical order**:
+
+```tsx
+export { Chip } from './components/chip';
+export { CodeBlock } from './components/code-block';
+export { Collapsible } from './components/collapsible';  // <-- new
+export { Combobox } from './components/combobox';
+```
+
+## Step 5: Write Tests
+
+Create `__tests__/<name>.test.tsx`.
+
+### Test File Structure
+
+```tsx
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { Component } from '../<name>';
+import styles from '../<name>.module.css';
+```
+
+### What to Test
+
+1. **Basic rendering** — renders children, applies custom `className`, forwards `ref`
+2. **Interaction** — click handlers, open/close toggling, state changes
+3. **Controlled vs uncontrolled** — `value`/`open` props, `onChange` callbacks
+4. **Keyboard navigation** — Tab, Enter, Space, Arrow keys as applicable
+5. **Disabled state** — `aria-disabled`, no toggle on click
+6. **Sub-components** — className, ref forwarding for each sub-component
+7. **data-slot contract** — a `__tests__/data-slots.test.tsx` asserting every slot renders, using `expectSlots` from `~/test-utils/data-slots` (pass `document.body` for portaled parts; also assert conditional slots disappear when their part is absent)
+
+### Testing Tips
+
+- Use `fireEvent.click()` for basic click tests
+- Use `userEvent.setup()` + `user.keyboard()` for keyboard tests
+- For **portaled Base UI components** (e.g., Combobox popup), use `fireEvent.pointerDown` + `fireEvent.click` instead of `userEvent.click` (jsdom quirk)
+- For **non-portaled Base UI components** (e.g., Select), use `flushMicrotasks` pattern:
+  ```tsx
+  const flushMicrotasks = async () => {
+    await act(async () => {
+      await new Promise(r => setTimeout(r, 0));
+    });
+  };
+  ```
+- Use `data-testid` to locate elements that lack ARIA roles
+- Base UI uses `aria-disabled="true"` instead of the HTML `disabled` attribute
+
+### Running Tests
+
+```bash
+pnpm --filter @raystack/apsara test -- --reporter=verbose components/<name>
+```
+
+## Step 6: Add Documentation
+
+Create `apps/www/src/content/docs/components/<name>/` with three files.
+
+The sidebar auto-discovers component pages from this directory structure (no config registration needed).
+
+### `index.mdx`
+
+```mdx
+---
+title: ComponentName
+description: Short description of the component.
+source: packages/raystack/components/<name>
+tag: new
+---
+
+import { preview, controlledDemo, disabledDemo } from "./demo.ts";
+
+<Demo data={preview} />
+
+## Anatomy
+
+Import and assemble the component:
+
+\`\`\`tsx
+import { Component } from '@raystack/apsara'
+
+<Component>
+  <Component.Trigger />
+  <Component.Panel />
+</Component>
+\`\`\`
+
+## API Reference
+
+### Root
+
+Groups all parts of the component.
+
+<auto-type-table path="./props.ts" name="ComponentProps" />
+
+### Trigger
+
+Toggles the visibility of the panel.
+
+<auto-type-table path="./props.ts" name="ComponentTriggerProps" />
+
+### Panel
+
+Contains the component content.
+
+<auto-type-table path="./props.ts" name="ComponentPanelProps" />
+
+## Examples
+
+### Controlled
+
+Description of the controlled example.
+
+<Demo data={controlledDemo} />
+
+### Disabled
+
+Description of the disabled example.
+
+<Demo data={disabledDemo} />
+
+## Accessibility
+
+- Bullet points about ARIA attributes, keyboard support, and WAI-ARIA patterns.
+```
+
+Frontmatter fields:
+- `title` — Component display name
+- `description` — Short summary
+- `source` — Path to component source (relative to repo root)
+- `tag: new` — Shows a "new" badge in the sidebar
+
+### `demo.ts`
+
+Preview/Code demo (static code rendered as a live example):
+
+```ts
+'use client';
+
+export const preview = {
+  type: 'code',
+  code: `<Component>
+  <Component.Trigger>Click me</Component.Trigger>
+  <Component.Panel>Content here</Component.Panel>
+</Component>`
+};
+```
+
+Tabbed code demo (multiple variants):
+
+```ts
+export const variantDemo = {
+  type: 'code',
+  tabs: [
+    { name: 'Default', code: `<Component>...</Component>` },
+    { name: 'Disabled', code: `<Component disabled>...</Component>` }
+  ]
+};
+```
+
+Playground demo (interactive with controls):
+
+```ts
+import { getPropsString } from '@/lib/utils';
+
+export const playground = {
+  type: 'playground',
+  controls: {
+    disabled: { type: 'checkbox', defaultValue: false },
+    size: { type: 'select', options: ['small', 'medium', 'large'], defaultValue: 'medium' }
+  },
+  getCode: (props: Record<string, unknown>) => {
+    return `<Component${getPropsString(props)}>...</Component>`;
+  }
+};
+```
+
+Use `preview` (code type) for simple components. Use `playground` for components with many configurable props.
+
+### `props.ts`
+
+TypeScript interfaces with JSDoc comments consumed by `<auto-type-table>` in the MDX:
+
+```ts
+export interface ComponentProps {
+  /** Whether the component is open (controlled). */
+  open?: boolean;
+
+  /**
+   * Whether the component is initially open (uncontrolled).
+   * @defaultValue false
+   */
+  defaultOpen?: boolean;
+
+  /** Event handler called when the open state changes. */
+  onOpenChange?: (open: boolean) => void;
+
+  /**
+   * Whether the component is disabled.
+   * @defaultValue false
+   */
+  disabled?: boolean;
+
+  /** Custom CSS class names */
+  className?: string;
+}
+```
+
+- Use `@defaultValue` JSDoc tag to document defaults
+- Keep descriptions concise
+- Include `className` prop on all sub-component interfaces
+
+## Step 7: Add the Interactive Playground
+
+The playground is a permanent, user-facing feature on the component's docs page — not a dev-time scratch file. It opens a dialog with a live preview of the component, a controls panel, and a live code editor. A reader flips the controls, and both the preview and the code update from `getCode(props)`. Control state is written to the URL, so a configured example is a shareable link. It is rendered by `apps/www/src/components/demo/demo-playground.tsx`; you only supply the `playground` export.
+
+Any component with configurable props should have a real playground covering its main props — one control per prop that matters. Add the `playground` export to `demo.ts`:
+
+```ts
+'use client';
+
+import type { ComponentPropsType } from '@/components/demo/types';
+import { getPropsString } from '@/lib/utils';
+
+export const getCode = (props: ComponentPropsType) =>
+  `<Component${getPropsString(props)} />`;
+
+export const playground = {
+  type: 'playground',
+  controls: {
+    variant: { type: 'select', options: ['solid', 'outline'], defaultValue: 'solid' },
+    size: { type: 'select', options: ['small', 'normal'], defaultValue: 'normal' },
+    disabled: { type: 'checkbox', defaultValue: false },
+    children: { type: 'text', initialValue: 'Click me' }
+  },
+  getCode
+};
+```
+
+Reference it from `index.mdx`:
+
+```mdx
+import { playground } from "./demo.ts";
+
+<Demo data={playground} />
+```
+
+Notes:
+- Control types: `select` (`options` + `defaultValue`), `checkbox` (`defaultValue`), `text` (`initialValue`), `icon`.
+- One control per prop that changes the component's look or behavior. Cover the real API, not a token subset.
+- `getCode` receives the changed props (values that differ from their default) and must return the JSX string for the current setup. Use `getPropsString` to serialize them; pull `children` out and place it between the tags.
+- See `button/demo.ts` for a full, real example.
+
+## Step 8: Verify
+
+```bash
+pnpm --filter @raystack/apsara build
+pnpm --filter @raystack/apsara test -- --reporter=verbose components/<name>
+pnpm --filter www build
+```
+
+Checklist:
+- [ ] Component builds without errors
+- [ ] All tests pass
+- [ ] Docs site builds and new page is generated
+- [ ] `displayName` set on all sub-components
+- [ ] Every rendered element has a `data-slot`, with a `data-slots.test.tsx` covering them
+- [ ] CSS uses `--rs-*` tokens only
+- [ ] Export in `packages/raystack/index.tsx` in alphabetical order
+- [ ] Interactive `playground` added to `demo.ts`, covering the component's main props
+
+---
+> Source: [raystack/apsara](https://github.com/raystack/apsara) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-09-07 -->
