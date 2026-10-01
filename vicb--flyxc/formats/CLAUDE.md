@@ -38,4 +38,4 @@ Or copy the instructions below directly into your CLAUDE.md:
 
 ---
 > Source: [vicb/flyXC](https://github.com/vicb/flyXC) — distributed by [TomeVault](https://tomevault.io).
-<!-- tomevault:4.0:claude_md:2026-07-26 -->
+<!-- tomevault:4.0:claude_md:2026-10-01 -->
