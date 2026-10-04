@@ -1,0 +1,24 @@
+# vscode-dataform-tools
+
+> - **Always use `just`**: This repository uses a `justfile` for common development and release tasks (type-checking, linting, packaging, and releases). Always check `justfile` before running ad-hoc shell commands.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/vscode-dataform-tools/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# Repository Agent Guidelines
+
+## Commands and Workflows
+- **Always use `just`**: This repository uses a `justfile` for common development and release tasks (type-checking, linting, packaging, and releases). Always check `justfile` before running ad-hoc shell commands.
+- **Extension Releases**: To cut or publish a release (or pre-release) of the VS Code extension, invoke the `extension-release` skill. The release lifecycle is managed via `just` recipes (`just changes`, `just release`, `just push-release`, etc.).
+- **Sub-packages**: Packages under `packages/*` (`npm-package`, `pypi-package`, `dataform-graph-cli`) are managed separately via Release Please on `main`.
+
+---
+> Source: [ashish10alex/vscode-dataform-tools](https://github.com/ashish10alex/vscode-dataform-tools) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-10-04 -->
