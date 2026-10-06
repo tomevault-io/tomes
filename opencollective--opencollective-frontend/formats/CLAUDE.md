@@ -1,0 +1,36 @@
+# opencollective-frontend
+
+> Next.js/React UI. Prefer user-facing "Contribution" over "Order", and "Account" over "Collective" where the GraphQL API uses Account.
+
+## Usage
+
+Add this to your project's CLAUDE.md to activate this skill:
+
+```
+Read and follow the instructions in .claude/skills/opencollective-frontend/SKILL.md
+```
+
+Or copy the instructions below directly into your CLAUDE.md:
+
+# opencollective-frontend
+
+Next.js/React UI. Prefer user-facing "Contribution" over "Order", and "Account" over "Collective" where the GraphQL API uses Account.
+
+## Stack
+
+Tailwind+ShadCN (primary), Styled Components/Styled System (legacy; do not add new usage). Lucide (primary), Styled Icons (legacy). Apollo Client, Formik+Zod (`FormikZod` wraps Formik with Zod), React Intl. Jest/RTL + Cypress E2E.
+
+## Rules
+
+- Reuse existing i18n strings (workspace skill `search-i18n-translations`). English source: `lang/en.json`. After i18n source changes, `npm run build:langs` and `npm run langs:check`.
+- New UI: Tailwind/ShadCN and Lucide, not styled-components or Styled Icons.
+
+## Quality
+
+From this repo: `npm run type:check`, `npm run lint:quiet`, `npm run prettier:check` (fix: `prettier:write`), npm run `ts-unused-exports`.
+Tests: Jest (`npm run test`); E2E Cypress.
+Schema/codegen: `npm run graphql:update` (API must be running).
+
+---
+> Source: [opencollective/opencollective-frontend](https://github.com/opencollective/opencollective-frontend) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:claude_md:2026-10-06 -->
