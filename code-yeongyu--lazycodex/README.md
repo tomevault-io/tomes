@@ -5,17 +5,17 @@
 ## All Platforms Config
 
 The `TOME.json` file in this directory is the project config converted for All Platforms.
-Original source: `CLAUDE.md` in [code-yeongyu/lazycodex](https://github.com/code-yeongyu/lazycodex).
+Original source: `AGENTS.md` in [code-yeongyu/lazycodex](https://github.com/code-yeongyu/lazycodex).
 
 ## Also available for
 
-- **Codex** — `AGENTS.md`
+- **Claude Code** — `CLAUDE.md`
 - **GitHub Copilot** — `copilot-instructions.md`
 - **Cursor** — `project-config.mdc`
 - **Gemini CLI** — `GEMINI.md`
 - **Windsurf** — `project-config.md`
 
-## Bundled Skills (25)
+## Bundled Skills (40)
 
 - [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/lsp/SKILL.md)
 - [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/rules/SKILL.md)
@@ -42,6 +42,21 @@ Original source: `CLAUDE.md` in [code-yeongyu/lazycodex](https://github.com/code
 - [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/components/comment-checker/skills/comment-checker/SKILL.md)
 - [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/ast-grep/SKILL.md)
 - [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/frontend/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/teammode/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/ultimate-browsing/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/components/teammode/skills/teammode/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/ulw-research/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/coding-agent-sessions/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/ultrawork/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/components/ultrawork/skills/ultrawork/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/components/lcx/skills/lcx-doctor/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/components/lcx/skills/lcx-report-bug/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/components/lcx/skills/lcx-contribute-bug-fix/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/data-scientist/SKILL.md)
+- [frontend](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/frontend)
+- [ultimate-browsing](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/ultimate-browsing)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/ulw-execute/SKILL.md)
+- [lazycodex](https://github.com/code-yeongyu/lazycodex/tree/main/plugins/omo/skills/browser/SKILL.md)
 
 Available for 6 platforms including Claude Code, Cursor, Windsurf, and more. Source: [github.com/code-yeongyu/lazycodex](https://github.com/code-yeongyu/lazycodex)
 
