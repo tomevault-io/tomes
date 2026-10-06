@@ -1,0 +1,20 @@
+---
+name: garden-desk-review-change
+description: Review a Garden Desk diff or pull request for actionable defects. Use for self-review, maintainer review, or security-sensitive changes where findings must be ordered by severity and grounded in exact evidence. Use when this capability is needed.
+metadata:
+  author: Private-Garden-Labs
+---
+
+# Review A Garden Desk Change
+
+Top priority: apply the Minimum Work and Test Rules in [AGENTS.md](../../../AGENTS.md) to every review. Treat unnecessary production code and unnecessary tests as P2 defects. Never request a test beyond the Test Rule.
+
+Use [AGENTS.md](../../../AGENTS.md) and [the architecture](../../../docs/ARCHITECTURE.md) as the baseline. Review in the order and with the P0-P3 severities in [the development workflow](../../../docs/DEVELOPMENT_WORKFLOW.md#review).
+
+For each finding give a concise title, severity, exact path and line, the failure scenario, and the smallest valid remedy. Do not report style preferences as defects.
+
+Lead with findings. If there are none, say so and state the remaining verification limits. Review only; do not edit, approve, merge, or publish unless separately asked.
+
+---
+> Source: [Private-Garden-Labs/garden-desk](https://github.com/Private-Garden-Labs/garden-desk) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-10-05 -->
