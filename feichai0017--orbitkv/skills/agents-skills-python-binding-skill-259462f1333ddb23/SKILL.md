@@ -1,0 +1,35 @@
+---
+name: python-binding
+description: Modify OrbitKV PyO3 APIs, native client ownership, Python type stubs or wheel packaging. Use for native binding and installed-artifact changes in this repository. Use when this capability is needed.
+metadata:
+  author: feichai0017
+---
+
+# OrbitKV Python bindings and adapters
+
+Read `AGENTS.md` from the Git root. Keep Python responsible for framework callbacks,
+layout inspection, GPU allocations and ownership handoff; shared cache state
+machines, batching, waiting and execution belong to the existing Rust owners.
+
+- Public bindings: `python/src/lib.rs`, `python/src/client.rs` and
+  `python/orbitkv/orbitkv.pyi`. Update stubs when an exposed API changes. Verify
+  actual call sites rather than restoring removed aliases or client facades.
+- Common client ownership: `crates/orbitkv-channel/src/cache_client.rs`.
+- Engine callback changes: use `.agents/skills/engine-integration/SKILL.md` and
+  `docs/adapters.md`; release targets and current qualification are distinct.
+- Model/layout identity and hybrid recovery are shared contracts. Do not equate
+  compatible API shapes with cross-engine byte compatibility.
+
+Use the gate table in `AGENTS.md`: default Python tests must remain source-only;
+native lifecycle changes need process integration, and consumed adapter changes
+need the relevant engine correctness/restart gate. Run `benches/tests` when
+changing benchmark helpers. Put runtime outputs outside the checkout.
+
+Use `scripts/build-wheel.sh` for a complete installed artifact; `maturin develop`
+is a development build. See `docs/releases.md` for CUDA variants, bundled native
+dependencies and installed-package checks. Freeze native artifacts before GPU
+tests: Cargo can restage shared libraries used by live Managers.
+
+---
+> Source: [feichai0017/orbitkv](https://github.com/feichai0017/orbitkv) — distributed by [TomeVault](https://tomevault.io).
+<!-- tomevault:4.0:skill_md:2026-10-05 -->
